@@ -257,6 +257,57 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        public static Bitmap CreateCustomerIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.White;
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
+
+                using (var brush = new SolidBrush(c))
+                using (var pen = new Pen(c, 1.6f))
+                {
+                    // Two users to represent customers
+                    // Main user (front)
+                    float hd = size * 0.30f;
+                    float hx = size * 0.36f;
+                    float hy = size * 0.08f;
+                    g.FillEllipse(brush, hx, hy, hd, hd);
+
+                    float bW = size * 0.56f;
+                    float bX = (size - bW) / 2f + size * 0.06f;
+                    float bY = size * 0.46f;
+                    using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+                    {
+                        path.AddArc(bX, bY, bW, bW * 0.72f, 180, 180);
+                        path.CloseFigure();
+                        g.FillPath(brush, path);
+                    }
+
+                    // Second user (back, smaller, slightly offset left)
+                    float hd2 = size * 0.24f;
+                    float hx2 = size * 0.06f;
+                    float hy2 = size * 0.14f;
+                    using (var brush2 = new SolidBrush(Color.FromArgb(180, c.R, c.G, c.B)))
+                    {
+                        g.FillEllipse(brush2, hx2, hy2, hd2, hd2);
+                        float bW2 = size * 0.38f;
+                        float bX2 = hx2 - size * 0.04f;
+                        float bY2 = size * 0.48f;
+                        using (var path2 = new System.Drawing.Drawing2D.GraphicsPath())
+                        {
+                            path2.AddArc(bX2, bY2, bW2, bW2 * 0.65f, 180, 180);
+                            path2.CloseFigure();
+                            g.FillPath(brush2, path2);
+                        }
+                    }
+                }
+            }
+            return bmp;
+        }
+
         public static void EnsureIconsSaved(string baseDirectory)
         {
             try

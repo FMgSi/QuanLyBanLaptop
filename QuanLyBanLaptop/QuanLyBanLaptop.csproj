@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -57,6 +58,12 @@
     </Compile>
     <Compile Include="SidebarControl.Designer.cs">
       <DependentUpon>SidebarControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DanhMuc\frmKhachHang.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DanhMuc\frmKhachHang.Designer.cs">
+      <DependentUpon>frmKhachHang.cs</DependentUpon>
     </Compile>
     <Compile Include="DanhMuc\frmNhanVien.cs">
       <SubType>Form</SubType>
@@ -102,6 +109,9 @@
     <Compile Include="Thongke\frmThongKe.Designer.cs">
       <DependentUpon>frmThongKe.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DanhMuc\frmKhachHang.resx">
+      <DependentUpon>frmKhachHang.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmDangNhap.resx">
       <DependentUpon>frmDangNhap.cs</DependentUpon>
     </EmbeddedResource>

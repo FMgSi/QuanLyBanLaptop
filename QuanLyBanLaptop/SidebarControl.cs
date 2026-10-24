@@ -60,6 +60,7 @@ namespace QuanLyBanLaptop
             btnBanHang.Image = IconHelper.CreateCartIcon(20);
             btnNhapHang.Image = IconHelper.CreateImportCartIcon(20);
             btnNhanVien.Image = IconHelper.CreateUserIcon(20);
+            btnKhachHang.Image = IconHelper.CreateCustomerIcon(20);
             btnThongKe.Image = IconHelper.CreateChartIcon(20);
 
             // Button tag mapping
@@ -68,6 +69,7 @@ namespace QuanLyBanLaptop
             btnBanHang.Tag = NavigationMenu.BanHang;
             btnNhapHang.Tag = NavigationMenu.NhapHang;
             btnNhanVien.Tag = NavigationMenu.NhanVien;
+            btnKhachHang.Tag = NavigationMenu.KhachHang;
             btnThongKe.Tag = NavigationMenu.ThongKe;
 
             // Common button appearance
@@ -202,6 +204,7 @@ namespace QuanLyBanLaptop
             btnBanHang.Text = visible ? "   Bán Hàng" : "";
             btnNhapHang.Text = visible ? "   Nhập Hàng" : "";
             btnNhanVien.Text = visible ? "   Nhân Viên" : "";
+            btnKhachHang.Text = visible ? "   Khách Hàng" : "";
             btnThongKe.Text = visible ? "   Thống Kê" : "";
 
             int paddingLeft = visible ? 12 : 16;

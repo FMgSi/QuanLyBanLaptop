@@ -1,6 +1,6 @@
 namespace QuanLyBanLaptop.HoaDon
 {
-    partial class frmNhapHang
+    partial class ucNhapHang
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -13,11 +13,10 @@ namespace QuanLyBanLaptop.HoaDon
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
         private void InitializeComponent()
         {
-            this.sidebarControl1 = new QuanLyBanLaptop.SidebarControl();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.pnlBottom = new System.Windows.Forms.Panel();
             this.btnXacNhanNhapHang = new System.Windows.Forms.Button();
@@ -62,15 +61,6 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
             // 
-            // sidebarControl1
-            // 
-            this.sidebarControl1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
-            this.sidebarControl1.Name = "sidebarControl1";
-            this.sidebarControl1.SelectedMenu = QuanLyBanLaptop.Classes.NavigationMenu.NhapHang;
-            this.sidebarControl1.Size = new System.Drawing.Size(175, 661);
-            this.sidebarControl1.TabIndex = 0;
-            // 
             // pnlMain
             // 
             this.pnlMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(242)))), ((int)(((byte)(245)))));
@@ -81,10 +71,10 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlMain.Controls.Add(this.pnlTopForms);
             this.pnlMain.Controls.Add(this.pnlHeader);
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(175, 0);
+            this.pnlMain.Location = new System.Drawing.Point(0, 0);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Padding = new System.Windows.Forms.Padding(16);
-            this.pnlMain.Size = new System.Drawing.Size(959, 661);
+            this.pnlMain.Size = new System.Drawing.Size(1134, 661);
             this.pnlMain.TabIndex = 1;
             // 
             // pnlBottom
@@ -95,7 +85,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlBottom.Location = new System.Drawing.Point(16, 595);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(927, 50);
+            this.pnlBottom.Size = new System.Drawing.Size(1102, 50);
             this.pnlBottom.TabIndex = 5;
             // 
             // btnXacNhanNhapHang
@@ -106,7 +96,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnXacNhanNhapHang.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnXacNhanNhapHang.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnXacNhanNhapHang.ForeColor = System.Drawing.Color.White;
-            this.btnXacNhanNhapHang.Location = new System.Drawing.Point(747, 10);
+            this.btnXacNhanNhapHang.Location = new System.Drawing.Point(922, 10);
             this.btnXacNhanNhapHang.Name = "btnXacNhanNhapHang";
             this.btnXacNhanNhapHang.Size = new System.Drawing.Size(180, 36);
             this.btnXacNhanNhapHang.TabIndex = 2;
@@ -119,9 +109,9 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblTongTienSo.AutoSize = true;
             this.lblTongTienSo.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTongTienSo.ForeColor = System.Drawing.Color.Black;
-            this.lblTongTienSo.Location = new System.Drawing.Point(650, 18);
+            this.lblTongTienSo.Location = new System.Drawing.Point(825, 18);
             this.lblTongTienSo.Name = "lblTongTienSo";
-            this.lblTongTienSo.Size = new System.Drawing.Size(67, 20);
+            this.lblTongTienSo.Size = new System.Drawing.Size(112, 36);
             this.lblTongTienSo.TabIndex = 1;
             this.lblTongTienSo.Text = "130.000";
             // 
@@ -130,9 +120,9 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblTongTienNhap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTongTienNhap.AutoSize = true;
             this.lblTongTienNhap.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTongTienNhap.Location = new System.Drawing.Point(530, 18);
+            this.lblTongTienNhap.Location = new System.Drawing.Point(705, 18);
             this.lblTongTienNhap.Name = "lblTongTienNhap";
-            this.lblTongTienNhap.Size = new System.Drawing.Size(115, 19);
+            this.lblTongTienNhap.Size = new System.Drawing.Size(202, 32);
             this.lblTongTienNhap.TabIndex = 0;
             this.lblTongTienNhap.Text = "Tổng tiền nhập :";
             // 
@@ -148,16 +138,17 @@ namespace QuanLyBanLaptop.HoaDon
             this.colDonGiaNhap,
             this.colThanhTien});
             this.dgvDanhSachNhap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDanhSachNhap.Location = new System.Drawing.Point(16, 315);
+            this.dgvDanhSachNhap.Location = new System.Drawing.Point(16, 330);
             this.dgvDanhSachNhap.Name = "dgvDanhSachNhap";
             this.dgvDanhSachNhap.ReadOnly = true;
             this.dgvDanhSachNhap.RowHeadersWidth = 30;
-            this.dgvDanhSachNhap.Size = new System.Drawing.Size(927, 330);
+            this.dgvDanhSachNhap.Size = new System.Drawing.Size(1102, 315);
             this.dgvDanhSachNhap.TabIndex = 4;
             // 
             // colMa
             // 
             this.colMa.HeaderText = "Mã";
+            this.colMa.MinimumWidth = 9;
             this.colMa.Name = "colMa";
             this.colMa.ReadOnly = true;
             this.colMa.Width = 90;
@@ -165,6 +156,7 @@ namespace QuanLyBanLaptop.HoaDon
             // colTen
             // 
             this.colTen.HeaderText = "Tên";
+            this.colTen.MinimumWidth = 9;
             this.colTen.Name = "colTen";
             this.colTen.ReadOnly = true;
             this.colTen.Width = 220;
@@ -172,13 +164,14 @@ namespace QuanLyBanLaptop.HoaDon
             // colSoLuong
             // 
             this.colSoLuong.HeaderText = "Số lượng";
+            this.colSoLuong.MinimumWidth = 9;
             this.colSoLuong.Name = "colSoLuong";
             this.colSoLuong.ReadOnly = true;
-            this.colSoLuong.Width = 100;
             // 
             // colDonGiaNhap
             // 
             this.colDonGiaNhap.HeaderText = "Đơn giá nhập";
+            this.colDonGiaNhap.MinimumWidth = 9;
             this.colDonGiaNhap.Name = "colDonGiaNhap";
             this.colDonGiaNhap.ReadOnly = true;
             this.colDonGiaNhap.Width = 130;
@@ -186,6 +179,7 @@ namespace QuanLyBanLaptop.HoaDon
             // colThanhTien
             // 
             this.colThanhTien.HeaderText = "Thành tiền";
+            this.colThanhTien.MinimumWidth = 9;
             this.colThanhTien.Name = "colThanhTien";
             this.colThanhTien.ReadOnly = true;
             this.colThanhTien.Width = 130;
@@ -198,7 +192,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblDanhSachSp.Location = new System.Drawing.Point(16, 285);
             this.lblDanhSachSp.Name = "lblDanhSachSp";
             this.lblDanhSachSp.Padding = new System.Windows.Forms.Padding(0, 5, 0, 5);
-            this.lblDanhSachSp.Size = new System.Drawing.Size(182, 30);
+            this.lblDanhSachSp.Size = new System.Drawing.Size(320, 45);
             this.lblDanhSachSp.TabIndex = 3;
             this.lblDanhSachSp.Text = "Danh sách sản phẩm nhập";
             // 
@@ -209,7 +203,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlActions.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlActions.Location = new System.Drawing.Point(16, 237);
             this.pnlActions.Name = "pnlActions";
-            this.pnlActions.Size = new System.Drawing.Size(927, 48);
+            this.pnlActions.Size = new System.Drawing.Size(1102, 48);
             this.pnlActions.TabIndex = 2;
             // 
             // btnXoaKhoiPhieu
@@ -248,7 +242,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlTopForms.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTopForms.Location = new System.Drawing.Point(16, 56);
             this.pnlTopForms.Name = "pnlTopForms";
-            this.pnlTopForms.Size = new System.Drawing.Size(927, 181);
+            this.pnlTopForms.Size = new System.Drawing.Size(1102, 181);
             this.pnlTopForms.TabIndex = 1;
             // 
             // picAnhLaptopNhap
@@ -256,7 +250,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.picAnhLaptopNhap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picAnhLaptopNhap.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.picAnhLaptopNhap.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picAnhLaptopNhap.Location = new System.Drawing.Point(785, 14);
+            this.picAnhLaptopNhap.Location = new System.Drawing.Point(960, 14);
             this.picAnhLaptopNhap.Name = "picAnhLaptopNhap";
             this.picAnhLaptopNhap.Size = new System.Drawing.Size(130, 150);
             this.picAnhLaptopNhap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -276,7 +270,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.grpChonLaptop.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.grpChonLaptop.Location = new System.Drawing.Point(365, 8);
             this.grpChonLaptop.Name = "grpChonLaptop";
-            this.grpChonLaptop.Size = new System.Drawing.Size(400, 160);
+            this.grpChonLaptop.Size = new System.Drawing.Size(575, 160);
             this.grpChonLaptop.TabIndex = 1;
             this.grpChonLaptop.TabStop = false;
             this.grpChonLaptop.Text = "Chọn Laptop && Nhập số lượng/đơn giá nhập";
@@ -285,7 +279,7 @@ namespace QuanLyBanLaptop.HoaDon
             // 
             this.txtDonGiaNhap.Location = new System.Drawing.Point(130, 110);
             this.txtDonGiaNhap.Name = "txtDonGiaNhap";
-            this.txtDonGiaNhap.Size = new System.Drawing.Size(180, 25);
+            this.txtDonGiaNhap.Size = new System.Drawing.Size(180, 38);
             this.txtDonGiaNhap.TabIndex = 5;
             // 
             // lblDonGiaNhap
@@ -293,7 +287,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblDonGiaNhap.AutoSize = true;
             this.lblDonGiaNhap.Location = new System.Drawing.Point(15, 113);
             this.lblDonGiaNhap.Name = "lblDonGiaNhap";
-            this.lblDonGiaNhap.Size = new System.Drawing.Size(87, 17);
+            this.lblDonGiaNhap.Size = new System.Drawing.Size(153, 31);
             this.lblDonGiaNhap.TabIndex = 4;
             this.lblDonGiaNhap.Text = "Đơn giá nhập";
             // 
@@ -301,7 +295,7 @@ namespace QuanLyBanLaptop.HoaDon
             // 
             this.txtDonSoLuong.Location = new System.Drawing.Point(130, 72);
             this.txtDonSoLuong.Name = "txtDonSoLuong";
-            this.txtDonSoLuong.Size = new System.Drawing.Size(180, 25);
+            this.txtDonSoLuong.Size = new System.Drawing.Size(180, 38);
             this.txtDonSoLuong.TabIndex = 3;
             this.txtDonSoLuong.Text = "0";
             // 
@@ -310,7 +304,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblDonSoLuong.AutoSize = true;
             this.lblDonSoLuong.Location = new System.Drawing.Point(15, 75);
             this.lblDonSoLuong.Name = "lblDonSoLuong";
-            this.lblDonSoLuong.Size = new System.Drawing.Size(86, 17);
+            this.lblDonSoLuong.Size = new System.Drawing.Size(153, 31);
             this.lblDonSoLuong.TabIndex = 2;
             this.lblDonSoLuong.Text = "Đơn số lượng";
             // 
@@ -329,7 +323,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.cboLaptop.FormattingEnabled = true;
             this.cboLaptop.Location = new System.Drawing.Point(18, 32);
             this.cboLaptop.Name = "cboLaptop";
-            this.cboLaptop.Size = new System.Drawing.Size(292, 25);
+            this.cboLaptop.Size = new System.Drawing.Size(292, 39);
             this.cboLaptop.TabIndex = 0;
             // 
             // grpThongTinPhieu
@@ -354,7 +348,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.cboNhanVien.FormattingEnabled = true;
             this.cboNhanVien.Location = new System.Drawing.Point(120, 110);
             this.cboNhanVien.Name = "cboNhanVien";
-            this.cboNhanVien.Size = new System.Drawing.Size(210, 25);
+            this.cboNhanVien.Size = new System.Drawing.Size(210, 39);
             this.cboNhanVien.TabIndex = 5;
             // 
             // lblNhanVien
@@ -362,7 +356,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblNhanVien.AutoSize = true;
             this.lblNhanVien.Location = new System.Drawing.Point(15, 113);
             this.lblNhanVien.Name = "lblNhanVien";
-            this.lblNhanVien.Size = new System.Drawing.Size(66, 17);
+            this.lblNhanVien.Size = new System.Drawing.Size(117, 31);
             this.lblNhanVien.TabIndex = 4;
             this.lblNhanVien.Text = "Nhân viên";
             // 
@@ -372,7 +366,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.dtpNgayNhap.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dtpNgayNhap.Location = new System.Drawing.Point(120, 72);
             this.dtpNgayNhap.Name = "dtpNgayNhap";
-            this.dtpNgayNhap.Size = new System.Drawing.Size(210, 25);
+            this.dtpNgayNhap.Size = new System.Drawing.Size(210, 38);
             this.dtpNgayNhap.TabIndex = 3;
             // 
             // lblNgayNhap
@@ -380,7 +374,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblNgayNhap.AutoSize = true;
             this.lblNgayNhap.Location = new System.Drawing.Point(15, 75);
             this.lblNgayNhap.Name = "lblNgayNhap";
-            this.lblNgayNhap.Size = new System.Drawing.Size(72, 17);
+            this.lblNgayNhap.Size = new System.Drawing.Size(126, 31);
             this.lblNgayNhap.TabIndex = 2;
             this.lblNgayNhap.Text = "Ngày nhập";
             // 
@@ -390,7 +384,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.cboNhaCungCap.FormattingEnabled = true;
             this.cboNhaCungCap.Location = new System.Drawing.Point(120, 32);
             this.cboNhaCungCap.Name = "cboNhaCungCap";
-            this.cboNhaCungCap.Size = new System.Drawing.Size(210, 25);
+            this.cboNhaCungCap.Size = new System.Drawing.Size(210, 39);
             this.cboNhaCungCap.TabIndex = 1;
             // 
             // lblNhaCungCap
@@ -398,7 +392,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblNhaCungCap.AutoSize = true;
             this.lblNhaCungCap.Location = new System.Drawing.Point(15, 35);
             this.lblNhaCungCap.Name = "lblNhaCungCap";
-            this.lblNhaCungCap.Size = new System.Drawing.Size(89, 17);
+            this.lblNhaCungCap.Size = new System.Drawing.Size(156, 31);
             this.lblNhaCungCap.TabIndex = 0;
             this.lblNhaCungCap.Text = "Nhà cung cấp";
             // 
@@ -408,7 +402,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(16, 16);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(927, 40);
+            this.pnlHeader.Size = new System.Drawing.Size(1102, 40);
             this.pnlHeader.TabIndex = 0;
             // 
             // lblHeaderTitle
@@ -418,20 +412,17 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblHeaderTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(36)))), ((int)(((byte)(71)))));
             this.lblHeaderTitle.Location = new System.Drawing.Point(3, 7);
             this.lblHeaderTitle.Name = "lblHeaderTitle";
-            this.lblHeaderTitle.Size = new System.Drawing.Size(155, 25);
+            this.lblHeaderTitle.Size = new System.Drawing.Size(295, 46);
             this.lblHeaderTitle.TabIndex = 0;
             this.lblHeaderTitle.Text = "Trang Nhập hàng";
             // 
-            // frmNhapHang
+            // ucNhapHang
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1134, 661);
             this.Controls.Add(this.pnlMain);
-            this.Controls.Add(this.sidebarControl1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "frmNhapHang";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Name = "ucNhapHang";
             this.Text = "TRANG NHẬP HÀNG";
             this.pnlMain.ResumeLayout(false);
             this.pnlMain.PerformLayout();
@@ -453,7 +444,6 @@ namespace QuanLyBanLaptop.HoaDon
 
         #endregion
 
-        private SidebarControl sidebarControl1;
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblHeaderTitle;

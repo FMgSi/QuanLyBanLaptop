@@ -1,6 +1,6 @@
 namespace QuanLyBanLaptop.DanhMuc
 {
-    partial class frmNhanVien
+    partial class ucNhanVien
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -13,11 +13,10 @@ namespace QuanLyBanLaptop.DanhMuc
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        #region Component Designer generated code
 
         private void InitializeComponent()
         {
-            this.sidebarControl1 = new QuanLyBanLaptop.SidebarControl();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.dgvNhanVien = new System.Windows.Forms.DataGridView();
             this.colMaNV = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -57,15 +56,6 @@ namespace QuanLyBanLaptop.DanhMuc
             this.grpThongTinNV.SuspendLayout();
             this.pnlHeader.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // sidebarControl1
-            // 
-            this.sidebarControl1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
-            this.sidebarControl1.Name = "sidebarControl1";
-            this.sidebarControl1.SelectedMenu = QuanLyBanLaptop.Classes.NavigationMenu.NhanVien;
-            this.sidebarControl1.Size = new System.Drawing.Size(175, 661);
-            this.sidebarControl1.TabIndex = 0;
             // 
             // pnlMain
             // 
@@ -407,16 +397,13 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "TRANG QUẢN LÝ NHÂN VIÊN";
             // 
-            // frmNhanVien
+            // ucNhanVien
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1134, 661);
             this.Controls.Add(this.pnlMain);
-            this.Controls.Add(this.sidebarControl1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "frmNhanVien";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Name = "ucNhanVien";
             this.Text = "TRANG QUẢN LÝ NHÂN VIÊN";
             this.pnlMain.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvNhanVien)).EndInit();
@@ -431,7 +418,6 @@ namespace QuanLyBanLaptop.DanhMuc
 
         #endregion
 
-        private SidebarControl sidebarControl1;
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblTitle;

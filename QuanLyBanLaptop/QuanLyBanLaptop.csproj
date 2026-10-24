@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,67 +47,91 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\DataProcesser.cs" />
-    <Compile Include="Classes\Function.cs" />
-    <Compile Include="Classes\SidebarTheme.cs" />
+    <Compile Include="Classes\AppSession.cs" />
+    <Compile Include="Classes\AuthService.cs" />
     <Compile Include="Classes\NavigationMenu.cs" />
-    <Compile Include="Classes\IconHelper.cs" />
-    <Compile Include="Classes\NavigationManager.cs" />
-    <Compile Include="SidebarControl.cs">
+    <Compile Include="Helpers\DbHelper.cs" />
+    <Compile Include="Classes\SidebarTheme.cs" />
+    <Compile Include="Helpers\ControlHelper.cs" />
+    <Compile Include="Helpers\FormatHelper.cs" />
+    <Compile Include="Helpers\IconHelper.cs" />
+    <Compile Include="Helpers\MessageHelper.cs" />
+    <Compile Include="Controls\SidebarControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="SidebarControl.Designer.cs">
+    <Compile Include="Controls\SidebarControl.Designer.cs">
       <DependentUpon>SidebarControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="DanhMuc\frmNhanVien.cs">
+    <Compile Include="Forms\frmDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DanhMuc\frmNhanVien.Designer.cs">
-      <DependentUpon>frmNhanVien.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmSanPham.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmSanPham.Designer.cs">
-      <DependentUpon>frmSanPham.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmDangNhap.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmDangNhap.Designer.cs">
+    <Compile Include="Forms\frmDangNhap.Designer.cs">
       <DependentUpon>frmDangNhap.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmTrangChu.cs">
+    <Compile Include="Forms\frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmTrangChu.Designer.cs">
-      <DependentUpon>frmTrangChu.cs</DependentUpon>
+    <Compile Include="Forms\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="HoaDon\frmBanHang.cs">
+    <Compile Include="Forms\frmQuanLyLoai.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HoaDon\frmBanHang.Designer.cs">
-      <DependentUpon>frmBanHang.cs</DependentUpon>
+    <Compile Include="Forms\frmQuanLyLoai.Designer.cs">
+      <DependentUpon>frmQuanLyLoai.cs</DependentUpon>
     </Compile>
-    <Compile Include="HoaDon\frmNhapHang.cs">
+    <Compile Include="Forms\frmQuanLyNhaCungCap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="HoaDon\frmNhapHang.Designer.cs">
-      <DependentUpon>frmNhapHang.cs</DependentUpon>
+    <Compile Include="Forms\frmQuanLyNhaCungCap.Designer.cs">
+      <DependentUpon>frmQuanLyNhaCungCap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ucTrangChu.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ucTrangChu.Designer.cs">
+      <DependentUpon>ucTrangChu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DanhMuc\ucNhanVien.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DanhMuc\ucNhanVien.Designer.cs">
+      <DependentUpon>ucNhanVien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DanhMuc\ucSanPham.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DanhMuc\ucSanPham.Designer.cs">
+      <DependentUpon>ucSanPham.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\ucBanHang.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HoaDon\ucBanHang.Designer.cs">
+      <DependentUpon>ucBanHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\ucNhapHang.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="HoaDon\ucNhapHang.Designer.cs">
+      <DependentUpon>ucNhapHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Thongke\ucThongKe.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Thongke\ucThongKe.Designer.cs">
+      <DependentUpon>ucThongKe.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Thongke\frmThongKe.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Thongke\frmThongKe.Designer.cs">
-      <DependentUpon>frmThongKe.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="frmDangNhap.resx">
+    <EmbeddedResource Include="Forms\frmDangNhap.resx">
       <DependentUpon>frmDangNhap.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmBanHang.resx">
-      <DependentUpon>frmBanHang.cs</DependentUpon>
+    <EmbeddedResource Include="HoaDon\ucBanHang.resx">
+      <DependentUpon>ucBanHang.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HoaDon\ucNhapHang.resx">
+      <DependentUpon>ucNhapHang.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

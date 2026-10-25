@@ -56,6 +56,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNhanVien = new System.Windows.Forms.DataGridView();
             this.colMaNV = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHoTen = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGioiTinh = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSDT = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colChucVu = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTrangThai = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -76,6 +77,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblChucVu = new System.Windows.Forms.Label();
             this.txtSDT = new System.Windows.Forms.TextBox();
             this.lblSDT = new System.Windows.Forms.Label();
+            this.cboGioiTinh = new System.Windows.Forms.ComboBox();
+            this.lblGioiTinh = new System.Windows.Forms.Label();
             this.txtHoTen = new System.Windows.Forms.TextBox();
             this.lblHoTen = new System.Windows.Forms.Label();
             this.txtMaNV = new System.Windows.Forms.TextBox();
@@ -474,6 +477,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNhanVien.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colMaNV,
             this.colHoTen,
+            this.colGioiTinh,
             this.colSDT,
             this.colChucVu,
             this.colTrangThai});
@@ -523,6 +527,14 @@ namespace QuanLyBanLaptop.DanhMuc
             this.colHoTen.Name = "colHoTen";
             this.colHoTen.ReadOnly = true;
             this.colHoTen.Width = 150;
+            // 
+            // colGioiTinh
+            // 
+            this.colGioiTinh.DataPropertyName = "GioiTinh";
+            this.colGioiTinh.HeaderText = "Giới tính";
+            this.colGioiTinh.Name = "colGioiTinh";
+            this.colGioiTinh.ReadOnly = true;
+            this.colGioiTinh.Width = 90;
             // 
             // colSDT
             // 
@@ -698,6 +710,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.grpThongTinNV.Controls.Add(this.lblChucVu);
             this.grpThongTinNV.Controls.Add(this.txtSDT);
             this.grpThongTinNV.Controls.Add(this.lblSDT);
+            this.grpThongTinNV.Controls.Add(this.cboGioiTinh);
+            this.grpThongTinNV.Controls.Add(this.lblGioiTinh);
             this.grpThongTinNV.Controls.Add(this.txtHoTen);
             this.grpThongTinNV.Controls.Add(this.lblHoTen);
             this.grpThongTinNV.Controls.Add(this.txtMaNV);
@@ -706,7 +720,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.grpThongTinNV.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
             this.grpThongTinNV.Location = new System.Drawing.Point(0, 0);
             this.grpThongTinNV.Name = "grpThongTinNV";
-            this.grpThongTinNV.Size = new System.Drawing.Size(290, 218);
+            this.grpThongTinNV.Size = new System.Drawing.Size(290, 220);
             this.grpThongTinNV.TabIndex = 0;
             this.grpThongTinNV.TabStop = false;
             this.grpThongTinNV.Text = " Thông tin nhân viên ";
@@ -719,7 +733,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.cboChucVu.Items.AddRange(new object[] {
             "Quản trị viên",
             "Nhân viên"});
-            this.cboChucVu.Location = new System.Drawing.Point(85, 165);
+            this.cboChucVu.Location = new System.Drawing.Point(85, 185);
             this.cboChucVu.Name = "cboChucVu";
             this.cboChucVu.Size = new System.Drawing.Size(194, 25);
             this.cboChucVu.TabIndex = 9;
@@ -729,7 +743,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblChucVu.AutoSize = true;
             this.lblChucVu.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblChucVu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.lblChucVu.Location = new System.Drawing.Point(12, 168);
+            this.lblChucVu.Location = new System.Drawing.Point(12, 188);
             this.lblChucVu.Name = "lblChucVu";
             this.lblChucVu.Size = new System.Drawing.Size(57, 17);
             this.lblChucVu.TabIndex = 8;
@@ -739,7 +753,7 @@ namespace QuanLyBanLaptop.DanhMuc
             // 
             this.txtSDT.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtSDT.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.txtSDT.Location = new System.Drawing.Point(85, 125);
+            this.txtSDT.Location = new System.Drawing.Point(85, 150);
             this.txtSDT.Name = "txtSDT";
             this.txtSDT.Size = new System.Drawing.Size(218, 24);
             this.txtSDT.TabIndex = 5;
@@ -749,17 +763,42 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblSDT.AutoSize = true;
             this.lblSDT.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblSDT.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.lblSDT.Location = new System.Drawing.Point(12, 128);
+            this.lblSDT.Location = new System.Drawing.Point(12, 153);
             this.lblSDT.Name = "lblSDT";
             this.lblSDT.Size = new System.Drawing.Size(34, 17);
             this.lblSDT.TabIndex = 4;
             this.lblSDT.Text = "SĐT:";
             // 
+            // cboGioiTinh
+            // 
+            this.cboGioiTinh.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboGioiTinh.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.cboGioiTinh.FormattingEnabled = true;
+            this.cboGioiTinh.Items.AddRange(new object[] {
+            "Nam",
+            "Nữ",
+            "Khác"});
+            this.cboGioiTinh.Location = new System.Drawing.Point(85, 113);
+            this.cboGioiTinh.Name = "cboGioiTinh";
+            this.cboGioiTinh.Size = new System.Drawing.Size(194, 25);
+            this.cboGioiTinh.TabIndex = 7;
+            // 
+            // lblGioiTinh
+            // 
+            this.lblGioiTinh.AutoSize = true;
+            this.lblGioiTinh.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            this.lblGioiTinh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
+            this.lblGioiTinh.Location = new System.Drawing.Point(12, 116);
+            this.lblGioiTinh.Name = "lblGioiTinh";
+            this.lblGioiTinh.Size = new System.Drawing.Size(57, 17);
+            this.lblGioiTinh.TabIndex = 6;
+            this.lblGioiTinh.Text = "Giới tính:";
+            // 
             // txtHoTen
             // 
             this.txtHoTen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHoTen.Font = new System.Drawing.Font("Segoe UI", 9.5F);
-            this.txtHoTen.Location = new System.Drawing.Point(85, 80);
+            this.txtHoTen.Location = new System.Drawing.Point(85, 75);
             this.txtHoTen.Name = "txtHoTen";
             this.txtHoTen.Size = new System.Drawing.Size(218, 24);
             this.txtHoTen.TabIndex = 3;
@@ -769,7 +808,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblHoTen.AutoSize = true;
             this.lblHoTen.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblHoTen.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(65)))), ((int)(((byte)(85)))));
-            this.lblHoTen.Location = new System.Drawing.Point(12, 83);
+            this.lblHoTen.Location = new System.Drawing.Point(12, 78);
             this.lblHoTen.Name = "lblHoTen";
             this.lblHoTen.Size = new System.Drawing.Size(50, 17);
             this.lblHoTen.TabIndex = 2;
@@ -833,6 +872,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.pnlToolbar.Name = "pnlToolbar";
             this.pnlToolbar.Size = new System.Drawing.Size(160, 36);
             this.pnlToolbar.TabIndex = 1;
+            this.pnlToolbar.Visible = false;
             // 
             // btnDangXuat
             // 
@@ -973,6 +1013,8 @@ namespace QuanLyBanLaptop.DanhMuc
         private System.Windows.Forms.TextBox txtMaNV;
         private System.Windows.Forms.TextBox txtSDT;
         private System.Windows.Forms.Label lblSDT;
+        private System.Windows.Forms.ComboBox cboGioiTinh;
+        private System.Windows.Forms.Label lblGioiTinh;
         private System.Windows.Forms.TextBox txtHoTen;
         private System.Windows.Forms.Label lblHoTen;
         private System.Windows.Forms.Label lblChucVu;
@@ -997,8 +1039,11 @@ namespace QuanLyBanLaptop.DanhMuc
         private System.Windows.Forms.Button btnThem;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaNV;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHoTen;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGioiTinh;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSDT;
         private System.Windows.Forms.DataGridViewTextBoxColumn colChucVu;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTrangThai;
     }
 }
+
+

@@ -61,6 +61,7 @@ CREATE TABLE LAPTOP (
 CREATE TABLE NHAN_VIEN (
     MaNV    VARCHAR(10)   PRIMARY KEY,
     TenNV   NVARCHAR(50)  NOT NULL,
+    GioiTinh NVARCHAR(10) NOT NULL DEFAULT N'Khác' CHECK (GioiTinh IN (N'Nam', N'Nữ', N'Khác')),
     SDT     VARCHAR(15)   NULL,
     ChucVu  NVARCHAR(50)  NOT NULL CHECK (ChucVu IN (N'Quản trị viên', N'Nhân viên')),
     TenDN   VARCHAR(50)   NOT NULL UNIQUE,

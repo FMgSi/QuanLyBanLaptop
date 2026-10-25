@@ -16,7 +16,6 @@ namespace QuanLyBanLaptop.Thongke
     public partial class frmThongKe : Form
     {
         private DataProcesser dataProcesser = new DataProcesser();
-        private bool isUsingDatabase = false;
 
         // ─── Dữ liệu mẫu ─────────────────────────────────────────────────────
         private readonly string[] THANG_NHAN = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -64,6 +63,7 @@ namespace QuanLyBanLaptop.Thongke
             btnMenuBanHang.Image = TaoIconGioHang(22, Color.FromArgb(200, 215, 230));
             btnMenuNhapHang.Image = TaoIconNhapHang(22, Color.FromArgb(200, 215, 230));
             btnMenuNhanVien.Image = TaoIconNhanVien(22, Color.FromArgb(200, 215, 230));
+            btnMenuCauHinhTraGop.Image = TaoIconTraGop(22, Color.FromArgb(200, 215, 230));
             btnMenuThongKe.Image = TaoIconThongKe(22, Color.White);
 
             // Toolbar
@@ -88,6 +88,7 @@ namespace QuanLyBanLaptop.Thongke
 
             // Cấu hình DataGridView Top 5
             KhoiTaoGridTop5();
+            TaoGiaoDienBaoCaoMoi();
         }
 
         private void KhoiTaoBieuDo()
@@ -149,106 +150,7 @@ namespace QuanLyBanLaptop.Thongke
         // ════════════════════════════════════════════════════════════════════════
         private void LayDuLieu()
         {
-            DateTime tuNgay = dtpTuNgay.Value.Date;
-            DateTime denNgay = dtpDenNgay.Value.Date;
-
-            if (tuNgay > denNgay)
-            {
-                MessageBox.Show("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            long tongDoanhThu = 0;
-            int tongDonHang = 0;
-            int tongLaptopBan = 0;
-            DataTable dtTop5 = null;
-            DataTable dtBieuDo = null;
-
-            // ── Thử kết nối DB ────────────────────────────────────────────────
-            try
-            {
-                string sqlTong = string.Format(
-                    "SELECT ISNULL(SUM(ThanhTien),0) AS DoanhThu, COUNT(DISTINCT MaHD) AS SoDon, ISNULL(SUM(SoLuong),0) AS SoLaptop " +
-                    "FROM CHI_TIET_HOA_DON hd " +
-                    "JOIN HOA_DON h ON hd.MaHD = h.MaHD " +
-                    "WHERE CAST(h.NgayLap AS DATE) BETWEEN '{0}' AND '{1}'",
-                    tuNgay.ToString("yyyy-MM-dd"), denNgay.ToString("yyyy-MM-dd"));
-
-                DataTable dtTong = dataProcesser.DocBang(sqlTong);
-                if (dtTong != null && dtTong.Rows.Count > 0)
-                {
-                    tongDoanhThu = Convert.ToInt64(dtTong.Rows[0]["DoanhThu"]);
-                    tongDonHang = Convert.ToInt32(dtTong.Rows[0]["SoDon"]);
-                    tongLaptopBan = Convert.ToInt32(dtTong.Rows[0]["SoLaptop"]);
-                }
-
-                // Top 5
-                string sqlTop5 = string.Format(
-                    "SELECT TOP 5 sp.TenSP AS TenSanPham, SUM(ct.SoLuong) AS SoLuong, SUM(ct.ThanhTien) AS DoanhThu " +
-                    "FROM CHI_TIET_HOA_DON ct " +
-                    "JOIN HOA_DON h ON ct.MaHD = h.MaHD " +
-                    "JOIN SAN_PHAM sp ON ct.MaSP = sp.MaSP " +
-                    "WHERE CAST(h.NgayLap AS DATE) BETWEEN '{0}' AND '{1}' " +
-                    "GROUP BY sp.TenSP ORDER BY DoanhThu DESC",
-                    tuNgay.ToString("yyyy-MM-dd"), denNgay.ToString("yyyy-MM-dd"));
-                dtTop5 = dataProcesser.DocBang(sqlTop5);
-
-                // Biểu đồ theo tháng trong năm
-                string sqlBieuDo = string.Format(
-                    "SELECT MONTH(h.NgayLap) AS Thang, ISNULL(SUM(ct.ThanhTien),0) AS DoanhThu " +
-                    "FROM CHI_TIET_HOA_DON ct JOIN HOA_DON h ON ct.MaHD = h.MaHD " +
-                    "WHERE YEAR(h.NgayLap) = {0} " +
-                    "GROUP BY MONTH(h.NgayLap) ORDER BY Thang",
-                    tuNgay.Year);
-                dtBieuDo = dataProcesser.DocBang(sqlBieuDo);
-
-                isUsingDatabase = true;
-            }
-            catch
-            {
-                isUsingDatabase = false;
-            }
-
-            // ── Dữ liệu mẫu nếu không có DB ──────────────────────────────────
-            if (!isUsingDatabase)
-            {
-                var rnd = new Random(42);
-                tongDoanhThu = 56000000;
-                tongDonHang = 24;
-                tongLaptopBan = 38;
-
-                dtTop5 = new DataTable();
-                dtTop5.Columns.Add("TenSanPham", typeof(string));
-                dtTop5.Columns.Add("SoLuong", typeof(int));
-                dtTop5.Columns.Add("DoanhThu", typeof(long));
-                dtTop5.Rows.Add("Tên máy 078", 10, 16000000L);
-                dtTop5.Rows.Add("Tên máy ST90", 5, 3000000L);
-                dtTop5.Rows.Add("Tên máy RTX", 4, 3500000L);
-                dtTop5.Rows.Add("Tên máy BTX", 2, 8000000L);
-                dtTop5.Rows.Add("Tên máy 83K", 3, 7500000L);
-
-                dtBieuDo = new DataTable();
-                dtBieuDo.Columns.Add("Thang", typeof(int));
-                dtBieuDo.Columns.Add("DoanhThu", typeof(long));
-                long[] mauBieuDo = { 550000, 700000, 850000, 620000, 900000, 780000, 1050000, 920000, 980000, 0, 0, 0 };
-                for (int i = 1; i <= 12; i++)
-                    dtBieuDo.Rows.Add(i, mauBieuDo[i - 1] + rnd.Next(0, 100000));
-            }
-
-            // ── Hiển thị card summary ─────────────────────────────────────────
-            lblDoanhThuValue.Text = tongDoanhThu.ToString("#,0") + " VNĐ";
-            lblSoDonValue.Text = tongDonHang.ToString();
-            lblLaptopBanValue.Text = tongLaptopBan.ToString();
-
-            // ── Hiển thị biểu đồ ─────────────────────────────────────────────
-            VeBieuDo(dtBieuDo);
-
-            // ── Hiển thị top 5 ────────────────────────────────────────────────
-            HienThiTop5(dtTop5);
-
-            // Trạng thái DB
-            lblTrangThaiDB.Text = isUsingDatabase ? "● Đang kết nối Database" : "● Dùng dữ liệu mẫu (Offline)";
-            lblTrangThaiDB.ForeColor = isUsingDatabase ? Color.FromArgb(0, 180, 100) : Color.FromArgb(230, 150, 0);
+            TaiBaoCaoMoi();
         }
 
         private void VeBieuDo(DataTable dt)
@@ -330,57 +232,36 @@ namespace QuanLyBanLaptop.Thongke
         // ════════════════════════════════════════════════════════════════════════
         private void XuatBaoCaoExcel()
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Excel Files (*.csv)|*.csv|All Files (*.*)|*.*";
-            sfd.FileName = "BaoCaoDoanhThu_" + DateTime.Now.ToString("yyyyMMdd_HHmm") + ".csv";
-            sfd.Title = "Lưu báo cáo Excel";
-
-            if (sfd.ShowDialog() != DialogResult.OK) return;
-
-            try
+            using (SaveFileDialog sfd = new SaveFileDialog())
             {
-                var sb = new StringBuilder();
-                sb.AppendLine("BÁO CÁO THỐNG KÊ DOANH THU");
-                sb.AppendLine("Từ ngày: " + dtpTuNgay.Value.ToString("dd/MM/yyyy") + " - Đến ngày: " + dtpDenNgay.Value.ToString("dd/MM/yyyy"));
-                sb.AppendLine("Xuất lúc: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
-                sb.AppendLine();
-
-                // Summary
-                sb.AppendLine("=== TỔNG QUAN ===");
-                sb.AppendLine("Tổng doanh thu:," + lblDoanhThuValue.Text);
-                sb.AppendLine("Số đơn hàng:," + lblSoDonValue.Text);
-                sb.AppendLine("Laptop đã bán:," + lblLaptopBanValue.Text);
-                sb.AppendLine();
-
-                // Top 5
-                sb.AppendLine("=== TOP 5 LAPTOP BÁN CHẠY ===");
-                sb.AppendLine("STT,Tên máy,Số lượng đã bán,Doanh thu (VNĐ)");
-                if (dgvTop5.DataSource is DataTable dt)
+                sfd.Filter = "Excel CSV UTF-8 (*.csv)|*.csv|All Files (*.*)|*.*";
+                sfd.FileName = "BaoCaoDoanhThu_" + DateTime.Now.ToString("yyyyMMdd_HHmm") + ".csv";
+                sfd.Title = "Lưu báo cáo doanh thu";
+                if (sfd.ShowDialog() != DialogResult.OK) return;
+                try
                 {
-                    int stt = 1;
-                    foreach (DataRow row in dt.Rows)
+                    var sb = new StringBuilder();
+                    sb.AppendLine(tieuDeBaoCao);
+                    sb.AppendLine("Từ ngày," + dtpTuNgay.Value.ToString("dd/MM/yyyy") + ",Đến ngày," + dtpDenNgay.Value.ToString("dd/MM/yyyy"));
+                    sb.AppendLine("Tổng doanh thu," + lblDoanhThuValue.Text);
+                    sb.AppendLine("Tổng giá vốn," + lblTongChiPhi.Text);
+                    sb.AppendLine("Tổng lợi nhuận," + lblTongLoiNhuan.Text);
+                    sb.AppendLine();
+                    if (duLieuBaoCao != null)
                     {
-                        sb.AppendLine(string.Format("{0},{1},{2},{3}",
-                            stt++, row["TenSanPham"], row["SoLuong"],
-                            Convert.ToInt64(row["DoanhThu"]).ToString("#,0")));
+                        sb.AppendLine(string.Join(",", duLieuBaoCao.Columns.Cast<DataColumn>().Select(c => "\"" + c.ColumnName.Replace("\"", "\"\"") + "\"")));
+                        foreach (DataRow row in duLieuBaoCao.Rows)
+                            sb.AppendLine(string.Join(",", row.ItemArray.Select(v => "\"" + Convert.ToString(v).Replace("\"", "\"\"") + "\"")));
                     }
+                    File.WriteAllText(sfd.FileName, sb.ToString(), new UTF8Encoding(true));
+                    MessageBox.Show("Đã xuất báo cáo thành công.", "Xuất báo cáo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-
-                File.WriteAllText(sfd.FileName, sb.ToString(), new UTF8Encoding(true));
-
-                DialogResult dr = MessageBox.Show(
-                    "Xuất báo cáo thành công!\nBạn có muốn mở file không?",
-                    "Thành công", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-
-                if (dr == DialogResult.Yes)
-                    System.Diagnostics.Process.Start(sfd.FileName);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi xuất file: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Không thể xuất báo cáo: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
-
         // ════════════════════════════════════════════════════════════════════════
         //  ĐIỀU HƯỚNG SIDEBAR
         // ════════════════════════════════════════════════════════════════════════
@@ -555,6 +436,27 @@ namespace QuanLyBanLaptop.Thongke
             return bmp;
         }
 
+        private Bitmap TaoIconTraGop(int size, Color color)
+        {
+            Bitmap bmp = new Bitmap(size, size);
+            using (Graphics g = Graphics.FromImage(bmp))
+            using (Pen pen = new Pen(color, 1.8f))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.ScaleTransform(size / 22f, size / 22f);
+
+                // Tờ lịch biểu thị kỳ hạn, dấu phần trăm biểu thị lãi suất trả góp.
+                g.DrawRectangle(pen, 3, 4, 16, 15);
+                g.DrawLine(pen, 3, 8, 19, 8);
+                g.DrawLine(pen, 7, 2, 7, 6);
+                g.DrawLine(pen, 15, 2, 15, 6);
+                g.DrawEllipse(pen, 6, 10, 3, 3);
+                g.DrawEllipse(pen, 13, 15, 3, 3);
+                g.DrawLine(pen, 8, 17, 15, 10);
+            }
+            return bmp;
+        }
+
         private Bitmap TaoIconLamMoi(int size, Color color)
         {
             Bitmap bmp = new Bitmap(size, size);
@@ -661,3 +563,5 @@ namespace QuanLyBanLaptop.Thongke
         }
     }
 }
+
+

@@ -64,6 +64,7 @@ namespace QuanLyBanLaptop.HoaDon
             // 
             // sidebarControl1
             // 
+            this.sidebarControl1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(36)))), ((int)(((byte)(71)))));
             this.sidebarControl1.Dock = System.Windows.Forms.DockStyle.Left;
             this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
             this.sidebarControl1.Name = "sidebarControl1";
@@ -132,7 +133,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblTongTienNhap.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTongTienNhap.Location = new System.Drawing.Point(530, 18);
             this.lblTongTienNhap.Name = "lblTongTienNhap";
-            this.lblTongTienNhap.Size = new System.Drawing.Size(115, 19);
+            this.lblTongTienNhap.Size = new System.Drawing.Size(117, 19);
             this.lblTongTienNhap.TabIndex = 0;
             this.lblTongTienNhap.Text = "Tổng tiền nhập :";
             // 
@@ -148,11 +149,11 @@ namespace QuanLyBanLaptop.HoaDon
             this.colDonGiaNhap,
             this.colThanhTien});
             this.dgvDanhSachNhap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDanhSachNhap.Location = new System.Drawing.Point(16, 315);
+            this.dgvDanhSachNhap.Location = new System.Drawing.Point(16, 314);
             this.dgvDanhSachNhap.Name = "dgvDanhSachNhap";
             this.dgvDanhSachNhap.ReadOnly = true;
             this.dgvDanhSachNhap.RowHeadersWidth = 30;
-            this.dgvDanhSachNhap.Size = new System.Drawing.Size(927, 330);
+            this.dgvDanhSachNhap.Size = new System.Drawing.Size(927, 331);
             this.dgvDanhSachNhap.TabIndex = 4;
             // 
             // colMa
@@ -174,7 +175,6 @@ namespace QuanLyBanLaptop.HoaDon
             this.colSoLuong.HeaderText = "Số lượng";
             this.colSoLuong.Name = "colSoLuong";
             this.colSoLuong.ReadOnly = true;
-            this.colSoLuong.Width = 100;
             // 
             // colDonGiaNhap
             // 
@@ -198,7 +198,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblDanhSachSp.Location = new System.Drawing.Point(16, 285);
             this.lblDanhSachSp.Name = "lblDanhSachSp";
             this.lblDanhSachSp.Padding = new System.Windows.Forms.Padding(0, 5, 0, 5);
-            this.lblDanhSachSp.Size = new System.Drawing.Size(182, 30);
+            this.lblDanhSachSp.Size = new System.Drawing.Size(181, 29);
             this.lblDanhSachSp.TabIndex = 3;
             this.lblDanhSachSp.Text = "Danh sách sản phẩm nhập";
             // 
@@ -310,7 +310,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblDonSoLuong.AutoSize = true;
             this.lblDonSoLuong.Location = new System.Drawing.Point(15, 75);
             this.lblDonSoLuong.Name = "lblDonSoLuong";
-            this.lblDonSoLuong.Size = new System.Drawing.Size(86, 17);
+            this.lblDonSoLuong.Size = new System.Drawing.Size(88, 17);
             this.lblDonSoLuong.TabIndex = 2;
             this.lblDonSoLuong.Text = "Đơn số lượng";
             // 
@@ -418,7 +418,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblHeaderTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(11)))), ((int)(((byte)(36)))), ((int)(((byte)(71)))));
             this.lblHeaderTitle.Location = new System.Drawing.Point(3, 7);
             this.lblHeaderTitle.Name = "lblHeaderTitle";
-            this.lblHeaderTitle.Size = new System.Drawing.Size(155, 25);
+            this.lblHeaderTitle.Size = new System.Drawing.Size(167, 25);
             this.lblHeaderTitle.TabIndex = 0;
             this.lblHeaderTitle.Text = "Trang Nhập hàng";
             // 

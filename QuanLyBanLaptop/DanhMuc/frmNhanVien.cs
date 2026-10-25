@@ -56,6 +56,7 @@ namespace QuanLyBanLaptop.DanhMuc
             btnMenuBanHang.Image = TaoIconGioHang(22, Color.FromArgb(200, 215, 230));
             btnMenuNhapHang.Image = TaoIconNhapHang(22, Color.FromArgb(200, 215, 230));
             btnMenuNhanVien.Image = TaoIconNhanVien(22, Color.White);
+            btnMenuCauHinhTraGop.Image = TaoIconTraGop(22, Color.FromArgb(200, 215, 230));
             btnMenuThongKe.Image = TaoIconThongKe(22, Color.FromArgb(200, 215, 230));
 
             // Vẽ Icon cho Toolbar ở TopBar
@@ -70,7 +71,8 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvNhanVien.AutoGenerateColumns = false;
             pnlLeft.Width = 300;
             grpThongTinNV.Width = grpTaiKhoan.Width = 290;
-            txtMaNV.Width = txtHoTen.Width = txtSDT.Width = cboChucVu.Width = 194;
+            txtMaNV.Width = txtHoTen.Width = txtSDT.Width = cboChucVu.Width = cboGioiTinh.Width = 194;
+            if (cboGioiTinh.Items.Count > 0) cboGioiTinh.SelectedIndex = 0;
             txtSDT.MaxLength = 10;
             txtHoTen.KeyPress += txtHoTen_KeyPress;
             txtSDT.KeyPress += txtSDT_KeyPress;
@@ -92,9 +94,10 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvNhanVien.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 249, 252);
             dgvNhanVien.Columns["colMaNV"].FillWeight = 13F;
             dgvNhanVien.Columns["colHoTen"].FillWeight = 27F;
-            dgvNhanVien.Columns["colSDT"].FillWeight = 18F;
-            dgvNhanVien.Columns["colChucVu"].FillWeight = 19F;
-            dgvNhanVien.Columns["colTrangThai"].FillWeight = 23F;
+            dgvNhanVien.Columns["colGioiTinh"].FillWeight = 12F;
+            dgvNhanVien.Columns["colSDT"].FillWeight = 16F;
+            dgvNhanVien.Columns["colChucVu"].FillWeight = 17F;
+            dgvNhanVien.Columns["colTrangThai"].FillWeight = 22F;
             dgvNhanVien.CellFormatting += dgvNhanVien_CellFormatting;
 
             pnlButtons.Resize += (s, e) => CanhNutDanhSach();
@@ -392,6 +395,27 @@ namespace QuanLyBanLaptop.DanhMuc
             return bmp;
         }
 
+        private Bitmap TaoIconTraGop(int size, Color color)
+        {
+            Bitmap bmp = new Bitmap(size, size);
+            using (Graphics g = Graphics.FromImage(bmp))
+            using (Pen pen = new Pen(color, 1.8f))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.ScaleTransform(size / 22f, size / 22f);
+
+                // Tờ lịch biểu thị kỳ hạn, dấu phần trăm biểu thị lãi suất trả góp.
+                g.DrawRectangle(pen, 3, 4, 16, 15);
+                g.DrawLine(pen, 3, 8, 19, 8);
+                g.DrawLine(pen, 7, 2, 7, 6);
+                g.DrawLine(pen, 15, 2, 15, 6);
+                g.DrawEllipse(pen, 6, 10, 3, 3);
+                g.DrawEllipse(pen, 13, 15, 3, 3);
+                g.DrawLine(pen, 8, 17, 15, 10);
+            }
+            return bmp;
+        }
+
         private Bitmap TaoIconLamMoi(int size, Color color)
         {
             Bitmap bmp = new Bitmap(size, size);
@@ -457,7 +481,7 @@ namespace QuanLyBanLaptop.DanhMuc
             try
             {
                 // Truy vấn bảng NHAN_VIEN trong CSDL QuanLyBanLaptop
-                string sql = "SELECT MaNV, TenNV, TenNV AS HoTen, SDT, ChucVu, TenDN, TenDN AS TenDangNhap, MatKhau, CAST(CASE WHEN ISNULL(DaNghi, 0) = 0 THEN 1 ELSE 0 END AS BIT) AS TrangThai, CASE WHEN ISNULL(DaNghi, 0) = 0 THEN N'Đang hoạt động' ELSE N'Đã nghỉ' END AS TrangThaiText FROM NHAN_VIEN";
+                string sql = "SELECT MaNV, TenNV, TenNV AS HoTen, ISNULL(GioiTinh, N'Khác') AS GioiTinh, SDT, ChucVu, TenDN, TenDN AS TenDangNhap, MatKhau, CAST(CASE WHEN ISNULL(DaNghi, 0) = 0 THEN 1 ELSE 0 END AS BIT) AS TrangThai, CASE WHEN ISNULL(DaNghi, 0) = 0 THEN N'Đang hoạt động' ELSE N'Đã bị khóa' END AS TrangThaiText FROM NHAN_VIEN";
                 DataTable dt = dataProcesser.DocBang(sql);
 
                 if (dt != null)
@@ -491,6 +515,7 @@ namespace QuanLyBanLaptop.DanhMuc
             dtNhanVien.Columns.Add("MaNV", typeof(string));
             dtNhanVien.Columns.Add("TenNV", typeof(string));
             dtNhanVien.Columns.Add("HoTen", typeof(string));
+            dtNhanVien.Columns.Add("GioiTinh", typeof(string));
             dtNhanVien.Columns.Add("SDT", typeof(string));
             dtNhanVien.Columns.Add("ChucVu", typeof(string));
             dtNhanVien.Columns.Add("TrangThai", typeof(bool));
@@ -498,9 +523,9 @@ namespace QuanLyBanLaptop.DanhMuc
             dtNhanVien.Columns.Add("TenDN", typeof(string));
             dtNhanVien.Columns.Add("TenDangNhap", typeof(string));
             dtNhanVien.Columns.Add("MatKhau", typeof(string));
-            dtNhanVien.Rows.Add("NV001", "Nguyễn Văn An", "Nguyễn Văn An", "0912345678", "Quản trị viên", true, "Đang hoạt động", "admin", "admin", "admin123");
-            dtNhanVien.Rows.Add("NV002", "Trần Thị Bình", "Trần Thị Bình", "0987654321", "Quản trị viên", true, "Đang hoạt động", "binh_sale", "binh_sale", "123456");
-            dtNhanVien.Rows.Add("NV003", "Lê Hoàng Cường", "Lê Hoàng Cường", "0905556666", "Nhân viên", true, "Đang hoạt động", "cuong_kho", "cuong_kho", "123456");
+            dtNhanVien.Rows.Add("NV001", "Nguyễn Văn An", "Nguyễn Văn An", "Nam", "0912345678", "Quản trị viên", true, "Đang hoạt động", "admin", "admin", "admin123");
+            dtNhanVien.Rows.Add("NV002", "Trần Thị Bình", "Trần Thị Bình", "Nữ", "0987654321", "Quản trị viên", true, "Đang hoạt động", "binh_sale", "binh_sale", "123456");
+            dtNhanVien.Rows.Add("NV003", "Lê Hoàng Cường", "Lê Hoàng Cường", "Nam", "0905556666", "Nhân viên", true, "Đang hoạt động", "cuong_kho", "cuong_kho", "123456");
         }
 
         private void HienThiThongTinDong(int rowIndex)
@@ -512,6 +537,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
             txtMaNV.Text = row.Cells["colMaNV"].Value?.ToString() ?? "";
             txtHoTen.Text = row.Cells["colHoTen"].Value?.ToString() ?? "";
+            cboGioiTinh.Text = row.Cells["colGioiTinh"].Value?.ToString() ?? "Khác";
             txtSDT.Text = row.Cells["colSDT"].Value?.ToString() ?? "";
             cboChucVu.Text = row.Cells["colChucVu"].Value?.ToString() ?? "Nhân viên";
 
@@ -581,7 +607,7 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             else
             {
-                dtNhanVien.DefaultView.RowFilter = $"MaNV LIKE '%{tuKhoa}%' OR HoTen LIKE '%{tuKhoa}%' OR SDT LIKE '%{tuKhoa}%' OR ChucVu LIKE '%{tuKhoa}%'";
+                dtNhanVien.DefaultView.RowFilter = $"MaNV LIKE '%{tuKhoa}%' OR HoTen LIKE '%{tuKhoa}%' OR GioiTinh LIKE '%{tuKhoa}%' OR SDT LIKE '%{tuKhoa}%' OR ChucVu LIKE '%{tuKhoa}%'";
             }
         }
 
@@ -636,6 +662,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 txtMaNV.Text = TaoMaNVTuDong();
                 txtHoTen.Clear();
+                cboGioiTinh.SelectedIndex = 0;
                 txtSDT.Clear();
                 txtTenDangNhap.Clear();
                 txtMatKhau.Clear();
@@ -686,6 +713,7 @@ namespace QuanLyBanLaptop.DanhMuc
             if (string.IsNullOrWhiteSpace(maMoi))
                 maMoi = TaoMaNVTuDong();
             string hoTen = txtHoTen.Text.Trim();
+            string gioiTinh = cboGioiTinh.Text;
             string sdt = txtSDT.Text.Trim();
             string chucVu = cboChucVu.Text;
             string tenDN = txtTenDangNhap.Text.Trim();
@@ -712,8 +740,8 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 try
                 {
-                    string sqlInsert = $"INSERT INTO NHAN_VIEN (MaNV, TenNV, SDT, ChucVu, TenDN, MatKhau) " +
-                                       $"VALUES ('{maMoi}', N'{hoTen}', '{sdt}', N'{chucVu}', '{tenDN}', '{matKhau}')";
+                    string sqlInsert = $"INSERT INTO NHAN_VIEN (MaNV, TenNV, GioiTinh, SDT, ChucVu, TenDN, MatKhau) " +
+                                       $"VALUES ('{maMoi}', N'{hoTen}', N'{gioiTinh}', '{sdt}', N'{chucVu}', '{tenDN}', '{matKhau}')";
                     dataProcesser.CapNhatDuLieu(sqlInsert);
                 }
                 catch (Exception ex)
@@ -760,6 +788,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
             string maNV = txtMaNV.Text.Trim();
             string hoTen = txtHoTen.Text.Trim();
+            string gioiTinh = cboGioiTinh.Text;
             string sdt = txtSDT.Text.Trim();
             string chucVu = cboChucVu.Text;
             string tenDN = txtTenDangNhap.Text.Trim();
@@ -791,7 +820,7 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 try
                 {
-                    string sqlUpdate = $"UPDATE NHAN_VIEN SET TenNV = N'{hoTen}', SDT = '{sdt}', " +
+                    string sqlUpdate = $"UPDATE NHAN_VIEN SET TenNV = N'{hoTen}', GioiTinh = N'{gioiTinh}', SDT = '{sdt}', " +
                                        $"ChucVu = N'{chucVu}', TenDN = '{tenDN}'";
                     if (!string.IsNullOrWhiteSpace(matKhau))
                         sqlUpdate += $", MatKhau = '{matKhau}'";
@@ -812,6 +841,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 DataRow r = found[0];
                 r["TenNV"] = hoTen;
                 r["HoTen"] = hoTen;
+                r["GioiTinh"] = gioiTinh;
                 r["SDT"] = sdt;
                 r["ChucVu"] = chucVu;
                 r["TenDN"] = tenDN;
@@ -867,6 +897,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     }
 
                     row["TrangThai"] = false;
+                    row["TrangThaiText"] = "Đã bị khóa";
                     dgvNhanVien.Refresh();
                     CapNhatTrangThaiKhoaGiaoDien(false);
 
@@ -904,6 +935,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     }
 
                     row["TrangThai"] = true;
+                    row["TrangThaiText"] = "Đang hoạt động";
                     dgvNhanVien.Refresh();
                     CapNhatTrangThaiKhoaGiaoDien(true);
 

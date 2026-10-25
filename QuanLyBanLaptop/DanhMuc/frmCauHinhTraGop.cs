@@ -14,111 +14,26 @@ namespace QuanLyBanLaptop.DanhMuc
         private const string ConnectionString = @"Data Source=.;Initial Catalog=QuanLyBanLapTop;Integrated Security=True";
         private readonly Dictionary<string, ThamSo> danhSachThamSo = TaoDanhSachThamSo();
         private readonly DataTable bangCauHinh = new DataTable();
-        private ComboBox cboThamSo;
-        private TextBox txtKhoa;
-        private TextBox txtGiaTri;
-        private TextBox txtMoTa;
-        private DataGridView dgvCauHinh;
-        private Button btnSua;
-        private Button btnLuu;
-        private Button btnHuy;
         private bool dangSua;
 
         public frmCauHinhTraGop()
         {
             InitializeComponent();
-            KhoiTaoGiaoDien();
+            foreach (var item in danhSachThamSo.Values) cboThamSo.Items.Add(item);
+            cboThamSo.SelectedIndex = 0;
+            cboThamSo.SelectedIndexChanged += cboThamSo_SelectedIndexChanged;
+            dgvCauHinh.SelectionChanged += dgvCauHinh_SelectionChanged;
+            btnLamMoi.Click += (s, e) => TaiDuLieu();
+            btnSua.Click += btnSua_Click;
+            btnLuu.Click += btnLuu_Click;
+            btnHuy.Click += btnHuy_Click;
             Shown += (s, e) => TaiDuLieu();
             FormClosed += (s, e) =>
             {
                 if (Owner != null) Owner.Show();
             };
-        }
-
-        private void KhoiTaoGiaoDien()
-        {
-            Text = "Cấu hình Trả Góp & Hạng Thành Viên";
-            StartPosition = FormStartPosition.CenterScreen;
-            MinimumSize = new Size(920, 620);
-            Size = new Size(1100, 740);
-            WindowState = FormWindowState.Maximized;
-            BackColor = Color.FromArgb(245, 247, 250);
-            Font = new Font("Segoe UI", 9.5F);
-
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(24), ColumnCount = 1, RowCount = 4 };
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 210));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 126));
-            Controls.Add(root);
-
-            var header = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(34, 64, 139) };
-            header.Controls.Add(new Label { Text = "▦  Cấu hình Trả Góp & Hạng Thành Viên (Bảng CAU_HINH)", Dock = DockStyle.Left, Width = 690, ForeColor = Color.White, Font = new Font("Segoe UI", 12, FontStyle.Bold), TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(14, 0, 0, 0) });
-            header.Controls.Add(new Label { Text = "Quản trị viên", Dock = DockStyle.Right, Width = 160, ForeColor = Color.White, Font = new Font("Segoe UI", 9, FontStyle.Bold), TextAlign = ContentAlignment.MiddleCenter });
-            root.Controls.Add(header, 0, 0);
-
-            var info = new GroupBox { Text = "Thông tin tham số", Dock = DockStyle.Fill, Padding = new Padding(14) };
-            var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, RowCount = 3, Padding = new Padding(0, 4, 0, 0) };
-            grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 125)); grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 90)); grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 42)); grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 48)); grid.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            cboThamSo = new ComboBox { Dock = DockStyle.Fill, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 10) };
-            cboThamSo.Items.Add("-- Chọn nhanh tham số cấu hình hệ thống --");
-            foreach (var item in danhSachThamSo.Values) cboThamSo.Items.Add(item);
-            cboThamSo.SelectedIndex = 0;
-            cboThamSo.SelectedIndexChanged += cboThamSo_SelectedIndexChanged;
-            grid.Controls.Add(TaoNhan("Chọn tham số:"), 0, 0); grid.Controls.Add(cboThamSo, 1, 0); grid.SetColumnSpan(cboThamSo, 3);
-            txtKhoa = TaoTextBox(); txtKhoa.ReadOnly = true;
-            txtGiaTri = TaoTextBox(); txtGiaTri.TextAlign = HorizontalAlignment.Right;
-            grid.Controls.Add(TaoNhan("Mã tham số:"), 0, 1); grid.Controls.Add(txtKhoa, 1, 1);
-            grid.Controls.Add(TaoNhan("Giá trị:"), 2, 1); grid.Controls.Add(txtGiaTri, 3, 1);
-            txtMoTa = TaoTextBox(); txtMoTa.ReadOnly = true;
-            grid.Controls.Add(TaoNhan("Mô tả / Quy định:"), 0, 2); grid.Controls.Add(txtMoTa, 1, 2); grid.SetColumnSpan(txtMoTa, 3);
-            info.Controls.Add(grid); root.Controls.Add(info, 0, 1);
-
-            var details = new GroupBox { Text = "Thông tin quy định chi tiết", Dock = DockStyle.Fill, Padding = new Padding(12) };
-            dgvCauHinh = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AllowUserToAddRows = false, AllowUserToDeleteRows = false, MultiSelect = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill, RowHeadersVisible = false, BackgroundColor = Color.White, BorderStyle = BorderStyle.FixedSingle, EnableHeadersVisualStyles = false };
-            dgvCauHinh.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(34, 64, 139); dgvCauHinh.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            dgvCauHinh.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold); dgvCauHinh.ColumnHeadersHeight = 38; dgvCauHinh.RowTemplate.Height = 36;
-            dgvCauHinh.Columns.Add(new DataGridViewTextBoxColumn { Name = "MoTa", HeaderText = "Quy định / Mô tả", FillWeight = 48 });
-            dgvCauHinh.Columns.Add(new DataGridViewTextBoxColumn { Name = "Khoa", HeaderText = "Mã tham số (Khoa)", FillWeight = 24 });
-            dgvCauHinh.Columns.Add(new DataGridViewTextBoxColumn { Name = "GiaTri", HeaderText = "Giá trị", FillWeight = 13, DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleRight } });
-            dgvCauHinh.Columns.Add(new DataGridViewTextBoxColumn { Name = "DonVi", HeaderText = "Đơn vị", FillWeight = 15 });
-            dgvCauHinh.SelectionChanged += dgvCauHinh_SelectionChanged;
-            details.Controls.Add(dgvCauHinh); root.Controls.Add(details, 0, 2);
-
-            var actions = new GroupBox { Text = "Thao tác", Dock = DockStyle.Fill, Padding = new Padding(12) };
-            var footer = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, Padding = Padding.Empty };
-            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            footer.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
-            footer.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            footer.Controls.Add(new Label { Text = "* Dữ liệu được đọc và cập nhật trực tiếp trong SQL Server ('CAU_HINH').", Dock = DockStyle.Fill, ForeColor = Color.FromArgb(85, 105, 140), Font = new Font("Segoe UI", 9, FontStyle.Italic), TextAlign = ContentAlignment.MiddleLeft }, 0, 0);
-
-            var buttons = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, RowCount = 1, Padding = new Padding(0, 4, 0, 0) };
-            for (int i = 0; i < 4; i++) buttons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            buttons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            var btnLamMoi = TaoNut("↻  Làm mới", Color.FromArgb(232, 237, 244)); btnLamMoi.Click += (s, e) => TaiDuLieu();
-            btnSua = TaoNut("▣  Chỉnh sửa", Color.FromArgb(220, 232, 250)); btnSua.Click += btnSua_Click;
-            btnLuu = TaoNut("▣  Lưu cấu hình", Color.FromArgb(218, 239, 226)); btnLuu.Click += btnLuu_Click;
-            btnHuy = TaoNut("⊘  Hủy bỏ", Color.FromArgb(249, 225, 228)); btnHuy.Click += btnHuy_Click;
-            Button[] actionButtons = { btnLamMoi, btnSua, btnLuu, btnHuy };
-            for (int i = 0; i < actionButtons.Length; i++)
-            {
-                actionButtons[i].Dock = DockStyle.Fill;
-                actionButtons[i].Height = 48;
-                actionButtons[i].Margin = new Padding(8, 2, 8, 4);
-                buttons.Controls.Add(actionButtons[i], i, 0);
-            }
-            footer.Controls.Add(buttons, 0, 1);
-            actions.Controls.Add(footer);
-            root.Controls.Add(actions, 0, 3);
             CapNhatTrangThaiSua(false);
         }
-
-        private static Label TaoNhan(string text) { return new Label { Text = text, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft, ForeColor = Color.FromArgb(45, 58, 78) }; }
-        private static TextBox TaoTextBox() { return new TextBox { Dock = DockStyle.Fill, Font = new Font("Segoe UI", 10), Margin = new Padding(3, 6, 12, 6) }; }
-        private static Button TaoNut(string text, Color color) { return new Button { Text = text, Width = 160, Height = 48, BackColor = color, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 10.5F, FontStyle.Bold), Margin = new Padding(8, 2, 8, 4), Cursor = Cursors.Hand, UseVisualStyleBackColor = false }; }
-
         private void TaiDuLieu()
         {
             try
@@ -240,3 +155,4 @@ namespace QuanLyBanLaptop.DanhMuc
         }
     }
 }
+

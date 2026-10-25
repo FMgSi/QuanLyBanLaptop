@@ -462,7 +462,7 @@ GO
 /* ---------- 6.4 Bán hàng + trả góp ---------- */
 
 -- Tạo lịch trả góp cho hóa đơn (gọi nội bộ từ sp_BanHang)
-CREATE PROCEDURE dbo.sp_TaoLichTraGop @MaHD VARCHAR(10)
+CREATE PROCEDURE dbo.sp_TaoLichTraGop @MaHD NVARCHAR(30)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -563,7 +563,7 @@ END
 GO
 
 -- Thu một kỳ trả góp; thu đủ mọi kỳ thì hóa đơn chuyển "Đã thanh toán"
-CREATE PROCEDURE dbo.sp_ThanhToanKy @MaHD VARCHAR(10), @KyThu INT, @NgayTra DATE = NULL
+CREATE PROCEDURE dbo.sp_ThanhToanKy @MaHD NVARCHAR(30), @KyThu INT, @NgayTra DATE = NULL
 AS
 BEGIN
     SET NOCOUNT ON;

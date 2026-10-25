@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Windows.Forms;
 
@@ -57,5 +58,86 @@ namespace QuanLyBanLaptop.Classes
 
         public static DialogResult XacNhan(string msg)
             => MessageBox.Show(msg, "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+        /// <summary>
+        /// Đọc số tiền thành chữ tiếng Việt (VD: 1.374.000 -> Một triệu ba trăm bảy mươi tư nghìn đồng).
+        /// </summary>
+        public static string ChuyenSoThanhChu(decimal number)
+        {
+            if (number == 0) return "Không đồng";
+            if (number < 0) return "Âm " + ChuyenSoThanhChu(Math.Abs(number));
+
+            long n = (long)Math.Round(number);
+            if (n == 0) return "Không đồng";
+
+            string sNumber = n.ToString();
+            int len = sNumber.Length;
+            int rem = len % 3;
+            if (rem > 0)
+                sNumber = sNumber.PadLeft(len + (3 - rem), '0');
+
+            string[] chuSo = { "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín" };
+            string[] dvTien = { "", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ" };
+
+            int numGroups = sNumber.Length / 3;
+            string result = "";
+
+            for (int i = 0; i < numGroups; i++)
+            {
+                string group = sNumber.Substring(i * 3, 3);
+                int tram = group[0] - '0';
+                int chuc = group[1] - '0';
+                int donvi = group[2] - '0';
+
+                if (tram == 0 && chuc == 0 && donvi == 0)
+                    continue;
+
+                string groupStr = "";
+                if (i == 0 && tram == 0)
+                {
+                    if (chuc == 1)
+                        groupStr += "mười ";
+                    else if (chuc > 1)
+                        groupStr += chuSo[chuc] + " mươi ";
+
+                    if (chuc > 0 && donvi == 1 && chuc != 1)
+                        groupStr += "mốt ";
+                    else if (chuc > 0 && donvi == 5)
+                        groupStr += "lăm ";
+                    else if (donvi > 0)
+                        groupStr += chuSo[donvi] + " ";
+                }
+                else
+                {
+                    groupStr += chuSo[tram] + " trăm ";
+
+                    if (chuc == 0 && donvi != 0)
+                        groupStr += "lẻ ";
+                    else if (chuc == 1)
+                        groupStr += "mười ";
+                    else if (chuc > 1)
+                        groupStr += chuSo[chuc] + " mươi ";
+
+                    if (chuc > 0 && donvi == 1 && chuc != 1)
+                        groupStr += "mốt ";
+                    else if (chuc > 0 && donvi == 5)
+                        groupStr += "lăm ";
+                    else if (donvi > 0)
+                        groupStr += chuSo[donvi] + " ";
+                }
+
+                int groupLevel = numGroups - 1 - i;
+                if (groupLevel >= 0 && groupLevel < dvTien.Length && !string.IsNullOrEmpty(dvTien[groupLevel]))
+                    groupStr += dvTien[groupLevel] + " ";
+
+                result += groupStr;
+            }
+
+            result = result.Trim();
+            if (string.IsNullOrEmpty(result)) return "Không đồng";
+            result = char.ToUpper(result[0]) + result.Substring(1) + " đồng";
+            while (result.Contains("  ")) result = result.Replace("  ", " ");
+            return result;
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace QuanLyBanLaptop
             this.picLogo = new System.Windows.Forms.PictureBox();
             this.pnlMenu = new System.Windows.Forms.Panel();
             this.btnThongKe = new System.Windows.Forms.Button();
+            this.btnTheoDoiTraGop = new System.Windows.Forms.Button();
             this.btnKhachHang = new System.Windows.Forms.Button();
             this.btnNhanVien = new System.Windows.Forms.Button();
             this.btnNhapHang = new System.Windows.Forms.Button();
@@ -56,6 +57,7 @@ namespace QuanLyBanLaptop
             // pnlMenu
             // 
             this.pnlMenu.Controls.Add(this.btnThongKe);
+            this.pnlMenu.Controls.Add(this.btnTheoDoiTraGop);
             this.pnlMenu.Controls.Add(this.btnKhachHang);
             this.pnlMenu.Controls.Add(this.btnNhanVien);
             this.pnlMenu.Controls.Add(this.btnNhapHang);
@@ -84,6 +86,23 @@ namespace QuanLyBanLaptop
             this.btnThongKe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnThongKe.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnThongKe.UseVisualStyleBackColor = true;
+            // 
+            // btnTheoDoiTraGop
+            // 
+            this.btnTheoDoiTraGop.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTheoDoiTraGop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTheoDoiTraGop.FlatAppearance.BorderSize = 0;
+            this.btnTheoDoiTraGop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTheoDoiTraGop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTheoDoiTraGop.Location = new System.Drawing.Point(0, 288);
+            this.btnTheoDoiTraGop.Name = "btnTheoDoiTraGop";
+            this.btnTheoDoiTraGop.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.btnTheoDoiTraGop.Size = new System.Drawing.Size(175, 48);
+            this.btnTheoDoiTraGop.TabIndex = 5;
+            this.btnTheoDoiTraGop.Text = "   Theo Dõi Trả Góp";
+            this.btnTheoDoiTraGop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTheoDoiTraGop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnTheoDoiTraGop.UseVisualStyleBackColor = true;
             // 
             // btnKhachHang
             // 
@@ -212,6 +231,7 @@ namespace QuanLyBanLaptop
         private System.Windows.Forms.Button btnNhapHang;
         private System.Windows.Forms.Button btnNhanVien;
         private System.Windows.Forms.Button btnKhachHang;
+        private System.Windows.Forms.Button btnTheoDoiTraGop;
         private System.Windows.Forms.Button btnThongKe;
         private System.Windows.Forms.Timer tmrCollapse;
     }

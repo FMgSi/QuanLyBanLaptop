@@ -1,4 +1,4 @@
-﻿namespace QuanLyBanLaptop.Classes
+namespace QuanLyBanLaptop.Classes
 {
     public enum NavigationMenu
     {
@@ -8,6 +8,7 @@
         NhapHang,
         NhanVien,
         KhachHang,
+        TheoDoiTraGop,
         ThongKe
     }
 }

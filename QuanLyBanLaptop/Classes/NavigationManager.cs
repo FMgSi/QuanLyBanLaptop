@@ -41,6 +41,9 @@ namespace QuanLyBanLaptop.Classes
                 case NavigationMenu.KhachHang:
                     newForm = new frmKhachHang();
                     break;
+                case NavigationMenu.TheoDoiTraGop:
+                    newForm = new frmQuanLyTraGop();
+                    break;
                 case NavigationMenu.ThongKe:
                     newForm = new frmThongKe();
                     break;

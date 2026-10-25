@@ -308,6 +308,43 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        public static Bitmap CreateInstallmentIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.FromArgb(245, 158, 11); // Gold / Amber
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
+
+                using (var pen = new Pen(c, 1.8f))
+                using (var brush = new SolidBrush(c))
+                {
+                    // Tờ lịch / văn bản hợp đồng
+                    float x = size * 0.16f;
+                    float y = size * 0.12f;
+                    float w = size * 0.68f;
+                    float h = size * 0.76f;
+                    g.DrawRectangle(pen, x, y, w, h);
+
+                    // Đầu móc lịch
+                    g.FillRectangle(brush, x + w * 0.2f, y - 2, 2.5f, 4);
+                    g.FillRectangle(brush, x + w * 0.65f, y - 2, 2.5f, 4);
+
+                    // Đường kẻ ngang đầu lịch
+                    g.DrawLine(pen, x, y + h * 0.28f, x + w, y + h * 0.28f);
+
+                    // Ký hiệu $ hoặc % ở giữa
+                    using (var font = new Font("Arial", size * 0.36f, FontStyle.Bold))
+                    {
+                        var sz = g.MeasureString("$", font);
+                        g.DrawString("$", font, brush, x + (w - sz.Width) / 2f + 1, y + h * 0.32f);
+                    }
+                }
+            }
+            return bmp;
+        }
+
         public static void EnsureIconsSaved(string baseDirectory)
         {
             try

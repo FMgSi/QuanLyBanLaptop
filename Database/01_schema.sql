@@ -14,15 +14,15 @@
      - Danh sách hàng truyền bằng table-valued parameter (TVP_BanHang, TVP_NhapHang).
    ===================================================================== */
 
-IF DB_ID(N'QuanLyBanLaptop') IS NOT NULL
+IF DB_ID(N'QuanLyBanLaptop_V2') IS NOT NULL
 BEGIN
-    ALTER DATABASE QuanLyBanLaptop SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE QuanLyBanLaptop;
+    ALTER DATABASE QuanLyBanLaptop_V2 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE QuanLyBanLaptop_V2;
 END
 GO
-CREATE DATABASE QuanLyBanLaptop;
+CREATE DATABASE QuanLyBanLaptop_V2;
 GO
-USE QuanLyBanLaptop;
+USE QuanLyBanLaptop_V2;
 GO
 
 /* =====================================================================
@@ -43,18 +43,25 @@ CREATE TABLE NHA_CUNG_CAP (
     Sdt    VARCHAR(15)    NULL
 );
 
+CREATE TABLE LOAI_MAY (
+    TenLoai NVARCHAR(50)  PRIMARY KEY,
+    MoTa    NVARCHAR(200) NULL
+);
+
 CREATE TABLE LAPTOP (
     MaLaptop        VARCHAR(10)   PRIMARY KEY,
     TenLaptop       NVARCHAR(100) NOT NULL,
-    Loai            NVARCHAR(50)  NULL,           -- Gaming, Văn phòng, Mỏng nhẹ...
+    Loai            NVARCHAR(50)  NULL REFERENCES LOAI_MAY(TenLoai),
     CPU             NVARCHAR(50)  NULL,
     RAM             VARCHAR(10)   NULL,
     SSD             VARCHAR(10)   NULL,
+    DonGiaNhap      DECIMAL(18,2) NULL DEFAULT 0,
     DonGia          DECIMAL(18,2) NOT NULL CHECK (DonGia >= 0),
     SoLuongTon      INT           NOT NULL DEFAULT 0 CHECK (SoLuongTon >= 0),  -- chỉ sửa qua sp_NhapHang/sp_BanHang
     ThoiGianBaoHanh INT           NOT NULL DEFAULT 12 CHECK (ThoiGianBaoHanh >= 0),  -- tháng
     MaNCC           VARCHAR(10)   NOT NULL REFERENCES NHA_CUNG_CAP(MaNCC),
-    HinhAnh         NVARCHAR(255) NULL,
+    Anh             NVARCHAR(255) NULL,
+    GhiChu          NVARCHAR(500) NULL,
     NgungKinhDoanh  BIT           NOT NULL DEFAULT 0   -- soft delete
 );
 

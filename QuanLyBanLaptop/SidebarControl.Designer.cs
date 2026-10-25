@@ -22,6 +22,8 @@ namespace QuanLyBanLaptop
             this.picLogo = new System.Windows.Forms.PictureBox();
             this.pnlMenu = new System.Windows.Forms.Panel();
             this.btnThongKe = new System.Windows.Forms.Button();
+            this.btnTheoDoiTraGop = new System.Windows.Forms.Button();
+            this.btnKhachHang = new System.Windows.Forms.Button();
             this.btnNhanVien = new System.Windows.Forms.Button();
             this.btnNhapHang = new System.Windows.Forms.Button();
             this.btnBanHang = new System.Windows.Forms.Button();
@@ -39,13 +41,13 @@ namespace QuanLyBanLaptop
             this.pnlLogo.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlLogo.Location = new System.Drawing.Point(0, 0);
             this.pnlLogo.Name = "pnlLogo";
-            this.pnlLogo.Size = new System.Drawing.Size(175, 80);
+            this.pnlLogo.Size = new System.Drawing.Size(230, 80);
             this.pnlLogo.TabIndex = 0;
             // 
             // picLogo
             // 
             this.picLogo.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picLogo.Location = new System.Drawing.Point(61, 14);
+            this.picLogo.Location = new System.Drawing.Point(89, 14);
             this.picLogo.Name = "picLogo";
             this.picLogo.Size = new System.Drawing.Size(52, 52);
             this.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -55,15 +57,17 @@ namespace QuanLyBanLaptop
             // pnlMenu
             // 
             this.pnlMenu.Controls.Add(this.btnThongKe);
+            this.pnlMenu.Controls.Add(this.btnTheoDoiTraGop);
+            this.pnlMenu.Controls.Add(this.btnKhachHang);
             this.pnlMenu.Controls.Add(this.btnNhanVien);
-            this.pnlMenu.Controls.Add(this.btnNhapHang);
+            // this.pnlMenu.Controls.Add(this.btnNhapHang); // Bỏ trang nhập hàng
             this.pnlMenu.Controls.Add(this.btnBanHang);
             this.pnlMenu.Controls.Add(this.btnQuanLyLaptop);
             this.pnlMenu.Controls.Add(this.btnTrangChu);
             this.pnlMenu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMenu.Location = new System.Drawing.Point(0, 80);
             this.pnlMenu.Name = "pnlMenu";
-            this.pnlMenu.Size = new System.Drawing.Size(175, 520);
+            this.pnlMenu.Size = new System.Drawing.Size(230, 570);
             this.pnlMenu.TabIndex = 1;
             // 
             // btnThongKe
@@ -73,15 +77,49 @@ namespace QuanLyBanLaptop
             this.btnThongKe.FlatAppearance.BorderSize = 0;
             this.btnThongKe.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThongKe.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnThongKe.Location = new System.Drawing.Point(0, 240);
+            this.btnThongKe.Location = new System.Drawing.Point(0, 288);
             this.btnThongKe.Name = "btnThongKe";
             this.btnThongKe.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnThongKe.Size = new System.Drawing.Size(175, 48);
-            this.btnThongKe.TabIndex = 5;
+            this.btnThongKe.Size = new System.Drawing.Size(230, 48);
+            this.btnThongKe.TabIndex = 6;
             this.btnThongKe.Text = "   Thống Kê";
             this.btnThongKe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnThongKe.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnThongKe.UseVisualStyleBackColor = true;
+            // 
+            // btnTheoDoiTraGop
+            // 
+            this.btnTheoDoiTraGop.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTheoDoiTraGop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnTheoDoiTraGop.FlatAppearance.BorderSize = 0;
+            this.btnTheoDoiTraGop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTheoDoiTraGop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTheoDoiTraGop.Location = new System.Drawing.Point(0, 288);
+            this.btnTheoDoiTraGop.Name = "btnTheoDoiTraGop";
+            this.btnTheoDoiTraGop.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.btnTheoDoiTraGop.Size = new System.Drawing.Size(230, 48);
+            this.btnTheoDoiTraGop.TabIndex = 5;
+            this.btnTheoDoiTraGop.Text = "   Theo Dõi Trả Góp";
+            this.btnTheoDoiTraGop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTheoDoiTraGop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnTheoDoiTraGop.UseVisualStyleBackColor = true;
+            // 
+            // btnKhachHang
+            // 
+            this.btnKhachHang.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnKhachHang.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnKhachHang.FlatAppearance.BorderSize = 0;
+            this.btnKhachHang.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnKhachHang.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnKhachHang.Location = new System.Drawing.Point(0, 240);
+            this.btnKhachHang.Name = "btnKhachHang";
+            this.btnKhachHang.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.btnKhachHang.Size = new System.Drawing.Size(230, 48);
+            this.btnKhachHang.TabIndex = 5;
+            this.btnKhachHang.Text = "   Khách Hàng";
+            this.btnKhachHang.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnKhachHang.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnKhachHang.UseVisualStyleBackColor = true;
             // 
             // btnNhanVien
             // 
@@ -93,7 +131,7 @@ namespace QuanLyBanLaptop
             this.btnNhanVien.Location = new System.Drawing.Point(0, 192);
             this.btnNhanVien.Name = "btnNhanVien";
             this.btnNhanVien.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnNhanVien.Size = new System.Drawing.Size(175, 48);
+            this.btnNhanVien.Size = new System.Drawing.Size(230, 48);
             this.btnNhanVien.TabIndex = 4;
             this.btnNhanVien.Text = "   Nhân Viên";
             this.btnNhanVien.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -110,12 +148,13 @@ namespace QuanLyBanLaptop
             this.btnNhapHang.Location = new System.Drawing.Point(0, 144);
             this.btnNhapHang.Name = "btnNhapHang";
             this.btnNhapHang.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnNhapHang.Size = new System.Drawing.Size(175, 48);
+            this.btnNhapHang.Size = new System.Drawing.Size(230, 48);
             this.btnNhapHang.TabIndex = 3;
             this.btnNhapHang.Text = "   Nhập Hàng";
             this.btnNhapHang.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnNhapHang.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnNhapHang.UseVisualStyleBackColor = true;
+            this.btnNhapHang.Visible = false;
             // 
             // btnBanHang
             // 
@@ -127,7 +166,7 @@ namespace QuanLyBanLaptop
             this.btnBanHang.Location = new System.Drawing.Point(0, 96);
             this.btnBanHang.Name = "btnBanHang";
             this.btnBanHang.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnBanHang.Size = new System.Drawing.Size(175, 48);
+            this.btnBanHang.Size = new System.Drawing.Size(230, 48);
             this.btnBanHang.TabIndex = 2;
             this.btnBanHang.Text = "   Bán Hàng";
             this.btnBanHang.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -144,7 +183,7 @@ namespace QuanLyBanLaptop
             this.btnQuanLyLaptop.Location = new System.Drawing.Point(0, 48);
             this.btnQuanLyLaptop.Name = "btnQuanLyLaptop";
             this.btnQuanLyLaptop.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnQuanLyLaptop.Size = new System.Drawing.Size(175, 48);
+            this.btnQuanLyLaptop.Size = new System.Drawing.Size(230, 48);
             this.btnQuanLyLaptop.TabIndex = 1;
             this.btnQuanLyLaptop.Text = "   Quản Lý Laptop";
             this.btnQuanLyLaptop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -161,7 +200,7 @@ namespace QuanLyBanLaptop
             this.btnTrangChu.Location = new System.Drawing.Point(0, 0);
             this.btnTrangChu.Name = "btnTrangChu";
             this.btnTrangChu.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
-            this.btnTrangChu.Size = new System.Drawing.Size(175, 48);
+            this.btnTrangChu.Size = new System.Drawing.Size(230, 48);
             this.btnTrangChu.TabIndex = 0;
             this.btnTrangChu.Text = "   Trang Chủ";
             this.btnTrangChu.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -174,7 +213,7 @@ namespace QuanLyBanLaptop
             this.Controls.Add(this.pnlMenu);
             this.Controls.Add(this.pnlLogo);
             this.Name = "SidebarControl";
-            this.Size = new System.Drawing.Size(175, 600);
+            this.Size = new System.Drawing.Size(230, 600);
             this.pnlLogo.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
             this.pnlMenu.ResumeLayout(false);
@@ -192,6 +231,8 @@ namespace QuanLyBanLaptop
         private System.Windows.Forms.Button btnBanHang;
         private System.Windows.Forms.Button btnNhapHang;
         private System.Windows.Forms.Button btnNhanVien;
+        private System.Windows.Forms.Button btnKhachHang;
+        private System.Windows.Forms.Button btnTheoDoiTraGop;
         private System.Windows.Forms.Button btnThongKe;
         private System.Windows.Forms.Timer tmrCollapse;
     }

@@ -13,6 +13,36 @@ namespace QuanLyBanLaptop.Classes
         private static readonly Dictionary<NavigationMenu, Form> _forms = new Dictionary<NavigationMenu, Form>();
         private static bool _isNavigating = false;
 
+        private static Form _hostForm;
+        private static Panel _containerPanel;
+        private static SidebarControl _mainSidebar;
+        private static Label _lblTitle;
+        private static Label _lblUser;
+
+        public static bool IsHosted => _hostForm != null && !_hostForm.IsDisposed && _containerPanel != null && !_containerPanel.IsDisposed;
+
+        public static void InitHost(Form hostForm, Panel containerPanel, SidebarControl sidebar, Label lblTitle = null, Label lblUser = null)
+        {
+            _hostForm = hostForm;
+            _containerPanel = containerPanel;
+            _mainSidebar = sidebar;
+            _lblTitle = lblTitle;
+            _lblUser = lblUser;
+
+            UpdateUserInfo();
+        }
+
+        public static void UpdateUserInfo()
+        {
+            if (_lblUser != null && !_lblUser.IsDisposed)
+            {
+                string name = !string.IsNullOrEmpty(UserSession.TenNV) ? UserSession.TenNV : "Quản trị viên";
+                string ma = !string.IsNullOrEmpty(UserSession.MaNV) ? $" ({UserSession.MaNV})" : "";
+                string role = !string.IsNullOrEmpty(UserSession.ChucVu) ? $" - {UserSession.ChucVu}" : "";
+                _lblUser.Text = $"👤 {name}{ma}{role}";
+            }
+        }
+
         public static Form GetForm(NavigationMenu menu)
         {
             if (_forms.TryGetValue(menu, out Form existing) && existing != null && !existing.IsDisposed)
@@ -33,10 +63,16 @@ namespace QuanLyBanLaptop.Classes
                     newForm = new frmBanHang();
                     break;
                 case NavigationMenu.NhapHang:
-                    newForm = new frmNhapHang();
+                    newForm = new frmTrangChu();
                     break;
                 case NavigationMenu.NhanVien:
                     newForm = new frmNhanVien();
+                    break;
+                case NavigationMenu.KhachHang:
+                    newForm = new frmKhachHang();
+                    break;
+                case NavigationMenu.TheoDoiTraGop:
+                    newForm = new frmQuanLyTraGop();
                     break;
                 case NavigationMenu.ThongKe:
                     newForm = new frmThongKe();
@@ -46,12 +82,23 @@ namespace QuanLyBanLaptop.Classes
                     break;
             }
 
-            // Hook close event to exit entire app when user clicks X on any form
+            // Hook close event: when hosted, closing a child view navigates back to TrangChu smoothly
             newForm.FormClosing += (s, e) =>
             {
-                if (!_isNavigating && e.CloseReason == CloseReason.UserClosing)
+                if (IsHosted)
                 {
-                    Application.Exit();
+                    if (e.CloseReason == CloseReason.UserClosing)
+                    {
+                        e.Cancel = true;
+                        Navigate(NavigationMenu.TrangChu);
+                    }
+                }
+                else
+                {
+                    if (!_isNavigating && e.CloseReason == CloseReason.UserClosing)
+                    {
+                        Application.Exit();
+                    }
                 }
             };
 
@@ -66,47 +113,130 @@ namespace QuanLyBanLaptop.Classes
                 _forms[menu] = form;
                 form.FormClosing += (s, e) =>
                 {
-                    if (!_isNavigating && e.CloseReason == CloseReason.UserClosing)
+                    if (IsHosted)
                     {
-                        Application.Exit();
+                        if (e.CloseReason == CloseReason.UserClosing)
+                        {
+                            e.Cancel = true;
+                            Navigate(NavigationMenu.TrangChu);
+                        }
+                    }
+                    else
+                    {
+                        if (!_isNavigating && e.CloseReason == CloseReason.UserClosing)
+                        {
+                            Application.Exit();
+                        }
                     }
                 };
             }
         }
 
+        public static void Navigate(NavigationMenu targetMenu)
+        {
+            Navigate(null, targetMenu);
+        }
+
         public static void Navigate(Form currentForm, NavigationMenu targetMenu)
         {
+            if (IsHosted)
+            {
+                Form targetForm = GetForm(targetMenu);
+                if (targetForm == null || targetForm.IsDisposed) return;
+
+                // Hide local sidebar inside the child form to prevent duplicate sidebars
+                foreach (Control c in targetForm.Controls)
+                {
+                    if (c is SidebarControl sc)
+                    {
+                        sc.Visible = false;
+                    }
+                }
+
+                // Configure child form as embedded control
+                targetForm.TopLevel = false;
+                targetForm.FormBorderStyle = FormBorderStyle.None;
+                targetForm.Dock = DockStyle.Fill;
+
+                _containerPanel.SuspendLayout();
+                if (!_containerPanel.Controls.Contains(targetForm))
+                {
+                    _containerPanel.Controls.Add(targetForm);
+                }
+
+                foreach (Control c in _containerPanel.Controls)
+                {
+                    if (c != targetForm)
+                    {
+                        c.Visible = false;
+                    }
+                }
+
+                targetForm.Visible = true;
+                targetForm.BringToFront();
+                targetForm.Show();
+                _containerPanel.ResumeLayout(true);
+
+                if (_lblTitle != null && !_lblTitle.IsDisposed)
+                {
+                    _lblTitle.Text = GetMenuTitle(targetMenu);
+                }
+
+                if (_mainSidebar != null && !_mainSidebar.IsDisposed)
+                {
+                    _mainSidebar.SelectedMenu = targetMenu;
+                    _mainSidebar.RefreshOverdueBadge();
+                }
+
+                return;
+            }
+
+            // Fallback for standalone window mode
             if (currentForm == null || currentForm.IsDisposed) return;
 
-            // Check if currentForm already matches targetMenu
-            Form targetForm = GetForm(targetMenu);
-            if (targetForm == currentForm) return;
+            Form standaloneTarget = GetForm(targetMenu);
+            if (standaloneTarget == currentForm) return;
 
             _isNavigating = true;
             try
             {
-                // Synchronize geometry & window state seamlessly
-                targetForm.StartPosition = FormStartPosition.Manual;
+                standaloneTarget.StartPosition = FormStartPosition.Manual;
                 if (currentForm.WindowState == FormWindowState.Normal)
                 {
-                    targetForm.WindowState = FormWindowState.Normal;
-                    targetForm.Location = currentForm.Location;
-                    targetForm.Size = currentForm.Size;
+                    standaloneTarget.WindowState = FormWindowState.Normal;
+                    standaloneTarget.Location = currentForm.Location;
+                    standaloneTarget.Size = currentForm.Size;
                 }
                 else
                 {
-                    targetForm.WindowState = currentForm.WindowState;
+                    standaloneTarget.WindowState = currentForm.WindowState;
                 }
 
-                targetForm.Show();
-                targetForm.BringToFront();
-                targetForm.Activate();
+                standaloneTarget.Show();
+                standaloneTarget.BringToFront();
+                standaloneTarget.Activate();
 
                 currentForm.Hide();
             }
             finally
             {
                 _isNavigating = false;
+            }
+        }
+
+        public static string GetMenuTitle(NavigationMenu menu)
+        {
+            switch (menu)
+            {
+                case NavigationMenu.TrangChu: return "Trang Chủ";
+                case NavigationMenu.QuanLyLaptop: return "Quản Lý Laptop";
+                case NavigationMenu.BanHang: return "Hóa Đơn Bán Hàng";
+                case NavigationMenu.NhapHang: return "Quản Lý Nhập Hàng";
+                case NavigationMenu.NhanVien: return "Quản Lý Nhân Viên";
+                case NavigationMenu.KhachHang: return "Quản Lý Khách Hàng";
+                case NavigationMenu.TheoDoiTraGop: return "Theo Dõi & Thu Tiền Trả Góp";
+                case NavigationMenu.ThongKe: return "Báo Cáo & Thống Kê Doanh Thu";
+                default: return "Hệ Thống Quản Lý Bán Laptop";
             }
         }
     }

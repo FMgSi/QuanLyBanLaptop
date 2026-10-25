@@ -11,9 +11,10 @@ namespace QuanLyBanLaptop
     {
         private NavigationMenu _selectedMenu = NavigationMenu.TrangChu;
         private bool _isCollapsed = false;
-        private const int EXPANDED_WIDTH = 175;
-        private const int COLLAPSED_WIDTH = 56;
-        private const int STEP_WIDTH = 30;
+        private int _overdueCount = 0;
+        private const int EXPANDED_WIDTH = 230;
+        private const int COLLAPSED_WIDTH = 64;
+        private const int STEP_WIDTH = 25;
 
         [Description("The currently selected menu item on the sidebar")]
         [DefaultValue(NavigationMenu.TrangChu)]
@@ -60,6 +61,8 @@ namespace QuanLyBanLaptop
             btnBanHang.Image = IconHelper.CreateCartIcon(20);
             btnNhapHang.Image = IconHelper.CreateImportCartIcon(20);
             btnNhanVien.Image = IconHelper.CreateUserIcon(20);
+            btnKhachHang.Image = IconHelper.CreateCustomerIcon(20);
+            btnTheoDoiTraGop.Image = IconHelper.CreateInstallmentIcon(20);
             btnThongKe.Image = IconHelper.CreateChartIcon(20);
 
             // Button tag mapping
@@ -68,6 +71,8 @@ namespace QuanLyBanLaptop
             btnBanHang.Tag = NavigationMenu.BanHang;
             btnNhapHang.Tag = NavigationMenu.NhapHang;
             btnNhanVien.Tag = NavigationMenu.NhanVien;
+            btnKhachHang.Tag = NavigationMenu.KhachHang;
+            btnTheoDoiTraGop.Tag = NavigationMenu.TheoDoiTraGop;
             btnThongKe.Tag = NavigationMenu.ThongKe;
 
             // Common button appearance
@@ -87,7 +92,46 @@ namespace QuanLyBanLaptop
             var tip = new ToolTip();
             tip.SetToolTip(picLogo, "Bấm để thu gọn / mở rộng menu");
 
+            // Vẽ badge đỏ cảnh báo kỳ quá hạn trên nút Theo Dõi Trả Góp
+            btnTheoDoiTraGop.Paint += (s, e) =>
+            {
+                if (_overdueCount > 0 && !_isCollapsed)
+                {
+                    string badgeText = _overdueCount > 99 ? "99+" : _overdueCount.ToString();
+                    int badgeSize = 20;
+                    int badgeX = btnTheoDoiTraGop.Width - badgeSize - 16;
+                    int badgeY = (btnTheoDoiTraGop.Height - badgeSize) / 2;
+
+                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    using (var brush = new SolidBrush(Color.FromArgb(239, 68, 68))) // Red
+                    {
+                        e.Graphics.FillEllipse(brush, badgeX, badgeY, badgeSize, badgeSize);
+                    }
+                    using (var font = new Font("Segoe UI", 8.2f, FontStyle.Bold))
+                    using (var textBrush = new SolidBrush(Color.White))
+                    {
+                        var sz = e.Graphics.MeasureString(badgeText, font);
+                        e.Graphics.DrawString(badgeText, font, textBrush,
+                            badgeX + (badgeSize - sz.Width) / 2f + 0.5f,
+                            badgeY + (badgeSize - sz.Height) / 2f + 0.5f);
+                    }
+                }
+            };
+
+            RefreshOverdueBadge();
             UpdateMenuStyles();
+        }
+
+        public void RefreshOverdueBadge()
+        {
+            try
+            {
+                object countObj = DataProcesser.ExecuteScalarSilent(
+                    "SELECT COUNT(DISTINCT MaHD) FROM LICH_TRA_GOP WHERE NgayTra IS NULL AND NgayDenHan < CAST(GETDATE() AS DATE)");
+                _overdueCount = (countObj != null && countObj != DBNull.Value) ? Convert.ToInt32(countObj) : 0;
+                btnTheoDoiTraGop.Invalidate();
+            }
+            catch { }
         }
 
         private void SetupEvents()
@@ -118,10 +162,7 @@ namespace QuanLyBanLaptop
                 UpdateMenuStyles();
 
                 Form parentForm = FindForm();
-                if (parentForm != null)
-                {
-                    NavigationManager.Navigate(parentForm, menu);
-                }
+                NavigationManager.Navigate(parentForm, menu);
             }
         }
 
@@ -202,9 +243,11 @@ namespace QuanLyBanLaptop
             btnBanHang.Text = visible ? "   Bán Hàng" : "";
             btnNhapHang.Text = visible ? "   Nhập Hàng" : "";
             btnNhanVien.Text = visible ? "   Nhân Viên" : "";
+            btnKhachHang.Text = visible ? "   Khách Hàng" : "";
+            btnTheoDoiTraGop.Text = visible ? "   Theo Dõi Trả Góp" : "";
             btnThongKe.Text = visible ? "   Thống Kê" : "";
 
-            int paddingLeft = visible ? 12 : 16;
+            int paddingLeft = visible ? 16 : 18;
             foreach (Control c in pnlMenu.Controls)
             {
                 if (c is Button b)

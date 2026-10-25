@@ -257,6 +257,94 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        public static Bitmap CreateCustomerIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.White;
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
+
+                using (var brush = new SolidBrush(c))
+                using (var pen = new Pen(c, 1.6f))
+                {
+                    // Two users to represent customers
+                    // Main user (front)
+                    float hd = size * 0.30f;
+                    float hx = size * 0.36f;
+                    float hy = size * 0.08f;
+                    g.FillEllipse(brush, hx, hy, hd, hd);
+
+                    float bW = size * 0.56f;
+                    float bX = (size - bW) / 2f + size * 0.06f;
+                    float bY = size * 0.46f;
+                    using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+                    {
+                        path.AddArc(bX, bY, bW, bW * 0.72f, 180, 180);
+                        path.CloseFigure();
+                        g.FillPath(brush, path);
+                    }
+
+                    // Second user (back, smaller, slightly offset left)
+                    float hd2 = size * 0.24f;
+                    float hx2 = size * 0.06f;
+                    float hy2 = size * 0.14f;
+                    using (var brush2 = new SolidBrush(Color.FromArgb(180, c.R, c.G, c.B)))
+                    {
+                        g.FillEllipse(brush2, hx2, hy2, hd2, hd2);
+                        float bW2 = size * 0.38f;
+                        float bX2 = hx2 - size * 0.04f;
+                        float bY2 = size * 0.48f;
+                        using (var path2 = new System.Drawing.Drawing2D.GraphicsPath())
+                        {
+                            path2.AddArc(bX2, bY2, bW2, bW2 * 0.65f, 180, 180);
+                            path2.CloseFigure();
+                            g.FillPath(brush2, path2);
+                        }
+                    }
+                }
+            }
+            return bmp;
+        }
+
+        public static Bitmap CreateInstallmentIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.FromArgb(245, 158, 11); // Gold / Amber
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
+
+                using (var pen = new Pen(c, 1.8f))
+                using (var brush = new SolidBrush(c))
+                {
+                    // Tờ lịch / văn bản hợp đồng
+                    float x = size * 0.16f;
+                    float y = size * 0.12f;
+                    float w = size * 0.68f;
+                    float h = size * 0.76f;
+                    g.DrawRectangle(pen, x, y, w, h);
+
+                    // Đầu móc lịch
+                    g.FillRectangle(brush, x + w * 0.2f, y - 2, 2.5f, 4);
+                    g.FillRectangle(brush, x + w * 0.65f, y - 2, 2.5f, 4);
+
+                    // Đường kẻ ngang đầu lịch
+                    g.DrawLine(pen, x, y + h * 0.28f, x + w, y + h * 0.28f);
+
+                    // Ký hiệu $ hoặc % ở giữa
+                    using (var font = new Font("Arial", size * 0.36f, FontStyle.Bold))
+                    {
+                        var sz = g.MeasureString("$", font);
+                        g.DrawString("$", font, brush, x + (w - sz.Width) / 2f + 1, y + h * 0.32f);
+                    }
+                }
+            }
+            return bmp;
+        }
+
         public static void EnsureIconsSaved(string baseDirectory)
         {
             try

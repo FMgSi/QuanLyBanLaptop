@@ -2,7 +2,7 @@
    QuanLyBanLaptop - 03_doi_soat.sql
    Đối soát dữ liệu dẫn xuất. Kết quả ĐÚNG là không có dòng nào.
    ===================================================================== */
-USE QuanLyBanLaptop;
+USE QuanLyBanLaptop_V2;
 GO
 
 SELECT N'Tồn kho lệch số serial trong kho' AS Loai, MaLaptop AS Khoa,

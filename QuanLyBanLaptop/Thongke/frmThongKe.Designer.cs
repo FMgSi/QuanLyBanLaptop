@@ -62,7 +62,7 @@ namespace QuanLyBanLaptop.Thongke
             this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
             this.sidebarControl1.Name = "sidebarControl1";
             this.sidebarControl1.SelectedMenu = QuanLyBanLaptop.Classes.NavigationMenu.ThongKe;
-            this.sidebarControl1.Size = new System.Drawing.Size(175, 661);
+            this.sidebarControl1.Size = new System.Drawing.Size(230, 661);
             this.sidebarControl1.TabIndex = 0;
             // 
             // pnlMain
@@ -73,7 +73,7 @@ namespace QuanLyBanLaptop.Thongke
             this.pnlMain.Controls.Add(this.grpBoLoc);
             this.pnlMain.Controls.Add(this.pnlHeader);
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(175, 0);
+            this.pnlMain.Location = new System.Drawing.Point(230, 0);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Padding = new System.Windows.Forms.Padding(16);
             this.pnlMain.Size = new System.Drawing.Size(959, 661);

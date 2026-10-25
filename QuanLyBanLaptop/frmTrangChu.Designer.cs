@@ -50,7 +50,7 @@ namespace QuanLyBanLaptop
             this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
             this.sidebarControl1.Name = "sidebarControl1";
             this.sidebarControl1.SelectedMenu = QuanLyBanLaptop.Classes.NavigationMenu.TrangChu;
-            this.sidebarControl1.Size = new System.Drawing.Size(175, 661);
+            this.sidebarControl1.Size = new System.Drawing.Size(230, 661);
             this.sidebarControl1.TabIndex = 0;
             // 
             // pnlContent
@@ -59,7 +59,7 @@ namespace QuanLyBanLaptop
             this.pnlContent.Controls.Add(this.pnlCards);
             this.pnlContent.Controls.Add(this.pnlHeader);
             this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlContent.Location = new System.Drawing.Point(175, 0);
+            this.pnlContent.Location = new System.Drawing.Point(230, 0);
             this.pnlContent.Name = "pnlContent";
             this.pnlContent.Padding = new System.Windows.Forms.Padding(24);
             this.pnlContent.Size = new System.Drawing.Size(959, 661);
@@ -104,7 +104,7 @@ namespace QuanLyBanLaptop
             this.pnlCards.AutoScroll = true;
             this.pnlCards.Controls.Add(this.pnlCardLaptop);
             this.pnlCards.Controls.Add(this.pnlCardBanHang);
-            this.pnlCards.Controls.Add(this.pnlCardNhapHang);
+            // this.pnlCards.Controls.Add(this.pnlCardNhapHang); // Bỏ trang nhập hàng
             this.pnlCards.Controls.Add(this.pnlCardNhanVien);
             this.pnlCards.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlCards.Location = new System.Drawing.Point(24, 104);
@@ -224,7 +224,7 @@ namespace QuanLyBanLaptop
             this.pnlCardNhanVien.Controls.Add(this.lblCardNhanVienCount);
             this.pnlCardNhanVien.Controls.Add(this.lblCardNhanVienTitle);
             this.pnlCardNhanVien.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlCardNhanVien.Location = new System.Drawing.Point(675, 20);
+            this.pnlCardNhanVien.Location = new System.Drawing.Point(450, 20);
             this.pnlCardNhanVien.Margin = new System.Windows.Forms.Padding(0, 0, 20, 20);
             this.pnlCardNhanVien.Name = "pnlCardNhanVien";
             this.pnlCardNhanVien.Padding = new System.Windows.Forms.Padding(16);
@@ -264,6 +264,7 @@ namespace QuanLyBanLaptop
             this.Name = "frmTrangChu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TRANG CHỦ - QUẢN LÝ BÁN LAPTOP";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.pnlContent.ResumeLayout(false);
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();

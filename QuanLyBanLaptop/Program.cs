@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 
 namespace QuanLyBanLaptop
@@ -13,7 +13,7 @@ namespace QuanLyBanLaptop
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmTrangChu());
+            Application.Run(new frmMain());
         }
     }
 }

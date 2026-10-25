@@ -5,7 +5,7 @@
 
    Tài khoản mẫu: admin / admin123 ; binh_sale / 123456 ; cuong_kho / 123456
    ===================================================================== */
-USE QuanLyBanLaptop;
+USE QuanLyBanLaptop_V2;
 GO
 SET NOCOUNT ON;
 
@@ -23,18 +23,25 @@ INSERT NHA_CUNG_CAP (MaNCC, TenNCC, DiaChi, Sdt) VALUES
 ('NCC04', N'Công ty Thương Mại HP Việt Nam',        N'Thanh Xuân, Hà Nội',      '0243332211'),
 ('NCC05', N'Nhà Phân Phối Lenovo Việt Nam',         N'Đống Đa, Hà Nội',         '0245556666');
 
+INSERT LOAI_MAY (TenLoai, MoTa) VALUES
+(N'Gaming',    N'Laptop chuyên chơi game và đồ họa nặng'),
+(N'Văn phòng', N'Laptop học tập và làm việc văn phòng nhẹ nhàng'),
+(N'Mỏng nhẹ',  N'Laptop cao cấp mỏng nhẹ, pin lâu, tiện di chuyển'),
+(N'Đồ họa',    N'Laptop chuyên render đồ họa, dựng video'),
+(N'Doanh nhân', N'Laptop mỏng nhẹ sang trọng cho doanh nhân');
+
 -- SoLuongTon = 0: tồn kho được cộng bởi sp_NhapHang bên dưới
-INSERT LAPTOP (MaLaptop, TenLaptop, Loai, CPU, RAM, SSD, DonGia, SoLuongTon, ThoiGianBaoHanh, MaNCC, HinhAnh) VALUES
-('LT001', N'Acer Nitro 5 AN515',      N'Gaming',    N'Core i5 12500H', '8GB',  '512GB', 18500000, 0, 12, 'NCC02', N'acer_nitro_5.jpg'),
-('LT002', N'Asus ROG Strix G15',      N'Gaming',    N'Ryzen 7 5800H',  '16GB', '512GB', 24500000, 0, 24, 'NCC01', N'asus_rog_g15.jpg'),
-('LT003', N'Dell Inspiron 15 3520',   N'Văn phòng', N'Core i5 1235U',  '8GB',  '512GB', 14200000, 0, 12, 'NCC03', N'dell_inspiron_3520.jpg'),
-('LT004', N'HP Pavilion 15',          N'Văn phòng', N'Core i5 1335U',  '16GB', '512GB', 16800000, 0, 12, 'NCC04', N'hp_pavilion_15.jpg'),
-('LT005', N'Lenovo IdeaPad Slim 3',   N'Văn phòng', N'Ryzen 5 7520U',  '8GB',  '256GB', 10500000, 0, 24, 'NCC05', N'lenovo_ideapad_slim3.jpg'),
-('LT006', N'Asus ZenBook 14 OLED',    N'Mỏng nhẹ',  N'Core i5 1340P',  '16GB', '512GB', 21900000, 0, 24, 'NCC01', N'asus_zenbook_14.jpg'),
-('LT007', N'Dell Vostro 3430',        N'Văn phòng', N'Core i3 1305U',  '8GB',  '256GB', 11200000, 0, 12, 'NCC03', N'dell_vostro_3430.jpg'),
-('LT008', N'Acer Swift Go 14',        N'Mỏng nhẹ',  N'Core i5 13500H', '16GB', '512GB', 17900000, 0, 12, 'NCC02', N'acer_swift_go.jpg'),
-('LT009', N'HP Victus 16',            N'Gaming',    N'Ryzen 5 7640HS', '16GB', '512GB', 19800000, 0, 12, 'NCC04', N'hp_victus_16.jpg'),
-('LT010', N'Lenovo Legion 5',         N'Gaming',    N'Core i7 13700H', '16GB', '1TB',   32500000, 0, 36, 'NCC05', N'lenovo_legion_5.jpg');
+INSERT LAPTOP (MaLaptop, TenLaptop, Loai, CPU, RAM, SSD, DonGiaNhap, DonGia, SoLuongTon, ThoiGianBaoHanh, MaNCC, Anh, GhiChu) VALUES
+('LT001', N'Acer Nitro 5 AN515',      N'Gaming',    N'Core i5 12500H', '8GB',  '512GB', 14800000, 18500000, 0, 12, 'NCC02', N'LT001.jpg', N'Laptop gaming quốc dân'),
+('LT002', N'Asus ROG Strix G15',      N'Gaming',    N'Ryzen 7 5800H',  '16GB', '512GB', 19600000, 24500000, 0, 24, 'NCC01', N'LT002.jpg', N'Hiệu năng cao, tản nhiệt tốt'),
+('LT003', N'Dell Inspiron 15 3520',   N'Văn phòng', N'Core i5 1235U',  '8GB',  '512GB', 11360000, 14200000, 0, 12, 'NCC03', N'LT003.jpg', N'Văn phòng bền bỉ'),
+('LT004', N'HP Pavilion 15',          N'Văn phòng', N'Core i5 1335U',  '16GB', '512GB', 13440000, 16800000, 0, 12, 'NCC04', N'LT004.jpg', N'Thiết kế sang trọng'),
+('LT005', N'Lenovo IdeaPad Slim 3',   N'Văn phòng', N'Ryzen 5 7520U',  '8GB',  '256GB', 8400000,  10500000, 0, 24, 'NCC05', N'LT005.jpg', N'Mỏng nhẹ học tập'),
+('LT006', N'Asus ZenBook 14 OLED',    N'Mỏng nhẹ',  N'Core i5 1340P',  '16GB', '512GB', 17520000, 21900000, 0, 24, 'NCC01', N'LT006.jpg', N'Màn hình OLED sắc nét'),
+('LT007', N'Dell Vostro 3430',        N'Văn phòng', N'Core i3 1305U',  '8GB',  '256GB', 8960000,  11200000, 0, 12, 'NCC03', N'LT007.jpg', N'Phù hợp kế toán'),
+('LT008', N'Acer Swift Go 14',        N'Mỏng nhẹ',  N'Core i5 13500H', '16GB', '512GB', 14320000, 17900000, 0, 12, 'NCC02', N'LT008.jpg', N'Mỏng nhẹ vỏ nhôm'),
+('LT009', N'HP Victus 16',            N'Gaming',    N'Ryzen 5 7640HS', '16GB', '512GB', 15840000, 19800000, 0, 12, 'NCC04', N'LT009.jpg', N'Gaming màn lớn 16 inch'),
+('LT010', N'Lenovo Legion 5',         N'Gaming',    N'Core i7 13700H', '16GB', '1TB',   26000000, 32500000, 0, 36, 'NCC05', N'LT010.jpg', N'Đỉnh cao đồ họa & game');
 
 INSERT NHAN_VIEN (MaNV, TenNV, SDT, ChucVu, TenDN, MatKhau) VALUES
 ('NV001', N'Nguyễn Văn An',   '0912345678', N'Quản trị viên', 'admin',     ''),

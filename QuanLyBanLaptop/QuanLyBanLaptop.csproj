@@ -34,6 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -47,16 +49,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\DataProcesser.cs" />
+    <Compile Include="Classes\DbHelpers.cs" />
     <Compile Include="Classes\Function.cs" />
     <Compile Include="Classes\SidebarTheme.cs" />
     <Compile Include="Classes\NavigationMenu.cs" />
     <Compile Include="Classes\IconHelper.cs" />
     <Compile Include="Classes\NavigationManager.cs" />
+    <Compile Include="Classes\UserSession.cs" />
     <Compile Include="SidebarControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="SidebarControl.Designer.cs">
       <DependentUpon>SidebarControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DanhMuc\frmKhachHang.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DanhMuc\frmKhachHang.Designer.cs">
+      <DependentUpon>frmKhachHang.cs</DependentUpon>
     </Compile>
     <Compile Include="DanhMuc\frmNhanVien.cs">
       <SubType>Form</SubType>
@@ -76,6 +86,12 @@
     <Compile Include="frmDangNhap.Designer.cs">
       <DependentUpon>frmDangNhap.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmTrangChu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,11 +104,43 @@
     <Compile Include="HoaDon\frmBanHang.Designer.cs">
       <DependentUpon>frmBanHang.cs</DependentUpon>
     </Compile>
+    <Compile Include="HoaDon\frmThanhToan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HoaDon\frmThanhToan.Designer.cs">
+      <DependentUpon>frmThanhToan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\HoaDonPrintData.cs" />
+    <Compile Include="HoaDon\PhieuThuPrintData.cs" />
+    <Compile Include="HoaDon\frmPrintPreview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HoaDon\frmPrintPreview.Designer.cs">
+      <DependentUpon>frmPrintPreview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\frmThuTienTraGop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HoaDon\frmThuTienTraGop.Designer.cs">
+      <DependentUpon>frmThuTienTraGop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\frmQuanLyTraGop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HoaDon\frmQuanLyTraGop.Designer.cs">
+      <DependentUpon>frmQuanLyTraGop.cs</DependentUpon>
+    </Compile>
     <Compile Include="HoaDon\frmNhapHang.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="HoaDon\frmNhapHang.Designer.cs">
       <DependentUpon>frmNhapHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HoaDon\frmTimKiemLaptop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HoaDon\frmTimKiemLaptop.Designer.cs">
+      <DependentUpon>frmTimKiemLaptop.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,11 +150,29 @@
     <Compile Include="Thongke\frmThongKe.Designer.cs">
       <DependentUpon>frmThongKe.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DanhMuc\frmKhachHang.resx">
+      <DependentUpon>frmKhachHang.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DanhMuc\frmSanPham.resx">
+      <DependentUpon>frmSanPham.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmDangNhap.resx">
       <DependentUpon>frmDangNhap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HoaDon\frmBanHang.resx">
       <DependentUpon>frmBanHang.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HoaDon\frmNhapHang.resx">
+      <DependentUpon>frmNhapHang.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HoaDon\frmQuanLyTraGop.resx">
+      <DependentUpon>frmQuanLyTraGop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HoaDon\frmThanhToan.resx">
+      <DependentUpon>frmThanhToan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HoaDon\frmThuTienTraGop.resx">
+      <DependentUpon>frmThuTienTraGop.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -129,6 +195,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Resources\logo.png" />
+    <None Include="Resources\text_utc.png" />
+    <None Include="Resources\burger-menu.png" />
+    <None Include="Resources\icon_trangchu.png" />
+    <None Include="Resources\icon_laptop.png" />
+    <None Include="Resources\icon_banhang.png" />
+    <None Include="Resources\icon_nhaphang.png" />
+    <None Include="Resources\icon_nhanvien.png" />
+    <None Include="Resources\icon_thongke.png" />
+    <Content Include="Resources\vietqr_user.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\Images\Button\" />

@@ -9,8 +9,8 @@ namespace QuanLyBanLaptop.DanhMuc
 {
     public partial class frmNhanVien : QuanLyBanLaptop.Classes.AppForm
     {
-        private enum FormMode { View, Add, Edit }
-        private FormMode _mode = FormMode.View;
+        private enum FormMode { Normal, Adding, Selected, Editing }
+        private FormMode _mode = FormMode.Normal;
         private string _selectedMaNV = null;
 
         // Khởi tạo giao diện và đăng ký sự kiện cho form.
@@ -25,7 +25,7 @@ namespace QuanLyBanLaptop.DanhMuc
             cboChucVu.Items.AddRange(new object[] { "Quản trị viên", "Nhân viên" });
             cboChucVu.SelectedIndex = 1;
 
-            SetFormMode(FormMode.View);
+            SetFormMode(FormMode.Normal);
         }
 
         // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
@@ -36,6 +36,10 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 sidebarControl1.SelectedMenu = NavigationMenu.NhanVien;
                 LoadDanhSachNhanVien();
+                _selectedMaNV = null;
+                ClearForm();
+                dgvNhanVien.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
         }
 
@@ -51,6 +55,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 });
                 dgvNhanVien.DataSource = dt;
                 SetGridHeaders();
+                dgvNhanVien.ClearSelection();
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -70,12 +75,11 @@ namespace QuanLyBanLaptop.DanhMuc
             Function.DatTieuDeCot(dgvNhanVien, "TrangThai", "Trạng thái");
         }
 
-        // thiet lap che do form nhan vien
+        // Thiết lập chế độ thao tác form nhân viên theo chuẩn ButtonTheme
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
-            bool editing = (mode == FormMode.Add || mode == FormMode.Edit);
-            bool hasSelected = (_selectedMaNV != null);
+            bool editing = (mode == FormMode.Adding || mode == FormMode.Editing);
 
             txtMaNV.ReadOnly    = true;
             txtTenNV.ReadOnly   = !editing;
@@ -88,12 +92,52 @@ namespace QuanLyBanLaptop.DanhMuc
             txtTenDN.ReadOnly   = !editing;
             txtMatKhau.ReadOnly = !editing;
 
-            btnThem.Enabled  = !editing;
-            btnSua.Enabled   = !editing && hasSelected;
-            btnXoa.Enabled   = !editing && hasSelected;
-            btnLuu.Enabled   = editing;
-            btnHuy.Enabled   = editing;
-            btnThoat.Enabled = true;
+            txtTimKiem.Enabled = !editing;
+            btnTimKiem.Enabled = !editing;
+            btnLamMoi.Enabled  = !editing;
+
+            switch (mode)
+            {
+                case FormMode.Normal:
+                    // 1. Khi mở bảng lên: chỉ nút Thêm và Thoát bấm được
+                    ButtonTheme.SetButtonState(btnThem, true);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, false);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Adding:
+                    // 2. Khi bấm vào nút Thêm: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Selected:
+                    // 3. Nếu bấm vào dòng trong DataGridView: nút Hủy, Sửa (và Xóa) sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, true);
+                    ButtonTheme.SetButtonState(btnXoa, true);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Editing:
+                    // 4. Bấm vào nút Sửa: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+            }
         }
 
         // do du lieu tu dong vao o nhap
@@ -130,7 +174,7 @@ namespace QuanLyBanLaptop.DanhMuc
         // Thực hiện ClearForm theo trạng thái và dữ liệu hiện tại.
         private void ClearForm()
         {
-            txtMaNV.Text    = TaoMaNVTuDong();
+            txtMaNV.Text    = "";
             txtTenNV.Text   = "";
             txtSDT.Text     = "";
             txtDiaChi.Text  = "";
@@ -152,7 +196,8 @@ namespace QuanLyBanLaptop.DanhMuc
             LoadDanhSachNhanVien();
             _selectedMaNV = null;
             ClearForm();
-            SetFormMode(FormMode.View);
+            dgvNhanVien.ClearSelection();
+            SetFormMode(FormMode.Normal);
         }
 
         // Xử lý sự kiện btnThem_Click của giao diện.
@@ -160,7 +205,9 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             _selectedMaNV = null;
             ClearForm();
-            SetFormMode(FormMode.Add);
+            txtMaNV.Text = TaoMaNVTuDong();
+            dgvNhanVien.ClearSelection();
+            SetFormMode(FormMode.Adding);
             txtTenNV.Focus();
         }
 
@@ -169,10 +216,10 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (_selectedMaNV == null)
             {
-                Function.ThongBaoThanhCong("Vui lòng chọn nhân viên cần sửa.", "Thông báo");
+                Function.ThongBaoCanhBao("Vui lòng chọn nhân viên trong bảng cần sửa.", "Thông báo");
                 return;
             }
-            SetFormMode(FormMode.Edit);
+            SetFormMode(FormMode.Editing);
             txtTenNV.Focus();
         }
 
@@ -190,7 +237,7 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 string gioiTinh = radNam.Checked ? "Nam" : "Nữ";
 
-                if (_mode == FormMode.Add)
+                if (_mode == FormMode.Adding)
                 {
                     if (string.IsNullOrWhiteSpace(txtTenDN.Text))
                     {
@@ -229,7 +276,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     if (string.IsNullOrEmpty(newMa)) newMa = txtMaNV.Text;
                     Function.ThongBaoThanhCong($"Thêm nhân viên thành công! Mã: {newMa}", "Thành công");
                 }
-                else if (_mode == FormMode.Edit)
+                else if (_mode == FormMode.Editing)
                 {
                     DataProcesser.ExecProcNonQuery("sp_CapNhatNhanVien", new[]
                     {
@@ -245,11 +292,16 @@ namespace QuanLyBanLaptop.DanhMuc
                     });
                     Function.ThongBaoThanhCong("Cập nhật nhân viên thành công!", "Thành công");
                 }
+                else
+                {
+                    return;
+                }
 
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
+                dgvNhanVien.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -259,7 +311,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (_selectedMaNV == null)
             {
-                Function.ThongBaoThanhCong("Vui lòng chọn nhân viên cần xóa.", "Thông báo");
+                Function.ThongBaoCanhBao("Vui lòng chọn nhân viên trong bảng cần xóa.", "Thông báo");
                 return;
             }
             var confirm = MessageBox.Show(
@@ -275,7 +327,8 @@ namespace QuanLyBanLaptop.DanhMuc
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
+                dgvNhanVien.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -283,16 +336,10 @@ namespace QuanLyBanLaptop.DanhMuc
         // Xử lý sự kiện btnHuy_Click của giao diện.
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            if (_selectedMaNV != null && dgvNhanVien.CurrentRow != null)
-            {
-                FillFormFromGrid(dgvNhanVien.CurrentRow);
-            }
-            else
-            {
-                _selectedMaNV = null;
-                ClearForm();
-            }
-            SetFormMode(FormMode.View);
+            _selectedMaNV = null;
+            ClearForm();
+            dgvNhanVien.ClearSelection();
+            SetFormMode(FormMode.Normal);
         }
 
         // Xử lý sự kiện btnThoat_Click của giao diện: Điều hướng về Trang Chủ
@@ -308,8 +355,7 @@ namespace QuanLyBanLaptop.DanhMuc
             DataGridViewRow row = dgvNhanVien.Rows[e.RowIndex];
             _selectedMaNV = row.Cells["MaNV"]?.Value?.ToString();
             FillFormFromGrid(row);
-            if (_mode == FormMode.View)
-                SetFormMode(FormMode.View);
+            SetFormMode(FormMode.Selected);
         }
 
         // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.

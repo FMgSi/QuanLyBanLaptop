@@ -255,7 +255,16 @@ namespace QuanLyBanLaptop.Classes
                 case "NHAN_VIEN.MaNV": sequence = "seq_AppEmployee"; break;
                 default: throw new ArgumentException("Bảng sinh mã chưa được hỗ trợ.");
             }
-            long next = Convert.ToInt64(DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo." + sequence));
+            long next = 1;
+            try
+            {
+                object val = DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo." + sequence);
+                if (val != null) next = Convert.ToInt64(val);
+            }
+            catch
+            {
+                next = 1;
+            }
             string id = tienTo + next.ToString("D" + doRong);
             if (id.Length > 10) throw new InvalidOperationException("Mã vượt giới hạn 10 ký tự.");
             return id;

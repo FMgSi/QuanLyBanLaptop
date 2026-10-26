@@ -304,9 +304,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnThoat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThoat.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnThoat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.btnThoat.Location = new System.Drawing.Point(606, 8);
+            this.btnThoat.Location = new System.Drawing.Point(614, 8);
             this.btnThoat.Name = "btnThoat";
-            this.btnThoat.Size = new System.Drawing.Size(78, 30);
+            this.btnThoat.Size = new System.Drawing.Size(80, 32);
             this.btnThoat.TabIndex = 8;
             this.btnThoat.Text = "Thoát";
             this.btnThoat.UseVisualStyleBackColor = false;
@@ -320,9 +320,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnXuatExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnXuatExcel.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnXuatExcel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(128)))), ((int)(((byte)(61)))));
-            this.btnXuatExcel.Location = new System.Drawing.Point(512, 8);
+            this.btnXuatExcel.Location = new System.Drawing.Point(520, 8);
             this.btnXuatExcel.Name = "btnXuatExcel";
-            this.btnXuatExcel.Size = new System.Drawing.Size(88, 30);
+            this.btnXuatExcel.Size = new System.Drawing.Size(88, 32);
             this.btnXuatExcel.TabIndex = 7;
             this.btnXuatExcel.Text = "Xuất Excel";
             this.btnXuatExcel.UseVisualStyleBackColor = false;
@@ -336,9 +336,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnInPhieu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInPhieu.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnInPhieu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.btnInPhieu.Location = new System.Drawing.Point(512, 8);
+            this.btnInPhieu.Location = new System.Drawing.Point(520, 8);
             this.btnInPhieu.Name = "btnInPhieu";
-            this.btnInPhieu.Size = new System.Drawing.Size(80, 30);
+            this.btnInPhieu.Size = new System.Drawing.Size(80, 32);
             this.btnInPhieu.TabIndex = 6;
             this.btnInPhieu.Text = "In phiếu";
             this.btnInPhieu.UseVisualStyleBackColor = false;
@@ -353,11 +353,11 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnHuy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHuy.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnHuy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.btnHuy.Location = new System.Drawing.Point(426, 8);
+            this.btnHuy.Location = new System.Drawing.Point(434, 8);
             this.btnHuy.Name = "btnHuy";
-            this.btnHuy.Size = new System.Drawing.Size(80, 30);
+            this.btnHuy.Size = new System.Drawing.Size(80, 32);
             this.btnHuy.TabIndex = 5;
-            this.btnHuy.Text = "Làm mới";
+            this.btnHuy.Text = "Hủy";
             this.btnHuy.UseVisualStyleBackColor = false;
             this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
             // 
@@ -369,9 +369,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnLuu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLuu.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnLuu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(128)))), ((int)(((byte)(61)))));
-            this.btnLuu.Location = new System.Drawing.Point(344, 8);
+            this.btnLuu.Location = new System.Drawing.Point(348, 8);
             this.btnLuu.Name = "btnLuu";
-            this.btnLuu.Size = new System.Drawing.Size(76, 30);
+            this.btnLuu.Size = new System.Drawing.Size(80, 32);
             this.btnLuu.TabIndex = 4;
             this.btnLuu.Text = "Lưu";
             this.btnLuu.UseVisualStyleBackColor = false;
@@ -387,7 +387,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnXoa.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(185)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
             this.btnXoa.Location = new System.Drawing.Point(262, 8);
             this.btnXoa.Name = "btnXoa";
-            this.btnXoa.Size = new System.Drawing.Size(76, 30);
+            this.btnXoa.Size = new System.Drawing.Size(80, 32);
             this.btnXoa.TabIndex = 3;
             this.btnXoa.Text = "Xóa";
             this.btnXoa.UseVisualStyleBackColor = false;
@@ -401,9 +401,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnSua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSua.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnSua.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.btnSua.Location = new System.Drawing.Point(180, 8);
+            this.btnSua.Location = new System.Drawing.Point(176, 8);
             this.btnSua.Name = "btnSua";
-            this.btnSua.Size = new System.Drawing.Size(76, 30);
+            this.btnSua.Size = new System.Drawing.Size(80, 32);
             this.btnSua.TabIndex = 2;
             this.btnSua.Text = "Sửa";
             this.btnSua.UseVisualStyleBackColor = false;
@@ -417,9 +417,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnThem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThem.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnThem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
-            this.btnThem.Location = new System.Drawing.Point(98, 8);
+            this.btnThem.Location = new System.Drawing.Point(90, 8);
             this.btnThem.Name = "btnThem";
-            this.btnThem.Size = new System.Drawing.Size(76, 30);
+            this.btnThem.Size = new System.Drawing.Size(80, 32);
             this.btnThem.TabIndex = 1;
             this.btnThem.Text = "Thêm";
             this.btnThem.UseVisualStyleBackColor = false;

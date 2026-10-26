@@ -42,6 +42,7 @@ namespace QuanLyBanLaptop.DanhMuc
             SetupLaptopEvents();
             SetupLoaiMayEvents();
             SetupNCCEvents();
+            SetFormMode(FormMode.Normal);
         }
 
         // Xử lý sự kiện FrmSanPham_Load của giao diện.
@@ -64,7 +65,8 @@ namespace QuanLyBanLaptop.DanhMuc
             LoadDataLoaiMay();
             LoadDataNCC();
             LamMoiLaptopInputs();
-            SetFormMode(FormMode.View);
+            dgvLaptop.ClearSelection();
+            SetFormMode(FormMode.Normal);
 
             SwitchTab(ActiveTab.TatCaMay);
         }
@@ -78,6 +80,9 @@ namespace QuanLyBanLaptop.DanhMuc
                 sidebarControl1.SelectedMenu = NavigationMenu.QuanLyLaptop;
                 LoadComboboxesLaptop();
                 LoadDataLaptop();
+                LamMoiLaptopInputs();
+                dgvLaptop.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
         }
 
@@ -110,6 +115,9 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 LoadComboboxesLaptop();
                 LoadDataLaptop();
+                LamMoiLaptopInputs();
+                dgvLaptop.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
             else if (tab == ActiveTab.LoaiMay)
             {
@@ -134,12 +142,13 @@ namespace QuanLyBanLaptop.DanhMuc
 
         private enum FormMode
         {
-            View,
-            Add,
-            Edit
+            Normal,
+            Adding,
+            Selected,
+            Editing
         }
 
-        private FormMode _mode = FormMode.View;
+        private FormMode _mode = FormMode.Normal;
 
         // Khởi tạo cấu hình và liên kết cho SetupLaptopEvents.
         private void SetupLaptopEvents()
@@ -159,6 +168,9 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 txtTimKiem.Clear();
                 LoadDataLaptop();
+                LamMoiLaptopInputs();
+                dgvLaptop.ClearSelection();
+                SetFormMode(FormMode.Normal);
                 txtTimKiem.Focus();
             };
 
@@ -171,12 +183,11 @@ namespace QuanLyBanLaptop.DanhMuc
             btnThoat.Click += BtnThoat_Click;
         }
 
-        // Thiết lập trạng thái chế độ thao tác form Laptop (chuẩn hóa View, Add, Edit)
+        // Thiết lập trạng thái chế độ thao tác form Laptop theo ButtonTheme
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
-            bool isEditing = (mode == FormMode.Add || mode == FormMode.Edit);
-            bool hasSelected = (dgvLaptop.CurrentRow != null && dgvLaptop.SelectedRows.Count > 0);
+            bool isEditing = (mode == FormMode.Adding || mode == FormMode.Editing);
 
             txtMaLaptop.ReadOnly = true;
             txtTenLaptop.ReadOnly = !isEditing;
@@ -185,18 +196,58 @@ namespace QuanLyBanLaptop.DanhMuc
             txtCPU.ReadOnly = !isEditing;
             cboRAM.Enabled = isEditing;
             cboSSD.Enabled = isEditing;
-            txtSoLuong.ReadOnly = (mode != FormMode.Add);
+            txtSoLuong.ReadOnly = (mode != FormMode.Adding);
             txtDonGiaNhap.ReadOnly = !isEditing;
             txtDonGiaBan.ReadOnly = !isEditing;
             txtGhiChu.ReadOnly = !isEditing;
             numBaoHanh.Enabled = isEditing;
 
-            btnThem.Enabled = !isEditing;
-            btnSua.Enabled = !isEditing && hasSelected;
-            btnXoa.Enabled = !isEditing && hasSelected;
-            btnLuu.Enabled = isEditing;
-            btnHuy.Enabled = isEditing;
-            btnThoat.Enabled = true;
+            txtTimKiem.Enabled = !isEditing;
+            btnTimKiem.Enabled = !isEditing;
+            btnLamMoiLoc.Enabled = !isEditing;
+
+            switch (mode)
+            {
+                case FormMode.Normal:
+                    // 1. Khi mở bảng lên: chỉ nút Thêm và Thoát bấm được
+                    ButtonTheme.SetButtonState(btnThem, true);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, false);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Adding:
+                    // 2. Khi bấm vào nút Thêm: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Selected:
+                    // 3. Nếu bấm vào dòng trong DataGridView: nút Hủy, Sửa (và Xóa) sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, true);
+                    ButtonTheme.SetButtonState(btnXoa, true);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Editing:
+                    // 4. Bấm vào nút Sửa: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+            }
         }
 
         // Xử lý sự kiện TxtChiNhapSoNguyen_KeyPress của giao diện.
@@ -274,6 +325,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
             DataTable dt = DataProcesser.ReadData(sql, parameters.ToArray());
             dgvLaptop.DataSource = dt;
+            dgvLaptop.ClearSelection();
         }
 
         // Xử lý sự kiện DgvLaptop_CellFormatting của giao diện.
@@ -366,52 +418,46 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvLaptop.Rows.Count) return;
             FillLaptopFromRow(dgvLaptop.Rows[e.RowIndex]);
-            if (_mode == FormMode.View)
-            {
-                SetFormMode(FormMode.View);
-            }
+            SetFormMode(FormMode.Selected);
         }
 
-        // Bấm nút Thêm: Chuyển sang Add mode, xóa trắng các trường, sinh mã mới, focus ô nhập tên
+        // Bấm nút Thêm: Chuyển sang Adding mode, xóa trắng các trường, sinh mã mới, focus ô nhập tên
         private void BtnThem_Click(object sender, EventArgs e)
         {
-            _mode = FormMode.Add;
             LamMoiLaptopInputs();
-            SetFormMode(FormMode.Add);
+            txtMaLaptop.Text = Function.SinhMaTuDong("LAPTOP", "MaLaptop", "MH", 2);
+            dgvLaptop.ClearSelection();
+            SetFormMode(FormMode.Adding);
             txtTenLaptop.Focus();
         }
 
-        // Bấm nút Sửa: Chuyển sang Edit mode, mở khóa các trường thông tin cho phép sửa
+        // Bấm nút Sửa: Chuyển sang Editing mode, mở khóa các trường thông tin cho phép sửa
         private void BtnSua_Click(object sender, EventArgs e)
         {
             if (dgvLaptop.CurrentRow == null || dgvLaptop.SelectedRows.Count == 0)
             {
-                Function.ThongBaoCanhBao("Vui lòng chọn sản phẩm cần sửa!");
+                Function.ThongBaoCanhBao("Vui lòng chọn sản phẩm trong bảng cần sửa!");
                 return;
             }
-            _mode = FormMode.Edit;
-            SetFormMode(FormMode.Edit);
+            SetFormMode(FormMode.Editing);
             txtTenLaptop.Focus();
         }
 
-        // Bấm nút Lưu: Lưu sản phẩm (Add hoặc Edit)
+        // Bấm nút Lưu: Lưu sản phẩm (Adding hoặc Editing)
         private void BtnLuu_Click(object sender, EventArgs e)
         {
-            SaveProduct(_mode == FormMode.Add);
+            if (_mode == FormMode.Adding || _mode == FormMode.Editing)
+            {
+                SaveProduct(_mode == FormMode.Adding);
+            }
         }
 
-        // Bấm nút Hủy: Hủy bỏ thêm/sửa, nạp lại dữ liệu dòng đang chọn hoặc xóa trắng và trở về View mode
+        // Bấm nút Hủy: Hủy bỏ thêm/sửa, trở về trạng thái ban đầu
         private void BtnHuy_Click(object sender, EventArgs e)
         {
-            if (dgvLaptop.CurrentRow != null && dgvLaptop.SelectedRows.Count > 0)
-            {
-                FillLaptopFromRow(dgvLaptop.CurrentRow);
-            }
-            else
-            {
-                LamMoiLaptopInputs();
-            }
-            SetFormMode(FormMode.View);
+            LamMoiLaptopInputs();
+            dgvLaptop.ClearSelection();
+            SetFormMode(FormMode.Normal);
         }
 
         // Đọc và kiểm tra dữ liệu chung, gọi service rồi tải lại danh sách.
@@ -443,7 +489,9 @@ namespace QuanLyBanLaptop.DanhMuc
                     WarrantyMonths = (int)numBaoHanh.Value, Notes = txtGhiChu.Text.Trim()
                 }, isNew);
                 LoadDataLaptop();
-                SetFormMode(FormMode.View);
+                LamMoiLaptopInputs();
+                dgvLaptop.ClearSelection();
+                SetFormMode(FormMode.Normal);
                 Function.ThongBaoThanhCong("Đã lưu sản phẩm thành công!");
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
@@ -479,7 +527,8 @@ namespace QuanLyBanLaptop.DanhMuc
                         Function.ThongBaoThanhCong("Đã chuyển trạng thái sang 'Ngừng kinh doanh'!", "Thông báo");
                         LoadDataLaptop();
                         LamMoiLaptopInputs();
-                        SetFormMode(FormMode.View);
+                        dgvLaptop.ClearSelection();
+                        SetFormMode(FormMode.Normal);
                     }
                     return;
                 }
@@ -491,7 +540,8 @@ namespace QuanLyBanLaptop.DanhMuc
                     // Sau đó load lại dữ liệu lên GridView
                     LoadDataLaptop();
                     LamMoiLaptopInputs();
-                    SetFormMode(FormMode.View);
+                    dgvLaptop.ClearSelection();
+                    SetFormMode(FormMode.Normal);
                 }
             }
         }
@@ -502,14 +552,14 @@ namespace QuanLyBanLaptop.DanhMuc
             NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
 
-        // làm mới các ô nhập liệu và sinh mã hàng MHxx tự động
+        // làm mới các ô nhập liệu
         private void LamMoiLaptopInputs()
         {
-            txtMaLaptop.Text = Function.SinhMaTuDong("LAPTOP", "MaLaptop", "MH", 2);
+            txtMaLaptop.Text = "";
             txtMaLaptop.ReadOnly = true;
             txtTenLaptop.Clear();
             txtSoLuong.Text = "0";
-            txtSoLuong.ReadOnly = false;
+            txtSoLuong.ReadOnly = true;
             txtDonGiaNhap.Clear();
             txtDonGiaBan.Clear();
             txtGhiChu.Clear();
@@ -520,7 +570,6 @@ namespace QuanLyBanLaptop.DanhMuc
             if (cboRAM.Items.Count > 0) cboRAM.SelectedIndex = 1;
             if (cboSSD.Items.Count > 0) cboSSD.SelectedIndex = 1;
             numBaoHanh.Value = 12;
-            txtTenLaptop.Focus();
         }
 
         #endregion

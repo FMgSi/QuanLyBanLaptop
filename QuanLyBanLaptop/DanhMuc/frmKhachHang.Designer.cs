@@ -224,97 +224,103 @@ namespace QuanLyBanLaptop.DanhMuc
             this.pnlButtons.Size = new System.Drawing.Size(981, 54);
             this.pnlButtons.TabIndex = 3;
 
-            System.Drawing.Font btnFont = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
-            int bW = 100; int bH = 38;
+            System.Drawing.Font btnFont = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular);
+            int bW = 80; int bH = 32;
 
             // btnThem
-            this.btnThem.BackColor = System.Drawing.Color.FromArgb(22, 163, 74);
-            this.btnThem.FlatAppearance.BorderSize = 0;
+            this.btnThem.BackColor = System.Drawing.Color.White;
+            this.btnThem.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnThem.FlatAppearance.BorderSize = 1;
             this.btnThem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThem.Font = btnFont;
-            this.btnThem.ForeColor = System.Drawing.Color.White;
-            this.btnThem.Location = new System.Drawing.Point(10, 8);
+            this.btnThem.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnThem.Location = new System.Drawing.Point(10, 10);
             this.btnThem.Name = "btnThem";
             this.btnThem.Size = new System.Drawing.Size(bW, bH);
             this.btnThem.TabIndex = 0;
-            this.btnThem.Text = "+  Thêm";
+            this.btnThem.Text = "Thêm";
             this.btnThem.UseVisualStyleBackColor = false;
             this.btnThem.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
 
             // btnSua
-            this.btnSua.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
-            this.btnSua.FlatAppearance.BorderSize = 0;
+            this.btnSua.BackColor = System.Drawing.Color.White;
+            this.btnSua.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnSua.FlatAppearance.BorderSize = 1;
             this.btnSua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSua.Font = btnFont;
-            this.btnSua.ForeColor = System.Drawing.Color.White;
-            this.btnSua.Location = new System.Drawing.Point(120, 8);
+            this.btnSua.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnSua.Location = new System.Drawing.Point(100, 10);
             this.btnSua.Name = "btnSua";
             this.btnSua.Size = new System.Drawing.Size(bW, bH);
             this.btnSua.TabIndex = 1;
-            this.btnSua.Text = "✏  Sửa";
+            this.btnSua.Text = "Sửa";
             this.btnSua.UseVisualStyleBackColor = false;
             this.btnSua.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
 
             // btnXoa
-            this.btnXoa.BackColor = System.Drawing.Color.FromArgb(220, 38, 38);
-            this.btnXoa.FlatAppearance.BorderSize = 0;
+            this.btnXoa.BackColor = System.Drawing.Color.White;
+            this.btnXoa.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnXoa.FlatAppearance.BorderSize = 1;
             this.btnXoa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnXoa.Font = btnFont;
-            this.btnXoa.ForeColor = System.Drawing.Color.White;
-            this.btnXoa.Location = new System.Drawing.Point(230, 8);
+            this.btnXoa.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnXoa.Location = new System.Drawing.Point(190, 10);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(bW, bH);
             this.btnXoa.TabIndex = 2;
-            this.btnXoa.Text = "🗑  Xóa";
+            this.btnXoa.Text = "Xóa";
             this.btnXoa.UseVisualStyleBackColor = false;
             this.btnXoa.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
 
             // btnLuu
-            this.btnLuu.BackColor = System.Drawing.Color.FromArgb(148, 163, 184);
-            this.btnLuu.FlatAppearance.BorderSize = 0;
+            this.btnLuu.BackColor = System.Drawing.Color.White;
+            this.btnLuu.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnLuu.FlatAppearance.BorderSize = 1;
             this.btnLuu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLuu.Font = btnFont;
-            this.btnLuu.ForeColor = System.Drawing.Color.White;
-            this.btnLuu.Location = new System.Drawing.Point(340, 8);
+            this.btnLuu.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnLuu.Location = new System.Drawing.Point(280, 10);
             this.btnLuu.Name = "btnLuu";
             this.btnLuu.Size = new System.Drawing.Size(bW, bH);
             this.btnLuu.TabIndex = 3;
-            this.btnLuu.Text = "💾  Lưu";
+            this.btnLuu.Text = "Lưu";
             this.btnLuu.UseVisualStyleBackColor = false;
             this.btnLuu.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnLuu.Visible = true;
             this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click);
 
             // btnHuy
-            this.btnHuy.BackColor = System.Drawing.Color.FromArgb(148, 163, 184);
-            this.btnHuy.FlatAppearance.BorderSize = 0;
+            this.btnHuy.BackColor = System.Drawing.Color.White;
+            this.btnHuy.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnHuy.FlatAppearance.BorderSize = 1;
             this.btnHuy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHuy.Font = btnFont;
-            this.btnHuy.ForeColor = System.Drawing.Color.White;
-            this.btnHuy.Location = new System.Drawing.Point(450, 8);
+            this.btnHuy.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnHuy.Location = new System.Drawing.Point(370, 10);
             this.btnHuy.Name = "btnHuy";
             this.btnHuy.Size = new System.Drawing.Size(bW, bH);
             this.btnHuy.TabIndex = 4;
-            this.btnHuy.Text = "✕  Hủy";
+            this.btnHuy.Text = "Hủy";
             this.btnHuy.UseVisualStyleBackColor = false;
             this.btnHuy.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnHuy.Visible = true;
             this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
 
             // btnThoat
-            this.btnThoat.BackColor = System.Drawing.Color.FromArgb(100, 116, 139);
-            this.btnThoat.FlatAppearance.BorderSize = 0;
+            this.btnThoat.BackColor = System.Drawing.Color.White;
+            this.btnThoat.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(203, 213, 225);
+            this.btnThoat.FlatAppearance.BorderSize = 1;
             this.btnThoat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThoat.Font = btnFont;
-            this.btnThoat.ForeColor = System.Drawing.Color.White;
-            this.btnThoat.Location = new System.Drawing.Point(560, 8);
+            this.btnThoat.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.btnThoat.Location = new System.Drawing.Point(460, 10);
             this.btnThoat.Name = "btnThoat";
             this.btnThoat.Size = new System.Drawing.Size(bW, bH);
             this.btnThoat.TabIndex = 5;
-            this.btnThoat.Text = "🚪  Thoát";
+            this.btnThoat.Text = "Thoát";
             this.btnThoat.UseVisualStyleBackColor = false;
             this.btnThoat.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnThoat.Visible = true;

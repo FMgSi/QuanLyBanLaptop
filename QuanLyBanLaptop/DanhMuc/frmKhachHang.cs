@@ -11,18 +11,10 @@ namespace QuanLyBanLaptop.DanhMuc
 {
     public partial class frmKhachHang : QuanLyBanLaptop.Classes.AppForm
     {
-        // Trạng thái form
-        private enum FormMode { View, Add, Edit }
-        private FormMode _mode = FormMode.View;
+        // Trạng thái thao tác form theo logic chuẩn
+        private enum FormMode { Normal, Adding, Selected, Editing }
+        private FormMode _mode = FormMode.Normal;
         private string _selectedMaKH = null;
-
-        // Bảng màu chuẩn
-        private static readonly Color ColorDisabled = Color.FromArgb(148, 163, 184); // Xám khi không dùng được (giống Lưu và Hủy)
-        private static readonly Color ColorGreen    = Color.FromArgb(34, 197, 94);   // Xanh lá (Thêm, Lưu)
-        private static readonly Color ColorBlue     = Color.FromArgb(37, 99, 235);   // Xanh dương (Sửa)
-        private static readonly Color ColorRed      = Color.FromArgb(239, 68, 68);   // Đỏ (Xóa, Hủy)
-        private static readonly Color ColorAmber    = Color.FromArgb(217, 119, 6);   // Cam (Khóa)
-        private static readonly Color ColorEmerald  = Color.FromArgb(16, 185, 129);  // Xanh ngọc (Mở khóa)
 
         // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmKhachHang()
@@ -41,7 +33,7 @@ namespace QuanLyBanLaptop.DanhMuc
             cboHangThanhVien.Items.AddRange(new object[] { "Đồng", "Bạc", "Vàng", "VIP" });
             cboHangThanhVien.SelectedIndex = 0;
 
-            SetFormMode(FormMode.View);
+            SetFormMode(FormMode.Normal);
         }
 
         // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
@@ -52,6 +44,10 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 sidebarControl1.SelectedMenu = NavigationMenu.KhachHang;
                 LoadDanhSachKhachHang();
+                _selectedMaKH = null;
+                ClearForm();
+                dgvKhachHang.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
         }
 
@@ -77,6 +73,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 dgvKhachHang.DataSource = dt;
                 SetGridHeaders();
+                dgvKhachHang.ClearSelection();
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -95,12 +92,11 @@ namespace QuanLyBanLaptop.DanhMuc
             Function.DatTieuDeCot(dgvKhachHang, "TrangThai",     "Trạng thái",      100);
         }
 
-        // thiet lap che do form khach hang
+        // Thiết lập chế độ thao tác form khách hàng theo chuẩn ButtonTheme
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
-            bool isEditing = (mode == FormMode.Add || mode == FormMode.Edit);
-            bool hasSelected = (_selectedMaKH != null);
+            bool isEditing = (mode == FormMode.Adding || mode == FormMode.Editing);
 
             txtMaKH.ReadOnly     = true;
             txtHoTen.ReadOnly    = !isEditing;
@@ -114,18 +110,48 @@ namespace QuanLyBanLaptop.DanhMuc
             btnTimKiem.Enabled = !isEditing;
             btnLamMoi.Enabled  = !isEditing;
 
-            btnThem.Enabled  = !isEditing;
-            btnSua.Enabled   = !isEditing && hasSelected;
-            btnXoa.Enabled   = !isEditing && hasSelected;
-            btnLuu.Enabled   = isEditing;
-            btnHuy.Enabled   = isEditing;
-            btnThoat.Enabled = true;
-        }
+            switch (mode)
+            {
+                case FormMode.Normal:
+                    // 1. Khi mở bảng lên: chỉ nút Thêm và Thoát bấm được
+                    ButtonTheme.SetButtonState(btnThem, true);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, false);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
 
-        // Dùng kiểu nút chung khi đổi trạng thái thao tác.
-        private void StyleButton(Button btn, Color back, Color fore)
-        {
-            ButtonTheme.Apply(btn);
+                case FormMode.Adding:
+                    // 2. Khi bấm vào nút Thêm: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Selected:
+                    // 3. Nếu bấm vào dòng trong DataGridView: nút Hủy, Sửa (và Xóa) sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, true);
+                    ButtonTheme.SetButtonState(btnXoa, true);
+                    ButtonTheme.SetButtonState(btnLuu, false);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+
+                case FormMode.Editing:
+                    // 4. Bấm vào nút Sửa: nút Hủy, Lưu sẽ bấm được
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true);
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    break;
+            }
         }
 
         // do du lieu tu dong vao o nhap
@@ -156,10 +182,10 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
-        // xoa trang thong tin va sinh ma khach hang tu dong KHxx
+        // xoa trang thong tin
         private void ClearForm()
         {
-            txtMaKH.Text         = Function.SinhMaTuDong("KHACH_HANG", "MaKH", "KH", 2);
+            txtMaKH.Text         = "";
             txtHoTen.Text        = "";
             txtSDT.Text          = "";
             txtDiaChi.Text       = "";
@@ -181,7 +207,8 @@ namespace QuanLyBanLaptop.DanhMuc
             LoadDanhSachKhachHang();
             _selectedMaKH = null;
             ClearForm();
-            SetFormMode(FormMode.View);
+            dgvKhachHang.ClearSelection();
+            SetFormMode(FormMode.Normal);
         }
 
         // them khach hang moi tu dong sinh ma KHxx
@@ -189,7 +216,9 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             _selectedMaKH = null;
             ClearForm();
-            SetFormMode(FormMode.Add);
+            txtMaKH.Text = Function.SinhMaTuDong("KHACH_HANG", "MaKH", "KH", 2);
+            dgvKhachHang.ClearSelection();
+            SetFormMode(FormMode.Adding);
             txtHoTen.Focus();
         }
 
@@ -198,10 +227,10 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (_selectedMaKH == null)
             {
-                Function.ThongBaoThanhCong("Vui lòng chọn khách hàng cần sửa.", "Thông báo");
+                Function.ThongBaoCanhBao("Vui lòng chọn khách hàng trong bảng cần sửa.", "Thông báo");
                 return;
             }
-            SetFormMode(FormMode.Edit);
+            SetFormMode(FormMode.Editing);
             txtHoTen.Focus();
         }
 
@@ -210,11 +239,11 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             try
             {
-                if (_mode == FormMode.Add)
+                if (_mode == FormMode.Adding)
                 {
                     if (!ValidateInput()) return;
 
-                    // Thêm mới: Mã KH do nhân viên tự nhập
+                    // Thêm mới: Mã KH do nhân viên tự nhập hoặc sinh tự động
                     string maKH = txtMaKH.Text.Trim().ToUpper();
                     DataProcesser.ExecProcNonQuery("sp_ThemKhachHang", new[]
                     {
@@ -229,7 +258,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                     Function.ThongBaoThanhCong($"Thêm khách hàng \"{maKH}\" thành công!", "Thành công");
                 }
-                else if (_mode == FormMode.Edit)
+                else if (_mode == FormMode.Editing)
                 {
                     if (!ValidateInput()) return;
 
@@ -246,11 +275,16 @@ namespace QuanLyBanLaptop.DanhMuc
                     });
                     Function.ThongBaoThanhCong("Cập nhật thông tin khách hàng thành công!", "Thành công");
                 }
+                else
+                {
+                    return;
+                }
 
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
                 _selectedMaKH = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
+                dgvKhachHang.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -280,7 +314,8 @@ namespace QuanLyBanLaptop.DanhMuc
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
                 _selectedMaKH = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
+                dgvKhachHang.ClearSelection();
+                SetFormMode(FormMode.Normal);
             }
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
@@ -288,16 +323,10 @@ namespace QuanLyBanLaptop.DanhMuc
         // ─── Nút Hủy ─────────────────────────────────────────────────────
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            if (_selectedMaKH != null && dgvKhachHang.CurrentRow != null)
-            {
-                FillFormFromGrid(dgvKhachHang.CurrentRow);
-            }
-            else
-            {
-                _selectedMaKH = null;
-                ClearForm();
-            }
-            SetFormMode(FormMode.View);
+            _selectedMaKH = null;
+            ClearForm();
+            dgvKhachHang.ClearSelection();
+            SetFormMode(FormMode.Normal);
         }
 
         // ─── Nút Thoát ───────────────────────────────────────────────────
@@ -313,8 +342,7 @@ namespace QuanLyBanLaptop.DanhMuc
             DataGridViewRow row = dgvKhachHang.Rows[e.RowIndex];
             _selectedMaKH = row.Cells["MaKH"]?.Value?.ToString();
             FillFormFromGrid(row);
-            if (_mode == FormMode.View)
-                SetFormMode(FormMode.View); // refresh button states
+            SetFormMode(FormMode.Selected);
         }
 
         // ─── Tìm kiếm khi gõ Enter ────────────────────────────────────────

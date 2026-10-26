@@ -35,6 +35,27 @@ namespace QuanLyBanLaptop.Classes
             button.Cursor = Cursors.Hand;
         }
 
+        // Cập nhật trạng thái Enabled và visual tương ứng cho nút
+        public static void SetButtonState(Button btn, bool enabled, Color? activeForeColor = null)
+        {
+            if (btn == null) return;
+            btn.Enabled = enabled;
+            if (enabled)
+            {
+                btn.BackColor = Color.White;
+                btn.ForeColor = activeForeColor ?? Color.FromArgb(30, 41, 59);
+                btn.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225);
+                btn.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                btn.BackColor = Color.FromArgb(248, 250, 252);
+                btn.ForeColor = Color.FromArgb(148, 163, 184);
+                btn.FlatAppearance.BorderColor = Color.FromArgb(226, 232, 240);
+                btn.Cursor = Cursors.Default;
+            }
+        }
+
         // Duyệt các nút lồng trong panel, tab và user control.
         public static void ApplyAll(Control parent)
         {

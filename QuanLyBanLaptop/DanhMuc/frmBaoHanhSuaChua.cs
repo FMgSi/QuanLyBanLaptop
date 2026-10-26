@@ -68,6 +68,7 @@ namespace QuanLyBanLaptop.DanhMuc
             UpdateUserInfoDisplay();
             txtMaPhieu.Text = SinhMaPhieuMoi();
             pnlHeaderTop.Visible = !NavigationManager.IsHosted;
+            SetActionState(ActionState.Normal);
         }
 
         protected override void OnVisibleChanged(EventArgs e)
@@ -84,6 +85,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     txtMaPhieu.Text = SinhMaPhieuMoi();
                 }
                 pnlHeaderTop.Visible = !NavigationManager.IsHosted;
+                SetActionState(ActionState.Normal);
             }
         }
 
@@ -495,6 +497,87 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
+        private enum ActionState
+        {
+            Normal,   // 1. Ban đầu: Chỉ Thêm và Thoát bấm được
+            Adding,   // 2. Bấm Thêm: Chỉ Hủy và Lưu bấm được
+            Selected, // 3. Bấm dòng Grid: Chỉ Hủy, Sửa, Xóa bấm được
+            Editing   // 4. Bấm Sửa: Chỉ Hủy và Lưu bấm được
+        }
+        private ActionState currentActionState = ActionState.Normal;
+
+        // Quản lý trạng thái và giao diện các nút thao tác theo chuẩn
+        private void SetActionState(ActionState state)
+        {
+            currentActionState = state;
+            switch (state)
+            {
+                case ActionState.Normal:
+                    ButtonTheme.SetButtonState(btnThem, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, false, Color.FromArgb(21, 128, 61));
+                    ButtonTheme.SetButtonState(btnHuy, false);
+                    ButtonTheme.SetButtonState(btnXuatExcel, true, Color.FromArgb(21, 128, 61));
+
+                    txtTenKH.ReadOnly = true;
+                    txtTenMay.ReadOnly = true;
+                    txtLoiDichVu.ReadOnly = true;
+                    btnChonKhachHang.Enabled = false;
+                    btnChonSanPham.Enabled = false;
+                    break;
+
+                case ActionState.Adding:
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true, Color.FromArgb(21, 128, 61));
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    ButtonTheme.SetButtonState(btnXuatExcel, true, Color.FromArgb(21, 128, 61));
+
+                    txtTenKH.ReadOnly = false;
+                    txtTenMay.ReadOnly = false;
+                    txtLoiDichVu.ReadOnly = false;
+                    btnChonKhachHang.Enabled = true;
+                    btnChonSanPham.Enabled = true;
+                    break;
+
+                case ActionState.Selected:
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, true);
+                    ButtonTheme.SetButtonState(btnXoa, true, Color.FromArgb(185, 28, 28));
+                    ButtonTheme.SetButtonState(btnLuu, false, Color.FromArgb(21, 128, 61));
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    ButtonTheme.SetButtonState(btnXuatExcel, true, Color.FromArgb(21, 128, 61));
+
+                    txtTenKH.ReadOnly = true;
+                    txtTenMay.ReadOnly = true;
+                    txtLoiDichVu.ReadOnly = true;
+                    btnChonKhachHang.Enabled = false;
+                    btnChonSanPham.Enabled = false;
+                    break;
+
+                case ActionState.Editing:
+                    ButtonTheme.SetButtonState(btnThem, false);
+                    ButtonTheme.SetButtonState(btnSua, false);
+                    ButtonTheme.SetButtonState(btnXoa, false);
+                    ButtonTheme.SetButtonState(btnLuu, true, Color.FromArgb(21, 128, 61));
+                    ButtonTheme.SetButtonState(btnHuy, true);
+                    ButtonTheme.SetButtonState(btnThoat, true);
+                    ButtonTheme.SetButtonState(btnXuatExcel, true, Color.FromArgb(21, 128, 61));
+
+                    txtTenKH.ReadOnly = false;
+                    txtTenMay.ReadOnly = false;
+                    txtLoiDichVu.ReadOnly = false;
+                    btnChonKhachHang.Enabled = true;
+                    btnChonSanPham.Enabled = true;
+                    break;
+            }
+        }
+
         // Chọn một phiếu từ Tab Tất cả nạp lên đúng 7 trường
         private void SelectTicketRow(string id)
         {
@@ -504,7 +587,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 selectedTicketId = item.Id;
                 selectedServiceId = null;
                 lblCurrentSelected.Text = $"Đang chọn: Phiếu {item.Id}";
-                lblFooterNote.Text = $"Đã nạp thông tin phiếu [{item.Id}] lên form chỉnh sửa";
+                lblFooterNote.Text = $"Đã nạp thông tin phiếu [{item.Id}]. Bấm 'Sửa' để cập nhật hoặc 'Hủy' để bỏ chọn.";
 
                 txtMaPhieu.Text = item.Id;
                 txtMaNV.Text = item.EmpId;
@@ -513,6 +596,8 @@ namespace QuanLyBanLaptop.DanhMuc
                 txtTenKH.Text = item.CustName;
                 txtTenMay.Text = item.Device;
                 txtLoiDichVu.Text = item.Problem;
+
+                SetActionState(ActionState.Selected);
             }
         }
 
@@ -542,9 +627,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 if (s != null)
                 {
                     txtLoiDichVu.Text = $"{s.Name} - [Lỗi: {s.Symptom}]";
-                    lblFooterNote.Text = $"Đã chọn: {s.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Thêm'!";
-                    if (string.IsNullOrEmpty(txtMaKH.Text)) btnChonKhachHang.Focus();
-                    else txtTenMay.Focus();
+                    lblFooterNote.Text = $"Đã chọn: {s.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!";
                 }
             }
             else
@@ -553,15 +636,72 @@ namespace QuanLyBanLaptop.DanhMuc
                 if (w != null)
                 {
                     txtLoiDichVu.Text = $"{w.Name} - [ĐK: {w.Condition}]";
-                    lblFooterNote.Text = $"Đã chọn: {w.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Thêm'!";
-                    if (string.IsNullOrEmpty(txtMaKH.Text)) btnChonKhachHang.Focus();
-                    else txtTenMay.Focus();
+                    lblFooterNote.Text = $"Đã chọn: {w.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!";
                 }
+            }
+
+            SetActionState(ActionState.Adding);
+            if (string.IsNullOrEmpty(txtMaKH.Text)) btnChonKhachHang.Focus();
+            else if (string.IsNullOrEmpty(txtTenMay.Text)) btnChonSanPham.Focus();
+            else txtLoiDichVu.Focus();
+        }
+
+        // ── 6. THAO TÁC NÚT (THÊM, SỬA, XÓA, LƯU, HỦY, THOÁT) ────────────────
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            SetActionState(ActionState.Adding);
+
+            selectedTicketId = null;
+            selectedServiceId = null;
+            lblCurrentSelected.Text = "Đang chọn: Thêm mới";
+            lblFooterNote.Text = "Đang thêm mới phiếu. Nhập thông tin rồi bấm 'Lưu' hoặc 'Hủy' để quay lại.";
+
+            // Sinh mã phiếu mới
+            txtMaPhieu.Text = SinhMaPhieuMoi();
+
+            // Giữ mã và tên nhân viên đăng nhập
+            txtMaNV.Text = !string.IsNullOrEmpty(UserSession.MaNV) ? UserSession.MaNV : "NV001";
+            txtTenNV.Text = !string.IsNullOrEmpty(UserSession.TenNV) ? UserSession.TenNV : "Nguyễn Văn An";
+
+            txtMaKH.Text = "";
+            txtTenKH.Text = "";
+            txtTenMay.Text = "";
+            txtLoiDichVu.Text = "";
+
+            dgvBaoHanh.ClearSelection();
+            btnChonKhachHang.Focus();
+        }
+
+        private void btnSua_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(selectedTicketId))
+            {
+                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong bảng để chỉnh sửa!");
+                return;
+            }
+
+            SetActionState(ActionState.Editing);
+            lblFooterNote.Text = $"Đang chỉnh sửa phiếu [{selectedTicketId}]. Sửa xong bấm 'Lưu' hoặc 'Hủy' để quay lại.";
+            txtLoiDichVu.Focus();
+        }
+
+        private void btnLuu_Click(object sender, EventArgs e)
+        {
+            if (currentActionState == ActionState.Adding)
+            {
+                ThucHienLuuThem();
+            }
+            else if (currentActionState == ActionState.Editing)
+            {
+                ThucHienLuuSua();
+            }
+            else
+            {
+                Function.ThongBaoCanhBao("Vui lòng bấm 'Thêm' hoặc 'Sửa' trước khi Lưu!");
             }
         }
 
-        // ── 6. THAO TÁC NÚT (THÊM, SỬA, XÓA, LƯU, LÀM MỚI, IN PHIẾU, THOÁT) ─
-        private void btnThem_Click(object sender, EventArgs e)
+        private void ThucHienLuuThem()
         {
             string custName = txtTenKH.Text.Trim();
             string device = txtTenMay.Text.Trim();
@@ -582,17 +722,13 @@ namespace QuanLyBanLaptop.DanhMuc
                 return;
             }
 
-            // Xác định loại phiếu dựa vào tab hiện tại hoặc dịch vụ
             string type = (currentTab == "warranty") ? "warranty" : "repair";
-
-            // Sinh mã phiếu theo quy tắc MP_ddMMyyyy_xx nếu chưa có
             string ticketId = txtMaPhieu.Text.Trim();
             if (string.IsNullOrEmpty(ticketId) || !ticketId.StartsWith("MP_"))
             {
                 ticketId = SinhMaPhieuMoi();
             }
 
-            // Thông tin nhân viên luôn lấy từ phiên đăng nhập
             string empId = !string.IsNullOrEmpty(UserSession.MaNV) ? UserSession.MaNV : (!string.IsNullOrWhiteSpace(txtMaNV.Text) ? txtMaNV.Text.Trim() : "NV001");
             string empName = !string.IsNullOrEmpty(UserSession.TenNV) ? UserSession.TenNV : (!string.IsNullOrWhiteSpace(txtTenNV.Text) ? txtTenNV.Text.Trim() : "Nguyễn Văn An");
             string custId = string.IsNullOrWhiteSpace(txtMaKH.Text) ? $"KH{(allTickets.Count + 1):D3}" : txtMaKH.Text.Trim();
@@ -609,11 +745,9 @@ namespace QuanLyBanLaptop.DanhMuc
                 Problem = string.IsNullOrEmpty(problem) ? "Tiếp nhận kiểm tra kỹ thuật" : problem
             };
 
-            // Tránh trùng mã phiếu
             allTickets.RemoveAll(t => t.Id == ticketId);
             allTickets.Insert(0, newTicket);
 
-            // Cập nhật CSDL nếu có kết nối
             try
             {
                 string sql = @"
@@ -630,27 +764,18 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch { }
 
-            selectedTicketId = ticketId;
-            lblCurrentSelected.Text = $"Đang chọn: Phiếu {ticketId}";
-
             SwitchTab("all");
             Function.ThongBaoThanhCong($"Đã thêm mới thành công phiếu {ticketId} ({(type == "repair" ? "Sửa chữa" : "Bảo hành")})!");
 
-            // Chuẩn bị sẵn mã phiếu tự gen mới tiếp theo cho lượt tiếp nhận kế tiếp
-            txtMaPhieu.Text = SinhMaPhieuMoi();
-            txtMaKH.Text = "";
-            txtTenKH.Text = "";
-            txtTenMay.Text = "";
-            txtLoiDichVu.Text = "";
-            txtMaNV.Text = empId;
-            txtTenNV.Text = empName;
+            HandleClearForm();
+            SetActionState(ActionState.Normal);
         }
 
-        private void btnSua_Click(object sender, EventArgs e)
+        private void ThucHienLuuSua()
         {
             if (string.IsNullOrEmpty(selectedTicketId))
             {
-                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong tab 'Tất cả' để chỉnh sửa!");
+                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong bảng để chỉnh sửa!");
                 return;
             }
 
@@ -664,7 +789,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 ticket.Device = string.IsNullOrWhiteSpace(txtTenMay.Text) ? ticket.Device : txtTenMay.Text.Trim();
                 ticket.Problem = string.IsNullOrWhiteSpace(txtLoiDichVu.Text) ? ticket.Problem : txtLoiDichVu.Text.Trim();
 
-                // Cập nhật CSDL
                 try
                 {
                     string sql = @"
@@ -680,6 +804,9 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 RenderGrid();
                 Function.ThongBaoThanhCong($"Đã lưu thay đổi cho phiếu {ticket.Id} thành công!");
+
+                HandleClearForm();
+                SetActionState(ActionState.Normal);
             }
         }
 
@@ -687,7 +814,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (string.IsNullOrEmpty(selectedTicketId))
             {
-                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong tab 'Tất cả' cần xóa!");
+                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong bảng cần xóa!");
                 return;
             }
 
@@ -705,25 +832,15 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 HandleClearForm();
                 RenderGrid();
+                SetActionState(ActionState.Normal);
                 Function.ThongBaoThanhCong($"Đã xóa thành công phiếu {idToDelete}!");
-            }
-        }
-
-        private void btnLuu_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(selectedTicketId))
-            {
-                btnSua_Click(sender, e);
-            }
-            else
-            {
-                btnThem_Click(sender, e);
             }
         }
 
         private void btnHuy_Click(object sender, EventArgs e)
         {
             HandleClearForm();
+            SetActionState(ActionState.Normal);
         }
 
         private void HandleClearForm()

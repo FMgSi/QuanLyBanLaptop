@@ -15,6 +15,12 @@ public static class SmokeTests
         checks++;
     }
 
+    private static void ClickButton(Button btn)
+    {
+        var m = typeof(Button).GetMethod("OnClick", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        m.Invoke(btn, new object[] { EventArgs.Empty });
+    }
+
     [STAThread]
     public static void Main()
     {
@@ -112,12 +118,24 @@ public static class SmokeTests
             Check(typeof(AppForm).IsAssignableFrom(typeof(QuanLyBanLaptop.DanhMuc.frmBaoHanhSuaChua)), "frmBaoHanhSuaChua must inherit AppForm");
             var dgvBH = baoHanh.Controls.Find("dgvBaoHanh", true).FirstOrDefault() as DataGridView;
             Check(dgvBH != null && !dgvBH.AllowUserToResizeColumns && !dgvBH.AllowUserToResizeRows && !dgvBH.AllowUserToOrderColumns, "dgvBaoHanh must not allow resizing or reordering");
-            Check(baoHanh.Controls.Find("btnThem", true).FirstOrDefault() != null, "btnThem must exist in frmBaoHanhSuaChua");
-            Check(baoHanh.Controls.Find("btnSua", true).FirstOrDefault() != null, "btnSua must exist in frmBaoHanhSuaChua");
-            Check(baoHanh.Controls.Find("btnXoa", true).FirstOrDefault() != null, "btnXoa must exist in frmBaoHanhSuaChua");
-            Check(baoHanh.Controls.Find("btnLuu", true).FirstOrDefault() != null, "btnLuu must exist in frmBaoHanhSuaChua");
-            Check(baoHanh.Controls.Find("btnHuy", true).FirstOrDefault() != null, "btnHuy must exist in frmBaoHanhSuaChua");
-            Check(baoHanh.Controls.Find("btnThoat", true).FirstOrDefault() != null, "btnThoat must exist in frmBaoHanhSuaChua");
+            var btnThem = baoHanh.Controls.Find("btnThem", true).FirstOrDefault() as Button;
+            var btnSua = baoHanh.Controls.Find("btnSua", true).FirstOrDefault() as Button;
+            var btnXoa = baoHanh.Controls.Find("btnXoa", true).FirstOrDefault() as Button;
+            var btnLuu = baoHanh.Controls.Find("btnLuu", true).FirstOrDefault() as Button;
+            var btnHuy = baoHanh.Controls.Find("btnHuy", true).FirstOrDefault() as Button;
+            var btnThoat = baoHanh.Controls.Find("btnThoat", true).FirstOrDefault() as Button;
+            Check(btnThem != null && btnThem.Enabled, "frmBaoHanhSuaChua btnThem initially enabled");
+            Check(btnThoat != null && btnThoat.Enabled, "frmBaoHanhSuaChua btnThoat initially enabled");
+            Check(btnSua != null && !btnSua.Enabled, "frmBaoHanhSuaChua btnSua initially disabled");
+            Check(btnLuu != null && !btnLuu.Enabled, "frmBaoHanhSuaChua btnLuu initially disabled");
+            Check(btnHuy != null && !btnHuy.Enabled, "frmBaoHanhSuaChua btnHuy initially disabled");
+            ClickButton(btnThem);
+            Check(!btnThem.Enabled, "frmBaoHanhSuaChua btnThem disabled after click");
+            Check(btnLuu.Enabled, "frmBaoHanhSuaChua btnLuu enabled after Them click");
+            Check(btnHuy.Enabled, "frmBaoHanhSuaChua btnHuy enabled after Them click");
+            ClickButton(btnHuy);
+            Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmBaoHanhSuaChua restored to initial state after Huy click");
+
             var btnInP = baoHanh.Controls.Find("btnInPhieu", true).FirstOrDefault();
             Check(btnInP != null, "btnInPhieu must exist in frmBaoHanhSuaChua");
             Check(btnInP.Visible == false, "btnInPhieu must be hidden in frmBaoHanhSuaChua");
@@ -125,14 +143,75 @@ public static class SmokeTests
             Check(baoHanh.Controls.Find("btnChonSanPham", true).FirstOrDefault() != null, "btnChonSanPham must exist in frmBaoHanhSuaChua");
         }
 
+        using (var kh = new QuanLyBanLaptop.DanhMuc.frmKhachHang())
+        {
+            var btnThem = kh.Controls.Find("btnThem", true).FirstOrDefault() as Button;
+            var btnSua = kh.Controls.Find("btnSua", true).FirstOrDefault() as Button;
+            var btnLuu = kh.Controls.Find("btnLuu", true).FirstOrDefault() as Button;
+            var btnHuy = kh.Controls.Find("btnHuy", true).FirstOrDefault() as Button;
+            var btnThoat = kh.Controls.Find("btnThoat", true).FirstOrDefault() as Button;
+            Check(btnThem != null && btnThem.Enabled, "frmKhachHang btnThem initially enabled");
+            Check(btnThoat != null && btnThoat.Enabled, "frmKhachHang btnThoat initially enabled");
+            Check(btnSua != null && !btnSua.Enabled, "frmKhachHang btnSua initially disabled");
+            Check(btnLuu != null && !btnLuu.Enabled, "frmKhachHang btnLuu initially disabled");
+            Check(btnHuy != null && !btnHuy.Enabled, "frmKhachHang btnHuy initially disabled");
+            ClickButton(btnThem);
+            Check(!btnThem.Enabled, "frmKhachHang btnThem disabled after click");
+            Check(btnLuu.Enabled, "frmKhachHang btnLuu enabled after Them click");
+            Check(btnHuy.Enabled, "frmKhachHang btnHuy enabled after Them click");
+            ClickButton(btnHuy);
+            Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmKhachHang restored to initial state after Huy click");
+        }
+
+        using (var nv = new QuanLyBanLaptop.DanhMuc.frmNhanVien())
+        {
+            var btnThem = nv.Controls.Find("btnThem", true).FirstOrDefault() as Button;
+            var btnSua = nv.Controls.Find("btnSua", true).FirstOrDefault() as Button;
+            var btnLuu = nv.Controls.Find("btnLuu", true).FirstOrDefault() as Button;
+            var btnHuy = nv.Controls.Find("btnHuy", true).FirstOrDefault() as Button;
+            var btnThoat = nv.Controls.Find("btnThoat", true).FirstOrDefault() as Button;
+            Check(btnThem != null && btnThem.Enabled, "frmNhanVien btnThem initially enabled");
+            Check(btnThoat != null && btnThoat.Enabled, "frmNhanVien btnThoat initially enabled");
+            Check(btnSua != null && !btnSua.Enabled, "frmNhanVien btnSua initially disabled");
+            Check(btnLuu != null && !btnLuu.Enabled, "frmNhanVien btnLuu initially disabled");
+            Check(btnHuy != null && !btnHuy.Enabled, "frmNhanVien btnHuy initially disabled");
+            ClickButton(btnThem);
+            Check(!btnThem.Enabled, "frmNhanVien btnThem disabled after click");
+            Check(btnLuu.Enabled, "frmNhanVien btnLuu enabled after Them click");
+            Check(btnHuy.Enabled, "frmNhanVien btnHuy enabled after Them click");
+            ClickButton(btnHuy);
+            Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmNhanVien restored to initial state after Huy click");
+        }
+
+        using (var sp = new QuanLyBanLaptop.DanhMuc.frmSanPham())
+        {
+            var btnThem = sp.Controls.Find("btnThem", true).FirstOrDefault() as Button;
+            var btnSua = sp.Controls.Find("btnSua", true).FirstOrDefault() as Button;
+            var btnLuu = sp.Controls.Find("btnLuu", true).FirstOrDefault() as Button;
+            var btnHuy = sp.Controls.Find("btnHuy", true).FirstOrDefault() as Button;
+            var btnThoat = sp.Controls.Find("btnThoat", true).FirstOrDefault() as Button;
+            Check(btnThem != null && btnThem.Enabled, "frmSanPham btnThem initially enabled");
+            Check(btnThoat != null && btnThoat.Enabled, "frmSanPham btnThoat initially enabled");
+            Check(btnSua != null && !btnSua.Enabled, "frmSanPham btnSua initially disabled");
+            Check(btnLuu != null && !btnLuu.Enabled, "frmSanPham btnLuu initially disabled");
+            Check(btnHuy != null && !btnHuy.Enabled, "frmSanPham btnHuy initially disabled");
+            ClickButton(btnThem);
+            Check(!btnThem.Enabled, "frmSanPham btnThem disabled after click");
+            Check(btnLuu.Enabled, "frmSanPham btnLuu enabled after Them click");
+            Check(btnHuy.Enabled, "frmSanPham btnHuy enabled after Them click");
+            ClickButton(btnHuy);
+            Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmSanPham restored to initial state after Huy click");
+        }
+
         Check(InstallmentCalculator.RateFor(3) > 0, "RateFor must return valid positive interest rate");
         Check(InstallmentCalculator.GetDefaultDownPaymentRatio() > 0, "GetDefaultDownPaymentRatio must return valid positive down payment ratio");
 
-        Console.WriteLine("PASS: " + checks + " checks (calculations, validation, recursive theme, sidebar blue theme, all forms, fixed grids/splitters, chart & config form, warranty form).");
+        Console.WriteLine("PASS: " + checks + " checks (calculations, validation, recursive theme, sidebar blue theme, all forms, fixed grids/splitters, chart & config form, warranty form, button state machines).");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("TEST FAILURE: " + ex.Message + "\n" + ex.StackTrace);
+            var err = ex.InnerException ?? ex;
+            Console.WriteLine("TEST FAILURE: " + err.Message + "\n" + err.StackTrace);
             Environment.Exit(1);
         }
     }

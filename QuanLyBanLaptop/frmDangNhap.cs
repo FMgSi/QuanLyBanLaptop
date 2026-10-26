@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
@@ -9,8 +9,9 @@ using QuanLyBanLaptop.DanhMuc;
 
 namespace QuanLyBanLaptop
 {
-    public partial class frmDangNhap : Form
+    public partial class frmDangNhap : QuanLyBanLaptop.Classes.AppForm
     {
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmDangNhap()
         {
             InitializeComponent();
@@ -65,6 +66,7 @@ namespace QuanLyBanLaptop
 
 
 
+        // Xử lý sự kiện BtnDangNhap_Click của giao diện.
         private void BtnDangNhap_Click(object sender, EventArgs e)
         {
             lblThongBao.Visible = false;
@@ -151,6 +153,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Thực hiện VerifyPassword theo trạng thái và dữ liệu hiện tại.
         private static bool VerifyPassword(string inputPassword, string storedPassword)
         {
             if (string.IsNullOrEmpty(storedPassword)) return false;
@@ -180,6 +183,7 @@ namespace QuanLyBanLaptop
             return false;
         }
 
+        // Thực hiện ComputeSha256 theo trạng thái và dữ liệu hiện tại.
         private static string ComputeSha256(string raw)
         {
             using (SHA256 sha = SHA256.Create())
@@ -194,6 +198,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Xử lý sự kiện pnlRight_Paint của giao diện.
         private void pnlRight_Paint(object sender, PaintEventArgs e)
         {
         }

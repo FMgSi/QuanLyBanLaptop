@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmPrintPreview : Form
+    public partial class frmPrintPreview : QuanLyBanLaptop.Classes.AppForm
     {
         private readonly HoaDonPrintData _data;
         private readonly PhieuThuPrintData _phieuThu;
@@ -28,6 +28,7 @@ namespace QuanLyBanLaptop.HoaDon
             _printDoc.PrintPage += InPhieuThu;
         }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmPrintPreview_Load(object sender, EventArgs e)
         {
             // Chiều cao tự co giãn theo số lượng sản phẩm

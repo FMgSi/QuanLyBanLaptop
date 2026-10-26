@@ -9,13 +9,12 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.DanhMuc
 {
-    public partial class frmKhachHang : Form
+    public partial class frmKhachHang : QuanLyBanLaptop.Classes.AppForm
     {
         // Trạng thái form
-        private enum FormMode { View, Add, Edit, Delete }
+        private enum FormMode { View, Add, Edit }
         private FormMode _mode = FormMode.View;
         private string _selectedMaKH = null;
-        private bool _currentSelectedIsLocked = false;
 
         // Bảng màu chuẩn
         private static readonly Color ColorDisabled = Color.FromArgb(148, 163, 184); // Xám khi không dùng được (giống Lưu và Hủy)
@@ -25,6 +24,7 @@ namespace QuanLyBanLaptop.DanhMuc
         private static readonly Color ColorAmber    = Color.FromArgb(217, 119, 6);   // Cam (Khóa)
         private static readonly Color ColorEmerald  = Color.FromArgb(16, 185, 129);  // Xanh ngọc (Mở khóa)
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmKhachHang()
         {
             InitializeComponent();
@@ -44,6 +44,7 @@ namespace QuanLyBanLaptop.DanhMuc
             SetFormMode(FormMode.View);
         }
 
+        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -98,9 +99,7 @@ namespace QuanLyBanLaptop.DanhMuc
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
-            bool isView = (mode == FormMode.View);
             bool isEditing = (mode == FormMode.Add || mode == FormMode.Edit);
-            bool isDelete = (mode == FormMode.Delete);
             bool hasSelected = (_selectedMaKH != null);
 
             txtMaKH.ReadOnly     = true;
@@ -109,63 +108,24 @@ namespace QuanLyBanLaptop.DanhMuc
             dtpNgaySinh.Enabled  =  isEditing;
             txtSDT.ReadOnly      = !isEditing;
             txtDiaChi.ReadOnly   = !isEditing;
-            cboHangThanhVien.Enabled = isEditing;
+            cboHangThanhVien.Enabled = false;
 
-            txtTimKiem.Enabled = isView;
-            btnTimKiem.Enabled = isView;
-            btnLamMoi.Enabled  = isView;
+            txtTimKiem.Enabled = !isEditing;
+            btnTimKiem.Enabled = !isEditing;
+            btnLamMoi.Enabled  = !isEditing;
 
-            if (isView)
-            {
-                btnThem.Visible = true;
-                btnSua.Visible  = true;
-                btnXoa.Visible  = true;
-                btnKhoa.Visible = true;
-
-                btnThem.Enabled = true;
-                btnSua.Enabled  = hasSelected;
-                btnXoa.Enabled  = hasSelected;
-                btnKhoa.Enabled = hasSelected;
-
-                StyleButton(btnThem, btnThem.Enabled ? ColorGreen : ColorDisabled, Color.White);
-                StyleButton(btnSua,  btnSua.Enabled  ? ColorBlue  : ColorDisabled, Color.White);
-                StyleButton(btnXoa,  btnXoa.Enabled  ? ColorRed   : ColorDisabled, Color.White);
-
-                Color activeKhoaColor = _currentSelectedIsLocked ? ColorEmerald : ColorAmber;
-                StyleButton(btnKhoa, btnKhoa.Enabled ? activeKhoaColor : ColorDisabled, Color.White);
-
-                btnLuu.Visible = false;
-                btnHuy.Visible = false;
-            }
-            else
-            {
-                btnThem.Visible = false;
-                btnSua.Visible  = false;
-                btnXoa.Visible  = false;
-                btnKhoa.Visible = false;
-
-                btnLuu.Location = new Point(10, 8);
-                btnHuy.Location = new Point(150, 8);
-                btnLuu.Size     = new Size(130, 38);
-                btnHuy.Size     = new Size(130, 38);
-
-                btnLuu.Text = "💾  Lưu";
-                btnHuy.Text = "✕  Hủy";
-
-                btnLuu.Visible = true;
-                btnHuy.Visible = true;
-                btnLuu.Enabled = true;
-                btnHuy.Enabled = true;
-
-                StyleButton(btnLuu, ColorGreen, Color.White);
-                StyleButton(btnHuy, ColorRed, Color.White);
-            }
+            btnThem.Enabled  = !isEditing;
+            btnSua.Enabled   = !isEditing && hasSelected;
+            btnXoa.Enabled   = !isEditing && hasSelected;
+            btnLuu.Enabled   = isEditing;
+            btnHuy.Enabled   = isEditing;
+            btnThoat.Enabled = true;
         }
 
+        // Dùng kiểu nút chung khi đổi trạng thái thao tác.
         private void StyleButton(Button btn, Color back, Color fore)
         {
-            btn.BackColor = back;
-            btn.ForeColor = fore;
+            ButtonTheme.Apply(btn);
         }
 
         // do du lieu tu dong vao o nhap
@@ -194,10 +154,6 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 dtpNgaySinh.Value = DateTime.Today.AddYears(-20);
             }
-
-            string tt = Function.LayGiaTriCell(row, "TrangThai");
-            _currentSelectedIsLocked = (tt == "Đã khóa");
-            btnKhoa.Text = _currentSelectedIsLocked ? "🔓  Mở khóa khách hàng" : "🔒  Khóa khách hàng";
         }
 
         // xoa trang thong tin va sinh ma khach hang tu dong KHxx
@@ -210,8 +166,6 @@ namespace QuanLyBanLaptop.DanhMuc
             cboGioiTinh.SelectedIndex      = 0;
             cboHangThanhVien.SelectedIndex = 0;
             dtpNgaySinh.Value    = DateTime.Today.AddYears(-20);
-            _currentSelectedIsLocked = false;
-            btnKhoa.Text         = "🔒  Khóa khách hàng";
         }
 
         // tim kiem khach hang
@@ -244,8 +198,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (_selectedMaKH == null)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần sửa.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Vui lòng chọn khách hàng cần sửa.", "Thông báo");
                 return;
             }
             SetFormMode(FormMode.Edit);
@@ -274,8 +227,7 @@ namespace QuanLyBanLaptop.DanhMuc
                         new SqlParameter("@HangThanhVien",  cboHangThanhVien.SelectedItem.ToString()),
                     });
 
-                    MessageBox.Show($"Thêm khách hàng \"{maKH}\" thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong($"Thêm khách hàng \"{maKH}\" thành công!", "Thành công");
                 }
                 else if (_mode == FormMode.Edit)
                 {
@@ -292,24 +244,7 @@ namespace QuanLyBanLaptop.DanhMuc
                         new SqlParameter("@DiaChi",         txtDiaChi.Text.Trim()),
                         new SqlParameter("@HangThanhVien",  cboHangThanhVien.SelectedItem.ToString()),
                     });
-                    MessageBox.Show("Cập nhật thông tin khách hàng thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (_mode == FormMode.Delete)
-                {
-                    // Xác nhận xóa khách hàng
-                    string tenKH = txtHoTen.Text;
-                    var confirm = MessageBox.Show(
-                        $"Bạn có chắc muốn XÓA khách hàng \"{tenKH}\" ({_selectedMaKH})?\n\nLưu ý: Khách hàng đã có hóa đơn sẽ không xóa được.",
-                        "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (confirm != DialogResult.Yes) return;
-
-                    DataProcesser.ExecProcNonQuery("sp_XoaKhachHang", new[]
-                    {
-                        new SqlParameter("@MaKH", _selectedMaKH)
-                    });
-                    MessageBox.Show("Xóa khách hàng thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Cập nhật thông tin khách hàng thành công!", "Thành công");
                 }
 
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
@@ -325,47 +260,23 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (_selectedMaKH == null)
             {
-                MessageBox.Show("Vui lòng chọn khách hàng cần xóa.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoCanhBao("Vui lòng chọn khách hàng cần xóa.", "Thông báo");
                 return;
             }
 
-            // Chuyển sang chế độ xóa: ẩn 4 nút, hiện [Xác nhận xóa] và [Hủy] ở vị trí Thêm và Sửa
-            SetFormMode(FormMode.Delete);
-        }
-
-        // ─── Nút Khóa / Mở khóa khách hàng ──────────────────────────────
-        private void btnKhoa_Click(object sender, EventArgs e)
-        {
-            if (_selectedMaKH == null)
-            {
-                MessageBox.Show("Vui lòng chọn khách hàng cần khóa / mở khóa.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            DataGridViewRow row = dgvKhachHang.CurrentRow;
-            if (row == null) return;
-            string tt = row.Cells["TrangThai"]?.Value?.ToString() ?? "";
-            bool daKhoa = (tt == "Đã khóa");
-            string action = daKhoa ? "MỞ KHÓA" : "KHÓA";
-
+            string tenKH = txtHoTen.Text;
             var confirm = MessageBox.Show(
-                $"Bạn có chắc muốn {action} khách hàng \"{txtHoTen.Text}\" ({_selectedMaKH})?",
-                $"Xác nhận {action.ToLower()}", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                $"Bạn có chắc muốn XÓA khách hàng \"{tenKH}\" ({_selectedMaKH})?\n\nLưu ý: Khách hàng đã có hóa đơn sẽ không xóa được.",
+                "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes) return;
 
             try
             {
-                DataProcesser.ExecProcNonQuery("sp_KhoaKhachHang", new[]
+                DataProcesser.ExecProcNonQuery("sp_XoaKhachHang", new[]
                 {
-                    new SqlParameter("@MaKH",   _selectedMaKH),
-                    new SqlParameter("@DaKhoa", !daKhoa)
+                    new SqlParameter("@MaKH", _selectedMaKH)
                 });
-
-                string msg = daKhoa ? "Đã mở khóa khách hàng thành công!" : "Đã khóa khách hàng thành công!";
-                MessageBox.Show(msg, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                Function.ThongBaoThanhCong("Xóa khách hàng thành công!", "Thành công");
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
                 _selectedMaKH = null;
                 ClearForm();
@@ -377,21 +288,22 @@ namespace QuanLyBanLaptop.DanhMuc
         // ─── Nút Hủy ─────────────────────────────────────────────────────
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            if (_mode == FormMode.Edit || _mode == FormMode.Delete)
+            if (_selectedMaKH != null && dgvKhachHang.CurrentRow != null)
             {
-                // Khi hủy Sửa hoặc Xóa: khôi phục lại dữ liệu của dòng đang chọn
-                if (dgvKhachHang.CurrentRow != null)
-                {
-                    FillFormFromGrid(dgvKhachHang.CurrentRow);
-                }
-                SetFormMode(FormMode.View);
+                FillFormFromGrid(dgvKhachHang.CurrentRow);
             }
             else
             {
                 _selectedMaKH = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
             }
+            SetFormMode(FormMode.View);
+        }
+
+        // ─── Nút Thoát ───────────────────────────────────────────────────
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+            NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
 
         // ─── Chọn dòng trong DataGridView ────────────────────────────────
@@ -424,6 +336,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
         // ─── Tách số thứ tự từ mã KH để tự động sắp xếp (001 -> 002 -> 003...) ───
 
+        // Thực hiện GetMaKHSortKey theo trạng thái và dữ liệu hiện tại.
         private static int GetMaKHSortKey(string maKH)
         {
             if (string.IsNullOrEmpty(maKH)) return int.MaxValue;
@@ -438,16 +351,14 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             if (string.IsNullOrWhiteSpace(txtMaKH.Text))
             {
-                MessageBox.Show("Vui lòng nhập mã khách hàng.", "Cảnh báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng nhập mã khách hàng.", "Cảnh báo");
                 txtMaKH.Focus();
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(txtHoTen.Text))
             {
-                MessageBox.Show("Vui lòng nhập họ tên khách hàng.", "Cảnh báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng nhập họ tên khách hàng.", "Cảnh báo");
                 txtHoTen.Focus();
                 return false;
             }
@@ -457,8 +368,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 string sdt = txtSDT.Text.Trim();
                 if (!Regex.IsMatch(sdt, @"^[0-9]+$"))
                 {
-                    MessageBox.Show("Số điện thoại chỉ được chứa các chữ số.", "Cảnh báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Số điện thoại chỉ được chứa các chữ số.", "Cảnh báo");
                     txtSDT.Focus();
                     return false;
                 }

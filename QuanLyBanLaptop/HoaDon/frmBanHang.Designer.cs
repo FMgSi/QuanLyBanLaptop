@@ -30,6 +30,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnSuaHD = new System.Windows.Forms.Button();
             this.btnXoaHD = new System.Windows.Forms.Button();
             this.btnLuuHD = new System.Windows.Forms.Button();
+            this.btnHuy = new System.Windows.Forms.Button();
             this.btnHuyHD = new System.Windows.Forms.Button();
             this.btnInHD = new System.Windows.Forms.Button();
             this.btnDong = new System.Windows.Forms.Button();
@@ -168,6 +169,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlButtonsRow.Controls.Add(this.btnSuaHD);
             this.pnlButtonsRow.Controls.Add(this.btnXoaHD);
             this.pnlButtonsRow.Controls.Add(this.btnLuuHD);
+            this.pnlButtonsRow.Controls.Add(this.btnHuy);
             this.pnlButtonsRow.Controls.Add(this.btnHuyHD);
             this.pnlButtonsRow.Controls.Add(this.btnInHD);
             this.pnlButtonsRow.Controls.Add(this.btnDong);
@@ -184,11 +186,11 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnThemHD.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThemHD.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnThemHD.ForeColor = System.Drawing.Color.White;
-            this.btnThemHD.Location = new System.Drawing.Point(150, 3);
+            this.btnThemHD.Location = new System.Drawing.Point(10, 3);
             this.btnThemHD.Name = "btnThemHD";
-            this.btnThemHD.Size = new System.Drawing.Size(130, 36);
+            this.btnThemHD.Size = new System.Drawing.Size(115, 36);
             this.btnThemHD.TabIndex = 0;
-            this.btnThemHD.Text = "+  Thêm hóa đơn";
+            this.btnThemHD.Text = "Thêm hóa đơn";
             this.btnThemHD.UseVisualStyleBackColor = false;
             // 
             // btnSuaHD
@@ -203,7 +205,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnSuaHD.Name = "btnSuaHD";
             this.btnSuaHD.Size = new System.Drawing.Size(100, 36);
             this.btnSuaHD.TabIndex = 1;
-            this.btnSuaHD.Text = "✏  Sửa";
+            this.btnSuaHD.Text = "Sửa";
             this.btnSuaHD.UseVisualStyleBackColor = false;
             this.btnSuaHD.Visible = false;
             // 
@@ -219,7 +221,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnXoaHD.Name = "btnXoaHD";
             this.btnXoaHD.Size = new System.Drawing.Size(100, 36);
             this.btnXoaHD.TabIndex = 2;
-            this.btnXoaHD.Text = "🗑  Xóa";
+            this.btnXoaHD.Text = "Xóa";
             this.btnXoaHD.UseVisualStyleBackColor = false;
             this.btnXoaHD.Visible = false;
             // 
@@ -231,13 +233,29 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnLuuHD.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLuuHD.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnLuuHD.ForeColor = System.Drawing.Color.White;
-            this.btnLuuHD.Location = new System.Drawing.Point(290, 3);
+            this.btnLuuHD.Location = new System.Drawing.Point(135, 3);
             this.btnLuuHD.Name = "btnLuuHD";
-            this.btnLuuHD.Size = new System.Drawing.Size(110, 36);
+            this.btnLuuHD.Size = new System.Drawing.Size(80, 36);
             this.btnLuuHD.TabIndex = 3;
-            this.btnLuuHD.Text = "💾  Lưu";
+            this.btnLuuHD.Text = "Lưu";
             this.btnLuuHD.UseVisualStyleBackColor = false;
             this.btnLuuHD.Visible = true;
+            // 
+            // btnHuy
+            // 
+            this.btnHuy.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
+            this.btnHuy.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHuy.FlatAppearance.BorderSize = 0;
+            this.btnHuy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHuy.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.btnHuy.ForeColor = System.Drawing.Color.White;
+            this.btnHuy.Location = new System.Drawing.Point(225, 3);
+            this.btnHuy.Name = "btnHuy";
+            this.btnHuy.Size = new System.Drawing.Size(80, 36);
+            this.btnHuy.TabIndex = 4;
+            this.btnHuy.Text = "Hủy";
+            this.btnHuy.UseVisualStyleBackColor = false;
+            this.btnHuy.Visible = true;
             // 
             // btnHuyHD
             // 
@@ -247,11 +265,11 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnHuyHD.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHuyHD.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnHuyHD.ForeColor = System.Drawing.Color.White;
-            this.btnHuyHD.Location = new System.Drawing.Point(410, 3);
+            this.btnHuyHD.Location = new System.Drawing.Point(315, 3);
             this.btnHuyHD.Name = "btnHuyHD";
-            this.btnHuyHD.Size = new System.Drawing.Size(120, 36);
-            this.btnHuyHD.TabIndex = 4;
-            this.btnHuyHD.Text = "✕  Hủy hóa đơn";
+            this.btnHuyHD.Size = new System.Drawing.Size(115, 36);
+            this.btnHuyHD.TabIndex = 5;
+            this.btnHuyHD.Text = "Hủy hóa đơn";
             this.btnHuyHD.UseVisualStyleBackColor = false;
             this.btnHuyHD.Visible = true;
             // 
@@ -263,12 +281,13 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnInHD.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInHD.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnInHD.ForeColor = System.Drawing.Color.White;
-            this.btnInHD.Location = new System.Drawing.Point(540, 3);
+            this.btnInHD.Location = new System.Drawing.Point(440, 3);
             this.btnInHD.Name = "btnInHD";
-            this.btnInHD.Size = new System.Drawing.Size(120, 36);
-            this.btnInHD.TabIndex = 5;
-            this.btnInHD.Text = "🖨  In hóa đơn";
+            this.btnInHD.Size = new System.Drawing.Size(105, 36);
+            this.btnInHD.TabIndex = 6;
+            this.btnInHD.Text = "In hóa đơn";
             this.btnInHD.UseVisualStyleBackColor = false;
+            this.btnInHD.Visible = false;
             // 
             // btnDong
             // 
@@ -278,11 +297,11 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnDong.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDong.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
             this.btnDong.ForeColor = System.Drawing.Color.White;
-            this.btnDong.Location = new System.Drawing.Point(670, 3);
+            this.btnDong.Location = new System.Drawing.Point(440, 3);
             this.btnDong.Name = "btnDong";
-            this.btnDong.Size = new System.Drawing.Size(100, 36);
-            this.btnDong.TabIndex = 6;
-            this.btnDong.Text = "✕  Đóng";
+            this.btnDong.Size = new System.Drawing.Size(85, 36);
+            this.btnDong.TabIndex = 7;
+            this.btnDong.Text = "Đóng";
             this.btnDong.UseVisualStyleBackColor = false;
             // 
             // lblBangChu
@@ -338,6 +357,9 @@ namespace QuanLyBanLaptop.HoaDon
             // 
             this.dgvGioHang.AllowUserToAddRows = false;
             this.dgvGioHang.AllowUserToDeleteRows = false;
+            this.dgvGioHang.AllowUserToResizeRows = false;
+            this.dgvGioHang.AllowUserToResizeColumns = false;
+            this.dgvGioHang.AllowUserToOrderColumns = false;
             this.dgvGioHang.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -478,21 +500,23 @@ namespace QuanLyBanLaptop.HoaDon
             this.lblMaHang.AutoSize = true;
             this.lblMaHang.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.lblMaHang.ForeColor = System.Drawing.Color.Black;
-            this.lblMaHang.Location = new System.Drawing.Point(20, 25);
+            this.lblMaHang.Location = new System.Drawing.Point(-200, -200);
             this.lblMaHang.Name = "lblMaHang";
             this.lblMaHang.Size = new System.Drawing.Size(82, 23);
             this.lblMaHang.TabIndex = 0;
             this.lblMaHang.Text = "Mã hàng:";
+            this.lblMaHang.Visible = false;
             // 
             // cboMaHang
             // 
             this.cboMaHang.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboMaHang.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.cboMaHang.FormattingEnabled = true;
-            this.cboMaHang.Location = new System.Drawing.Point(95, 22);
+            this.cboMaHang.Location = new System.Drawing.Point(-200, -200);
             this.cboMaHang.Name = "cboMaHang";
-            this.cboMaHang.Size = new System.Drawing.Size(115, 29);
+            this.cboMaHang.Size = new System.Drawing.Size(10, 29);
             this.cboMaHang.TabIndex = 1;
+            this.cboMaHang.Visible = false;
             // 
             // btnTimKiemSP
             // 
@@ -502,9 +526,9 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnTimKiemSP.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTimKiemSP.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnTimKiemSP.ForeColor = System.Drawing.Color.White;
-            this.btnTimKiemSP.Location = new System.Drawing.Point(218, 21);
+            this.btnTimKiemSP.Location = new System.Drawing.Point(20, 21);
             this.btnTimKiemSP.Name = "btnTimKiemSP";
-            this.btnTimKiemSP.Size = new System.Drawing.Size(95, 31);
+            this.btnTimKiemSP.Size = new System.Drawing.Size(190, 31);
             this.btnTimKiemSP.TabIndex = 2;
             this.btnTimKiemSP.Text = "🔍 Tìm máy";
             this.btnTimKiemSP.UseVisualStyleBackColor = false;
@@ -1017,6 +1041,7 @@ namespace QuanLyBanLaptop.HoaDon
         private System.Windows.Forms.Button btnSuaHD;
         private System.Windows.Forms.Button btnXoaHD;
         private System.Windows.Forms.Button btnLuuHD;
+        private System.Windows.Forms.Button btnHuy;
         private System.Windows.Forms.Button btnHuyHD;
         private System.Windows.Forms.Button btnInHD;
         private System.Windows.Forms.Button btnDong;

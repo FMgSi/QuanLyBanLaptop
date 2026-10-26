@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -8,7 +8,7 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmThuTienTraGop : Form
+    public partial class frmThuTienTraGop : QuanLyBanLaptop.Classes.AppForm
     {
         [DllImport("user32.dll")]
         public static extern bool ReleaseCapture();
@@ -29,6 +29,7 @@ namespace QuanLyBanLaptop.HoaDon
         private decimal _tienPhat = 0;
         private decimal _tongPhaiThu = 0;
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmThuTienTraGop(
             string maHD, string tenKH, string sdt,
             int kyThu, int tongSoKy, DateTime ngayDenHan, decimal tienGocKy)
@@ -80,6 +81,7 @@ namespace QuanLyBanLaptop.HoaDon
             };
         }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmThuTienTraGop_Load(object sender, EventArgs e)
         {
             // Hiển thị thông tin chung
@@ -132,23 +134,27 @@ namespace QuanLyBanLaptop.HoaDon
             UpdatePhuongThucView();
         }
 
+        // Xử lý sự kiện btnClose_Click của giao diện.
         private void btnClose_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
+        // Xử lý sự kiện btnDong_Click của giao diện.
         private void btnDong_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
+        // Xử lý sự kiện cboPhuongThuc_SelectedIndexChanged của giao diện.
         private void cboPhuongThuc_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdatePhuongThucView();
         }
 
+        // Thực hiện UpdatePhuongThucView theo trạng thái và dữ liệu hiện tại.
         private void UpdatePhuongThucView()
         {
             bool isTienMat = cboPhuongThuc.SelectedIndex == 1; // Tiền mặt
@@ -171,11 +177,13 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Xử lý sự kiện txtKhachDua_TextChanged của giao diện.
         private void txtKhachDua_TextChanged(object sender, EventArgs e)
         {
             TinhTienThua();
         }
 
+        // Thực hiện TinhTienThua theo trạng thái và dữ liệu hiện tại.
         private void TinhTienThua()
         {
             string raw = txtKhachDua.Text.Trim().Replace(",", "").Replace(".", "");
@@ -205,6 +213,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Xử lý sự kiện btnXacNhanIn_Click của giao diện.
         private void btnXacNhanIn_Click(object sender, EventArgs e)
         {
             bool isTienMat = cboPhuongThuc.SelectedIndex == 1;
@@ -216,8 +225,7 @@ namespace QuanLyBanLaptop.HoaDon
                 string raw = txtKhachDua.Text.Trim().Replace(",", "").Replace(".", "");
                 if (!decimal.TryParse(raw, out khachDua) || khachDua < _tongPhaiThu)
                 {
-                    MessageBox.Show("Số tiền khách đưa chưa đủ để thanh toán kỳ này!", "Cảnh báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Số tiền khách đưa chưa đủ để thanh toán kỳ này!", "Cảnh báo");
                     txtKhachDua.Focus();
                     return;
                 }
@@ -238,8 +246,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi lưu thanh toán kỳ vào CSDL: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi("Lỗi khi lưu thanh toán kỳ vào CSDL: " + ex.Message, "Lỗi");
                 return;
             }
 

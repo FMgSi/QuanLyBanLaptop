@@ -22,6 +22,7 @@ namespace QuanLyBanLaptop
             this.picLogo = new System.Windows.Forms.PictureBox();
             this.pnlMenu = new System.Windows.Forms.Panel();
             this.btnThongKe = new System.Windows.Forms.Button();
+            this.btnBaoHanhSuaChua = new System.Windows.Forms.Button();
             this.btnTheoDoiTraGop = new System.Windows.Forms.Button();
             this.btnKhachHang = new System.Windows.Forms.Button();
             this.btnNhanVien = new System.Windows.Forms.Button();
@@ -57,6 +58,7 @@ namespace QuanLyBanLaptop
             // pnlMenu
             // 
             this.pnlMenu.Controls.Add(this.btnThongKe);
+            this.pnlMenu.Controls.Add(this.btnBaoHanhSuaChua);
             this.pnlMenu.Controls.Add(this.btnTheoDoiTraGop);
             this.pnlMenu.Controls.Add(this.btnKhachHang);
             this.pnlMenu.Controls.Add(this.btnNhanVien);
@@ -77,15 +79,32 @@ namespace QuanLyBanLaptop
             this.btnThongKe.FlatAppearance.BorderSize = 0;
             this.btnThongKe.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThongKe.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnThongKe.Location = new System.Drawing.Point(0, 288);
+            this.btnThongKe.Location = new System.Drawing.Point(0, 336);
             this.btnThongKe.Name = "btnThongKe";
             this.btnThongKe.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
             this.btnThongKe.Size = new System.Drawing.Size(230, 48);
-            this.btnThongKe.TabIndex = 6;
+            this.btnThongKe.TabIndex = 7;
             this.btnThongKe.Text = "   Thống Kê";
             this.btnThongKe.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnThongKe.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnThongKe.UseVisualStyleBackColor = true;
+            // 
+            // btnBaoHanhSuaChua
+            // 
+            this.btnBaoHanhSuaChua.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnBaoHanhSuaChua.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnBaoHanhSuaChua.FlatAppearance.BorderSize = 0;
+            this.btnBaoHanhSuaChua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBaoHanhSuaChua.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnBaoHanhSuaChua.Location = new System.Drawing.Point(0, 288);
+            this.btnBaoHanhSuaChua.Name = "btnBaoHanhSuaChua";
+            this.btnBaoHanhSuaChua.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.btnBaoHanhSuaChua.Size = new System.Drawing.Size(230, 48);
+            this.btnBaoHanhSuaChua.TabIndex = 6;
+            this.btnBaoHanhSuaChua.Text = "   Sửa Chữa Bảo Hành";
+            this.btnBaoHanhSuaChua.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnBaoHanhSuaChua.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnBaoHanhSuaChua.UseVisualStyleBackColor = true;
             // 
             // btnTheoDoiTraGop
             // 
@@ -233,6 +252,7 @@ namespace QuanLyBanLaptop
         private System.Windows.Forms.Button btnNhanVien;
         private System.Windows.Forms.Button btnKhachHang;
         private System.Windows.Forms.Button btnTheoDoiTraGop;
+        private System.Windows.Forms.Button btnBaoHanhSuaChua;
         private System.Windows.Forms.Button btnThongKe;
         private System.Windows.Forms.Timer tmrCollapse;
     }

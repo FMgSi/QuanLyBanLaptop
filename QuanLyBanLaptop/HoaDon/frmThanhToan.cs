@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -10,10 +10,8 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    /// <summary>
-    /// Form Thanh Toán Hóa Đơn & Trả Góp - Thiết kế chuẩn theo giao diện người dùng yêu cầu.
-    /// </summary>
-    public partial class frmThanhToan : Form
+    // Form Thanh Toán Hóa Đơn & Trả Góp - Thiết kế chuẩn theo giao diện người dùng yêu cầu.
+    public partial class frmThanhToan : QuanLyBanLaptop.Classes.AppForm
     {
         // Cho phép kéo di chuyển form không viền
         [DllImport("user32.dll")]
@@ -52,6 +50,7 @@ namespace QuanLyBanLaptop.HoaDon
             (12, 8.0, "12 Tháng (Lãi suất 8.0%)")
         };
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmThanhToan(
             string maHD, string maKH, string tenKH, string hangKhach,
             string maNV, string tenNV, string diaChi, string sdt,
@@ -143,6 +142,7 @@ namespace QuanLyBanLaptop.HoaDon
             };
         }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmThanhToan_Load(object sender, EventArgs e)
         {
             pnlTitleBar.BringToFront();
@@ -168,7 +168,7 @@ namespace QuanLyBanLaptop.HoaDon
             TinhTienThua();
 
             // Tab 2: Khởi tạo giá trị
-            decimal downpayment = Math.Round(_tongTien * TY_LE_TRA_TRUOC, 0);
+            decimal downpayment = Math.Round(_tongTien * TY_LE_TRA_TRUOC, 0, MidpointRounding.AwayFromZero);
             decimal loan        = _tongTien - downpayment;
 
             txtTraTruoc.Text  = Function.FormatTien(downpayment);
@@ -190,6 +190,7 @@ namespace QuanLyBanLaptop.HoaDon
             this.Close();
         }
 
+        // Xử lý sự kiện btnHuy_Click của giao diện.
         private void btnHuy_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
@@ -198,17 +199,19 @@ namespace QuanLyBanLaptop.HoaDon
 
         // Chuyển đổi Tab Trả Thẳng / Trả Góp
         private void btnTabThang_Click(object sender, EventArgs e) => ChonTab(1);
+        // Xử lý sự kiện btnTabGop_Click của giao diện.
         private void btnTabGop_Click(object sender, EventArgs e)   => ChonTab(2);
 
+        // Thực hiện ChonTab theo trạng thái và dữ liệu hiện tại.
         private void ChonTab(int tabIndex)
         {
             if (tabIndex == 1)
             {
                 // Tab 1 Active
-                btnTabThang.BackColor = Color.White;
-                btnTabThang.ForeColor = Color.FromArgb(29, 78, 216); // #1D4ED8
-                btnTabGop.BackColor   = Color.Transparent;
-                btnTabGop.ForeColor   = Color.FromArgb(71, 85, 105); // #475569
+                ButtonTheme.Apply(btnTabThang);
+                
+                ButtonTheme.Apply(btnTabGop);
+                
 
                 pnlTabIndicator.Location = new Point(btnTabThang.Left, pnlTabBar.Height - 4);
                 pnlTabIndicator.Width    = btnTabThang.Width;
@@ -220,10 +223,10 @@ namespace QuanLyBanLaptop.HoaDon
             else
             {
                 // Tab 2 Active
-                btnTabGop.BackColor   = Color.White;
-                btnTabGop.ForeColor   = Color.FromArgb(29, 78, 216); // #1D4ED8
-                btnTabThang.BackColor = Color.Transparent;
-                btnTabThang.ForeColor = Color.FromArgb(71, 85, 105); // #475569
+                ButtonTheme.Apply(btnTabGop);
+                
+                ButtonTheme.Apply(btnTabThang);
+                
 
                 pnlTabIndicator.Location = new Point(btnTabGop.Left, pnlTabBar.Height - 4);
                 pnlTabIndicator.Width    = btnTabGop.Width;
@@ -241,6 +244,7 @@ namespace QuanLyBanLaptop.HoaDon
         // ═══════════════════════════════════════════════════════════════════
         private void txtKhachDua_TextChanged(object sender, EventArgs e) => TinhTienThua();
 
+        // Thực hiện TinhTienThua theo trạng thái và dữ liệu hiện tại.
         private void TinhTienThua()
         {
             string raw = txtKhachDua.Text.Trim().Replace(",", "").Replace(".", "");
@@ -269,6 +273,7 @@ namespace QuanLyBanLaptop.HoaDon
         // ═══════════════════════════════════════════════════════════════════
         private void cboChuKy_SelectedIndexChanged(object sender, EventArgs e) => TinhLichTraGop();
 
+        // Thực hiện TinhLichTraGop theo trạng thái và dữ liệu hiện tại.
         private void TinhLichTraGop()
         {
             if (cboChuKy.SelectedIndex < 0 || cboChuKy.SelectedIndex >= _goiTraGop.Length) return;
@@ -277,15 +282,12 @@ namespace QuanLyBanLaptop.HoaDon
             int kyHan = goi.Ky;
             decimal laiSuat = (decimal)(goi.LaiSuat / 100.0);
 
-            decimal downpayment = Math.Round(_tongTien * TY_LE_TRA_TRUOC, 0);
-            decimal loan        = _tongTien - downpayment;
-
-            txtTraTruoc.Text  = Function.FormatTien(downpayment);
+            var plan = Services.InstallmentCalculator.Calculate(_tongTien, kyHan);
+            decimal downpayment = plan.DownPayment, loan = plan.Principal;
+            decimal totalInterest = plan.Interest, totalPayable = loan + totalInterest;
+            decimal baseMonthly = plan.Monthly;
+            txtTraTruoc.Text = Function.FormatTien(downpayment);
             txtSoTienVay.Text = Function.FormatTien(loan);
-
-            decimal totalInterest = Math.Round(loan * laiSuat, 0);
-            decimal totalPayable  = loan + totalInterest;
-            decimal baseMonthly   = Math.Floor(totalPayable / kyHan);
 
             lblTongTienLai.Text = "Tổng tiền lãi: " + Function.FormatTien(totalInterest)
                                 + " (Lãi suất " + goi.LaiSuat.ToString("0.0") + "%)";
@@ -325,6 +327,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Thực hiện XacNhanTraThang theo trạng thái và dữ liệu hiện tại.
         private void XacNhanTraThang()
         {
             string phuongThucUI = cboPhuongThuc.SelectedItem?.ToString() ?? "Chuyển khoản ngân hàng";
@@ -335,9 +338,9 @@ namespace QuanLyBanLaptop.HoaDon
                 string raw = txtKhachDua.Text.Trim().Replace(",", "").Replace(".", "");
                 if (!decimal.TryParse(raw, out khachDua) || khachDua < _tongTien)
                 {
-                    MessageBox.Show(
+                    Function.ThongBaoCanhBao(
                         "Tiền khách đưa chưa đủ. Cần thanh toán: " + Function.FormatTien(_tongTien),
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        "Thông báo");
                     txtKhachDua.Focus();
                     return;
                 }
@@ -362,12 +365,12 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Thực hiện XacNhanTraGop theo trạng thái và dữ liệu hiện tại.
         private void XacNhanTraGop()
         {
             if (cboChuKy.SelectedIndex < 0)
             {
-                MessageBox.Show("Vui lòng chọn chu kỳ trả góp.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng chọn chu kỳ trả góp.", "Thông báo");
                 return;
             }
 
@@ -375,11 +378,9 @@ namespace QuanLyBanLaptop.HoaDon
             int kyHan = goi.Ky;
             double laiSuatPct = goi.LaiSuat;
 
-            decimal downpayment = Math.Round(_tongTien * TY_LE_TRA_TRUOC, 0);
-            decimal loan = _tongTien - downpayment;
-            decimal totalInterest = Math.Round(loan * (decimal)(laiSuatPct / 100.0), 0);
-            decimal totalPayable = loan + totalInterest;
-            decimal baseMonthly = Math.Floor(totalPayable / kyHan);
+            var plan = Services.InstallmentCalculator.Calculate(_tongTien, kyHan);
+            decimal downpayment = plan.DownPayment, loan = plan.Principal;
+            decimal totalInterest = plan.Interest, baseMonthly = plan.Monthly;
 
             if (LuuHoaDonVaoDB("Trả góp", kyHan, "Đang trả góp"))
             {
@@ -395,6 +396,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Thực hiện InHoaDonPreview theo trạng thái và dữ liệu hiện tại.
         private void InHoaDonPreview(bool isTraGop, int chuKy, double laiSuat,
             decimal downpayment, decimal loan, decimal interest, decimal monthly,
             decimal khachDua, decimal tienThua)
@@ -433,177 +435,21 @@ namespace QuanLyBanLaptop.HoaDon
         // ═══════════════════════════════════════════════════════════════════
         // LƯU CSDL SQL SERVER VỚI 1 TRANSACTION
         // ═══════════════════════════════════════════════════════════════════
+        // Giao diện chỉ gửi dữ liệu; service chịu trách nhiệm toàn bộ transaction.
         private bool LuuHoaDonVaoDB(string phuongThuc, int chuKy, string tinhTrang)
         {
-            // Kiểm tra tồn kho trước
-            foreach (DataRow r in _dtGioHang.Rows)
-            {
-                if (r.RowState == DataRowState.Deleted) continue;
-                string maLT  = r["MaLaptop"].ToString();
-                string tenLT = r["TenLaptop"].ToString();
-                int slMua    = Convert.ToInt32(r["SoLuong"]);
-
-                object tonObj = DataProcesser.ExecuteScalar(
-                    "SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop = @Ma",
-                    new[] { new SqlParameter("@Ma", maLT) });
-                int ton = (tonObj != null && tonObj != DBNull.Value) ? Convert.ToInt32(tonObj) : 0;
-                if (slMua > ton)
-                {
-                    MessageBox.Show("Mặt hàng [" + tenLT + "] chỉ còn " + ton + " máy trong kho, không đủ số lượng (" + slMua + ")!",
-                        "Không đủ hàng", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return false;
-                }
-            }
-
             try
             {
-                using (var conn = DataProcesser.GetConnection())
-                using (var trans = conn.BeginTransaction())
+                new Services.SaleService().Save(new Services.SaleRequest
                 {
-                    try
-                    {
-                        // 1. Tính tổng tiền từ giỏ hàng
-                        decimal tongTien = 0;
-                        foreach (DataRow r in _dtGioHang.Rows)
-                            if (r.RowState != DataRowState.Deleted)
-                                tongTien += Convert.ToDecimal(r["ThanhTien"]);
-
-                        // 2. Insert HOA_DON
-                        using (var cmd = new SqlCommand(
-                            "INSERT INTO HOA_DON (MaHD,MaKH,MaNV,NgayLap,PhuongThucThanhToan,ChuKyTraGop,TinhTrang,TongTien)" +
-                            " VALUES (@MaHD,@MaKH,@MaNV,@NgayLap,@Phuong,@ChuKy,@TinhTrang,@TongTien)", conn, trans))
-                        {
-                            cmd.Parameters.Add("@MaHD",      SqlDbType.NVarChar, 30).Value = _maHD;
-                            cmd.Parameters.Add("@MaKH",      SqlDbType.VarChar, 10).Value  = _maKH;
-                            cmd.Parameters.Add("@MaNV",      SqlDbType.VarChar, 10).Value  = _maNV;
-                            cmd.Parameters.Add("@NgayLap",   SqlDbType.DateTime).Value     = _ngayLap;
-                            cmd.Parameters.Add("@Phuong",    SqlDbType.NVarChar, 50).Value = phuongThuc;
-                            cmd.Parameters.Add("@ChuKy",     SqlDbType.Int).Value          = chuKy;
-                            cmd.Parameters.Add("@TinhTrang", SqlDbType.NVarChar, 30).Value = tinhTrang;
-                            cmd.Parameters.Add("@TongTien",  SqlDbType.Decimal).Value      = tongTien;
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        // 3. Insert CHI_TIET_HD + trừ kho + gán Serial
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState == DataRowState.Deleted) continue;
-                            string maLT    = r["MaLaptop"].ToString();
-                            decimal donGia = Convert.ToDecimal(r["DonGia"]);
-                            int sl         = Convert.ToInt32(r["SoLuong"]);
-                            decimal giam   = Convert.ToDecimal(r["GiamGia"]);
-                            decimal tt     = Convert.ToDecimal(r["ThanhTien"]);
-                            int tgBH       = (r.Table.Columns.Contains("ThoiGianBaoHanh") && r["ThoiGianBaoHanh"] != DBNull.Value)
-                                             ? Convert.ToInt32(r["ThoiGianBaoHanh"]) : 12;
-
-                            using (var cmdCT = new SqlCommand(
-                                "INSERT INTO CHI_TIET_HD (MaHD,MaLaptop,SoLuong,DonGia,GiaVon,ThoiGianBaoHanh,GiamGia,ThanhTien)" +
-                                " VALUES (@MaHD,@MaLaptop,@SoLuong,@DonGia,@GiaVon,@TgBH,@GiamGia,@ThanhTien)", conn, trans))
-                            {
-                                cmdCT.Parameters.AddWithValue("@MaHD",      _maHD);
-                                cmdCT.Parameters.AddWithValue("@MaLaptop",  maLT);
-                                cmdCT.Parameters.AddWithValue("@SoLuong",   sl);
-                                cmdCT.Parameters.AddWithValue("@DonGia",    donGia);
-                                cmdCT.Parameters.AddWithValue("@GiaVon",    donGia * 0.8m);
-                                cmdCT.Parameters.AddWithValue("@TgBH",      tgBH);
-                                cmdCT.Parameters.AddWithValue("@GiamGia",   giam);
-                                cmdCT.Parameters.AddWithValue("@ThanhTien", tt);
-                                cmdCT.ExecuteNonQuery();
-                            }
-
-                            // Trừ tồn kho
-                            using (var cmdKho = new SqlCommand(
-                                "UPDATE LAPTOP SET SoLuongTon = SoLuongTon - @SL WHERE MaLaptop = @Ma", conn, trans))
-                            {
-                                cmdKho.Parameters.AddWithValue("@SL", sl);
-                                cmdKho.Parameters.AddWithValue("@Ma", maLT);
-                                cmdKho.ExecuteNonQuery();
-                            }
-
-                            // Cập nhật trạng thái Serial sang 'Đã bán'
-                            using (var cmdSrl = new SqlCommand(
-                                ";WITH xepHang AS (" +
-                                "SELECT SerialNo, ROW_NUMBER() OVER (ORDER BY SerialNo) AS rn " +
-                                "FROM LAPTOP_SERIAL WHERE MaLaptop=@MaLaptop AND TrangThai=N'Trong kho'" +
-                                ") " +
-                                "UPDATE s SET s.TrangThai=N'Đã bán', s.MaHD=@MaHD," +
-                                " s.NgayHetBH=DATEADD(MONTH,@TgBH,@Ngay)" +
-                                " FROM LAPTOP_SERIAL s JOIN xepHang x ON s.SerialNo=x.SerialNo WHERE x.rn<=@SoLuong",
-                                conn, trans))
-                            {
-                                cmdSrl.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdSrl.Parameters.AddWithValue("@MaHD",     _maHD);
-                                cmdSrl.Parameters.AddWithValue("@SoLuong",  sl);
-                                cmdSrl.Parameters.AddWithValue("@TgBH",     tgBH);
-                                cmdSrl.Parameters.AddWithValue("@Ngay",     _ngayLap.Date);
-                                cmdSrl.ExecuteNonQuery();
-                            }
-                        }
-
-                        // 4. Nếu là trả góp: gọi sp_TaoLichTraGop
-                        if (phuongThuc == "Trả góp")
-                        {
-                            using (var cmdLich = new SqlCommand("dbo.sp_TaoLichTraGop", conn, trans))
-                            {
-                                cmdLich.CommandType = CommandType.StoredProcedure;
-                                cmdLich.Parameters.AddWithValue("@MaHD", _maHD);
-                                cmdLich.ExecuteNonQuery();
-                            }
-                        }
-
-                        // 5. Cập nhật hạng thành viên
-                        try
-                        {
-                            using (var cmdHang = new SqlCommand("dbo.sp_CapNhatHangThanhVien", conn, trans))
-                            {
-                                cmdHang.CommandType = CommandType.StoredProcedure;
-                                cmdHang.Parameters.AddWithValue("@MaKH", (object)_maKH ?? DBNull.Value);
-                                cmdHang.ExecuteNonQuery();
-                            }
-                        }
-                        catch (SqlException spEx) when (spEx.Number == 2812)
-                        {
-                            // Dự phòng khi SP chưa được khởi tạo trong CSDL
-                            using (var cmdFallback = new SqlCommand(@"
-                                UPDATE kh
-                                SET HangThanhVien = CASE 
-                                    WHEN ISNULL(t.Tong, 0) >= 50000000 THEN N'VIP'
-                                    WHEN ISNULL(t.Tong, 0) >= 20000000 THEN N'Vàng'
-                                    WHEN ISNULL(t.Tong, 0) >= 5000000  THEN N'Bạc'
-                                    ELSE N'Đồng'
-                                END
-                                FROM KHACH_HANG kh
-                                OUTER APPLY (
-                                    SELECT SUM(TongTien) AS Tong 
-                                    FROM HOA_DON_BAN 
-                                    WHERE MaKH = kh.MaKH AND TrangThai IN (N'Đã thanh toán', N'Đang trả góp', N'Hoàn tất')
-                                ) t
-                                WHERE kh.MaKH = @MaKH", conn, trans))
-                            {
-                                cmdFallback.Parameters.AddWithValue("@MaKH", (object)_maKH ?? DBNull.Value);
-                                cmdFallback.ExecuteNonQuery();
-                            }
-                        }
-
-                        trans.Commit();
-                        return true;
-                    }
-                    catch
-                    {
-                        trans.Rollback();
-                        throw;
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                DataProcesser.ShowSqlError(ex);
-                return false;
+                    InvoiceId = _maHD, CustomerId = _maKH, EmployeeId = _maNV,
+                    Date = _ngayLap, PaymentMethod = phuongThuc, Months = chuKy, Items = _dtGioHang
+                });
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi lưu giao dịch vào CSDL: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi(ex.Message, "Không thể lưu hóa đơn");
                 return false;
             }
         }
@@ -660,13 +506,13 @@ namespace QuanLyBanLaptop.HoaDon
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Lỗi xuất hóa đơn: " + ex.Message, "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Function.ThongBaoLoi("Lỗi xuất hóa đơn: " + ex.Message, "Lỗi");
                     }
                 }
             }
         }
 
+        // Xử lý sự kiện lblHangKhach_Click của giao diện.
         private void lblHangKhach_Click(object sender, EventArgs e)
         {
 

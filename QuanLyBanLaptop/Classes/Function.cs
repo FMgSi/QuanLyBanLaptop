@@ -11,43 +11,37 @@ using System.Windows.Forms;
 
 namespace QuanLyBanLaptop.Classes
 {
-    /// <summary>
-    /// Lớp tiện ích trung tâm gom tất cả các hàm dùng nhiều trong toàn bộ hệ thống
-    /// (CSDL, Định dạng tiền/ngày, Kiểm tra dữ liệu, Sinh mã, Thông báo, Định dạng bảng, Xuất file).
-    /// Các form sau này chỉ việc gọi Function.<TênHàm> mà không cần viết lại logic.
-    /// </summary>
+    // Lớp tiện ích trung tâm gom tất cả các hàm dùng nhiều trong toàn bộ hệ thống (CSDL, Định dạng tiền/ngày, Kiểm tra dữ liệu, Sinh mã, Thông báo, Định dạng bảng, Xuất file). Các form sau này chỉ việc gọi Function.<TênHàm> mà không cần viết lại logic.
     public static class Function
     {
         #region 1. Thông tin phiên đăng nhập người dùng
 
-        /// <summary>Mã nhân viên đang đăng nhập.</summary>
+        // Mã nhân viên đang đăng nhập.
         public static string CurrentMaNV
         {
             get => UserSession.MaNV;
             set => UserSession.MaNV = value;
         }
 
-        /// <summary>Tên nhân viên đang đăng nhập.</summary>
+        // Tên nhân viên đang đăng nhập.
         public static string CurrentTenNV
         {
             get => UserSession.TenNV;
             set => UserSession.TenNV = value;
         }
 
-        /// <summary>Chức vụ của nhân viên đang đăng nhập.</summary>
+        // Chức vụ của nhân viên đang đăng nhập.
         public static string CurrentChucVu
         {
             get => UserSession.ChucVu;
             set => UserSession.ChucVu = value;
         }
 
-        /// <summary>Nhân viên hiện tại có phải Quản trị viên / Quản lý không.</summary>
+        // Nhân viên hiện tại có phải Quản trị viên / Quản lý không.
         public static bool IsAdmin =>
             CurrentChucVu == "Quản trị viên" || CurrentChucVu == "Quản lý";
 
-        /// <summary>
-        /// Gán thông tin phiên đăng nhập từ DataRow.
-        /// </summary>
+        // Gán thông tin phiên đăng nhập từ DataRow.
         public static void SetCurrentUser(DataRow row)
         {
             if (row == null) return;
@@ -60,7 +54,7 @@ namespace QuanLyBanLaptop.Classes
             }
         }
 
-        /// <summary>Xóa thông tin phiên đăng nhập khi đăng xuất.</summary>
+        // Xóa thông tin phiên đăng nhập khi đăng xuất.
         public static void ClearCurrentUser()
         {
             CurrentMaNV = null;
@@ -73,63 +67,43 @@ namespace QuanLyBanLaptop.Classes
 
         #region 2. Các hàm truy vấn và tương tác CSDL (gọi nhanh qua Function)
 
-        /// <summary>
-        /// Đọc bảng dữ liệu với danh sách SqlParameter.
-        /// </summary>
+        // Đọc bảng dữ liệu với danh sách SqlParameter.
         public static DataTable DocBang(string sql, params SqlParameter[] parameters)
             => DataProcesser.ReadData(sql, parameters);
 
-        /// <summary>
-        /// Đọc bảng dữ liệu với tham số vị trí @0, @1, @2...
-        /// </summary>
+        // Đọc bảng dữ liệu với tham số vị trí @0, @1, @2...
         public static DataTable DocBang(string sql, params object[] values)
             => DataProcesser.ReadData(sql, values);
 
-        /// <summary>
-        /// Thực thi lệnh INSERT, UPDATE, DELETE với danh sách SqlParameter.
-        /// </summary>
+        // Thực thi lệnh INSERT, UPDATE, DELETE với danh sách SqlParameter.
         public static int CapNhat(string sql, params SqlParameter[] parameters)
             => DataProcesser.ChangeData(sql, parameters);
 
-        /// <summary>
-        /// Thực thi lệnh INSERT, UPDATE, DELETE với tham số vị trí @0, @1, @2...
-        /// </summary>
+        // Thực thi lệnh INSERT, UPDATE, DELETE với tham số vị trí @0, @1, @2...
         public static int CapNhat(string sql, params object[] values)
             => DataProcesser.ChangeData(sql, values);
 
-        /// <summary>
-        /// Lấy 1 giá trị đơn (COUNT, SUM, MAX...) với danh sách SqlParameter.
-        /// </summary>
+        // Lấy 1 giá trị đơn (COUNT, SUM, MAX...) với danh sách SqlParameter.
         public static object LayGiaTri(string sql, params SqlParameter[] parameters)
             => DataProcesser.ExecuteScalar(sql, parameters);
 
-        /// <summary>
-        /// Lấy 1 giá trị đơn với tham số vị trí @0, @1, @2...
-        /// </summary>
+        // Lấy 1 giá trị đơn với tham số vị trí @0, @1, @2...
         public static object LayGiaTri(string sql, params object[] values)
             => DataProcesser.ExecuteScalar(sql, values);
 
-        /// <summary>
-        /// Thực thi Stored Procedure trả về DataTable.
-        /// </summary>
+        // Thực thi Stored Procedure trả về DataTable.
         public static DataTable ExecProc(string procName, params SqlParameter[] parameters)
             => DataProcesser.ExecProc(procName, parameters);
 
-        /// <summary>
-        /// Thực thi Stored Procedure không trả về kết quả (Insert/Update/Delete).
-        /// </summary>
+        // Thực thi Stored Procedure không trả về kết quả (Insert/Update/Delete).
         public static void ExecProcNonQuery(string procName, params SqlParameter[] parameters)
             => DataProcesser.ExecProcNonQuery(procName, parameters);
 
-        /// <summary>
-        /// Nạp dữ liệu vào ComboBox chỉ với 1 dòng lệnh.
-        /// </summary>
+        // Nạp dữ liệu vào ComboBox chỉ với 1 dòng lệnh.
         public static void FillComboBox(ComboBox cbo, string sql, string displayMember, string valueMember, string defaultItemText = null)
             => DataProcesser.FillComboBox(cbo, sql, displayMember, valueMember, defaultItemText);
 
-        /// <summary>
-        /// Kiểm tra kết nối tới cơ sở dữ liệu.
-        /// </summary>
+        // Kiểm tra kết nối tới cơ sở dữ liệu.
         public static bool TestKetNoi()
             => DataProcesser.TestConnection();
 
@@ -137,21 +111,15 @@ namespace QuanLyBanLaptop.Classes
 
         #region 3. Định dạng và xử lý Tiền tệ, Ngày tháng, Số
 
-        /// <summary>
-        /// Định dạng số tiền kiểu Việt Nam: "1.500.000 ₫".
-        /// </summary>
+        // Định dạng số tiền kiểu Việt Nam: "1.500.000 ₫".
         public static string FormatTien(decimal amount)
             => amount.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) + " ₫";
 
-        /// <summary>
-        /// Bí danh cho FormatTien.
-        /// </summary>
+        // Bí danh cho FormatTien.
         public static string FormatCurrency(decimal amount)
             => FormatTien(amount);
 
-        /// <summary>
-        /// Chuyển đổi chuỗi tiền tệ (vd: "1.500.000 ₫", "1500000", "1,500,000") về số decimal an toàn.
-        /// </summary>
+        // Chuyển đổi chuỗi tiền tệ (vd: "1.500.000 ₫", "1500000", "1,500,000") về số decimal an toàn.
         public static decimal ParseTien(string text, decimal defaultValue = 0)
         {
             if (string.IsNullOrWhiteSpace(text)) return defaultValue;
@@ -170,21 +138,15 @@ namespace QuanLyBanLaptop.Classes
             return defaultValue;
         }
 
-        /// <summary>
-        /// Định dạng ngày tháng theo chuẩn Việt Nam: dd/MM/yyyy.
-        /// </summary>
+        // Định dạng ngày tháng theo chuẩn Việt Nam: dd/MM/yyyy.
         public static string FormatNgay(DateTime dt)
             => dt.ToString("dd/MM/yyyy");
 
-        /// <summary>
-        /// Định dạng ngày và giờ: dd/MM/yyyy HH:mm.
-        /// </summary>
+        // Định dạng ngày và giờ: dd/MM/yyyy HH:mm.
         public static string FormatNgayGio(DateTime dt)
             => dt.ToString("dd/MM/yyyy HH:mm");
 
-        /// <summary>
-        /// Parse chuỗi ngày (dd/MM/yyyy, yyyy-MM-dd...) về DateTime an toàn.
-        /// </summary>
+        // Parse chuỗi ngày (dd/MM/yyyy, yyyy-MM-dd...) về DateTime an toàn.
         public static DateTime? ParseNgay(string dateStr)
         {
             if (string.IsNullOrWhiteSpace(dateStr)) return null;
@@ -197,9 +159,7 @@ namespace QuanLyBanLaptop.Classes
             return null;
         }
 
-        /// <summary>
-        /// Đọc số tiền thành chữ tiếng Việt chuẩn (VD: 1.500.000 -> Một triệu năm trăm nghìn đồng).
-        /// </summary>
+        // Đọc số tiền thành chữ tiếng Việt chuẩn (VD: 1.500.000 -> Một triệu năm trăm nghìn đồng).
         public static string ChuyenSoThanhChu(decimal number)
         {
             if (number == 0) return "Không đồng";
@@ -283,50 +243,29 @@ namespace QuanLyBanLaptop.Classes
         #region 4. Sinh ma tu dong thong minh
 
         // sinh ma tu dong theo tien to va so chu so dinh dang vd NV01, KH01, MH01
+        // Cấp mã từ sequence DB để không trùng khi nhiều máy cùng thêm dữ liệu.
         public static string SinhMaTuDong(string tenBang, string tenCot, string tienTo, int doRong = 2)
         {
-            try
+            string sequence;
+            switch (tenBang + "." + tenCot)
             {
-                string sql = $"SELECT {tenCot} FROM {tenBang} WHERE {tenCot} LIKE '{tienTo}%'";
-                DataTable dt = DataProcesser.ExecuteReader(sql);
-                int maxSo = 0;
-                if (dt != null)
-                {
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        string val = row[0]?.ToString() ?? "";
-                        if (val.StartsWith(tienTo, StringComparison.OrdinalIgnoreCase))
-                        {
-                            string numPart = val.Substring(tienTo.Length);
-                            string digits = "";
-                            foreach (char c in numPart)
-                            {
-                                if (char.IsDigit(c)) digits += c;
-                                else break;
-                            }
-                            if (int.TryParse(digits, out int num) && num > maxSo)
-                            {
-                                maxSo = num;
-                            }
-                        }
-                    }
-                }
-                int nextSo = maxSo + 1;
-                return tienTo + nextSo.ToString("D" + doRong);
+                case "LAPTOP.MaLaptop": sequence = "seq_AppLaptop"; break;
+                case "NHA_CUNG_CAP.MaNCC": sequence = "seq_AppSupplier"; break;
+                case "KHACH_HANG.MaKH": sequence = "seq_AppCustomer"; break;
+                case "NHAN_VIEN.MaNV": sequence = "seq_AppEmployee"; break;
+                default: throw new ArgumentException("Bảng sinh mã chưa được hỗ trợ.");
             }
-            catch
-            {
-                return tienTo + 1.ToString("D" + doRong);
-            }
+            long next = Convert.ToInt64(DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo." + sequence));
+            string id = tienTo + next.ToString("D" + doRong);
+            if (id.Length > 10) throw new InvalidOperationException("Mã vượt giới hạn 10 ký tự.");
+            return id;
         }
 
         #endregion
 
         #region 5. Kiểm tra tính hợp lệ dữ liệu (Validation)
 
-        /// <summary>
-        /// Kiểm tra chuỗi có bị rỗng hay không.
-        /// </summary>
+        // Kiểm tra chuỗi có bị rỗng hay không.
         public static bool KiemTraRong(string text, string tenTruong, out string thongBaoLoi)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -338,18 +277,14 @@ namespace QuanLyBanLaptop.Classes
             return true;
         }
 
-        /// <summary>
-        /// Kiểm tra số điện thoại Việt Nam hợp lệ (10 chữ số, bắt đầu bằng 03, 05, 07, 08, 09...).
-        /// </summary>
+        // Kiểm tra số điện thoại Việt Nam hợp lệ (10 chữ số, bắt đầu bằng 03, 05, 07, 08, 09...).
         public static bool KiemTraSDT(string sdt)
         {
             if (string.IsNullOrWhiteSpace(sdt)) return false;
             return Regex.IsMatch(sdt.Trim(), @"^(0[3|5|7|8|9])[0-9]{8}$");
         }
 
-        /// <summary>
-        /// Kiểm tra số nguyên hợp lệ trong khoảng min đến max.
-        /// </summary>
+        // Kiểm tra số nguyên hợp lệ trong khoảng min đến max.
         public static bool KiemTraSoNguyen(string text, string tenTruong, out int ketQua, int min = 1, int max = int.MaxValue)
         {
             ketQua = 0;
@@ -361,9 +296,7 @@ namespace QuanLyBanLaptop.Classes
             return true;
         }
 
-        /// <summary>
-        /// Kiểm tra số thực (tiền, tỷ lệ) hợp lệ trong khoảng min đến max.
-        /// </summary>
+        // Kiểm tra số thực (tiền, tỷ lệ) hợp lệ trong khoảng min đến max.
         public static bool KiemTraSoThuc(string text, string tenTruong, out decimal ketQua, decimal min = 0, decimal max = decimal.MaxValue)
         {
             ketQua = 0;
@@ -381,19 +314,19 @@ namespace QuanLyBanLaptop.Classes
 
         #region 6. Hộp thoại thông báo & Xác nhận
 
-        /// <summary>Hiển thị hộp thoại lỗi.</summary>
+        // Hiển thị hộp thoại lỗi.
         public static void ThongBaoLoi(string msg, string title = "Lỗi")
             => MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-        /// <summary>Hiển thị hộp thoại thành công.</summary>
+        // Hiển thị hộp thoại thành công.
         public static void ThongBaoThanhCong(string msg, string title = "Thành công")
             => MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-        /// <summary>Hiển thị hộp thoại cảnh báo.</summary>
+        // Hiển thị hộp thoại cảnh báo.
         public static void ThongBaoCanhBao(string msg, string title = "Cảnh báo")
             => MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-        /// <summary>Hiển thị hộp thoại xác nhận Yes / No.</summary>
+        // Hiển thị hộp thoại xác nhận Yes / No.
         public static DialogResult XacNhan(string msg, string title = "Xác nhận")
             => MessageBox.Show(msg, title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -401,9 +334,7 @@ namespace QuanLyBanLaptop.Classes
 
         #region 7. Tiện ích giao diện DataGridView & Xuất báo cáo
 
-        /// <summary>
-        /// Áp dụng bảng màu và kiểu hiển thị chuyên nghiệp, hiện đại cho DataGridView.
-        /// </summary>
+        // Áp dụng bảng màu và kiểu hiển thị chuyên nghiệp, hiện đại cho DataGridView.
         public static void DinhDangBang(DataGridView dgv)
         {
             if (dgv == null) return;
@@ -441,12 +372,12 @@ namespace QuanLyBanLaptop.Classes
             dgv.AllowUserToAddRows = false;
             dgv.AllowUserToDeleteRows = false;
             dgv.AllowUserToResizeRows = false;
+            dgv.AllowUserToResizeColumns = false;
+            dgv.AllowUserToOrderColumns = false;
             dgv.ReadOnly = true;
         }
 
-        /// <summary>
-        /// Xuất dữ liệu DataGridView ra file CSV / Excel UTF-8 kèm BOM, tương thích tiếng Việt có dấu.
-        /// </summary>
+        // Xuất dữ liệu DataGridView ra file CSV / Excel UTF-8 kèm BOM, tương thích tiếng Việt có dấu.
         public static void XuatExcel(DataGridView dgv, string defaultFileName = "DanhSach.csv")
         {
             if (dgv == null || dgv.Rows.Count == 0)
@@ -568,44 +499,11 @@ namespace QuanLyBanLaptop.Classes
         }
 
         // sinh ma hoa don tu dong theo quy tac HDB_ddMMyyyy0xxx
+        // Dùng namespace mã mới và sequence nguyên tử, không phụ thuộc đồng hồ máy khách.
         public static string SinhMaHoaDonTuDong()
         {
-            try
-            {
-                string ngayThangNam = DateTime.Now.ToString("ddMMyyyy");
-                string prefix = "HĐB_" + ngayThangNam + "0";
-                string sql = $"SELECT MaHD FROM HOA_DON WHERE MaHD LIKE '{prefix}%' OR MaHD LIKE 'HDB_{ngayThangNam}0%'";
-                DataTable dt = DataProcesser.ExecuteReader(sql);
-                int maxSo = 0;
-                if (dt != null)
-                {
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        string val = row[0]?.ToString() ?? "";
-                        int idx = val.IndexOf(ngayThangNam + "0", StringComparison.OrdinalIgnoreCase);
-                        if (idx >= 0)
-                        {
-                            string tail = val.Substring(idx + (ngayThangNam + "0").Length);
-                            string digits = "";
-                            foreach (char c in tail)
-                            {
-                                if (char.IsDigit(c)) digits += c;
-                                else break;
-                            }
-                            if (int.TryParse(digits, out int n) && n > maxSo)
-                            {
-                                maxSo = n;
-                            }
-                        }
-                    }
-                }
-                int nextSo = maxSo + 1;
-                return prefix + nextSo.ToString("D3");
-            }
-            catch
-            {
-                return "HĐB_" + DateTime.Now.ToString("ddMMyyyy") + "0001";
-            }
+            long next = Convert.ToInt64(DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo.seq_AppInvoice"));
+            return $"HDB_{DateTime.Now:ddMMyyyy}{next:D4}";
         }
 
         #endregion

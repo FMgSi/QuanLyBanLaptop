@@ -7,12 +7,13 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.DanhMuc
 {
-    public partial class frmNhanVien : Form
+    public partial class frmNhanVien : QuanLyBanLaptop.Classes.AppForm
     {
         private enum FormMode { View, Add, Edit }
         private FormMode _mode = FormMode.View;
         private string _selectedMaNV = null;
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmNhanVien()
         {
             InitializeComponent();
@@ -27,6 +28,7 @@ namespace QuanLyBanLaptop.DanhMuc
             SetFormMode(FormMode.View);
         }
 
+        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -73,6 +75,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             _mode = mode;
             bool editing = (mode == FormMode.Add || mode == FormMode.Edit);
+            bool hasSelected = (_selectedMaNV != null);
 
             txtMaNV.ReadOnly    = true;
             txtTenNV.ReadOnly   = !editing;
@@ -85,13 +88,12 @@ namespace QuanLyBanLaptop.DanhMuc
             txtTenDN.ReadOnly   = !editing;
             txtMatKhau.ReadOnly = !editing;
 
-            Function.DatTrangThaiNut(editing, btnThem, btnSua, btnXoa, btnLuu, btnBoQua, btnKhoa);
-            if (!editing && _selectedMaNV == null)
-            {
-                btnSua.Enabled = false;
-                btnXoa.Enabled = false;
-                btnKhoa.Enabled = false;
-            }
+            btnThem.Enabled  = !editing;
+            btnSua.Enabled   = !editing && hasSelected;
+            btnXoa.Enabled   = !editing && hasSelected;
+            btnLuu.Enabled   = editing;
+            btnHuy.Enabled   = editing;
+            btnThoat.Enabled = true;
         }
 
         // do du lieu tu dong vao o nhap
@@ -103,7 +105,7 @@ namespace QuanLyBanLaptop.DanhMuc
             txtSDT.Text     = Function.LayGiaTriCell(row, "SDT");
             txtDiaChi.Text  = Function.LayGiaTriCell(row, "DiaChi");
             txtTenDN.Text   = Function.LayGiaTriCell(row, "TenDN");
-            txtMatKhau.Text = Function.LayGiaTriCell(row, "MatKhau");
+            txtMatKhau.Clear();
 
             string gt = Function.LayGiaTriCell(row, "GioiTinh", "Nam");
             radNam.Checked = (gt == "Nam");
@@ -125,6 +127,7 @@ namespace QuanLyBanLaptop.DanhMuc
             return Function.SinhMaTuDong("NHAN_VIEN", "MaNV", "NV", 2);
         }
 
+        // Thực hiện ClearForm theo trạng thái và dữ liệu hiện tại.
         private void ClearForm()
         {
             txtMaNV.Text    = TaoMaNVTuDong();
@@ -142,6 +145,7 @@ namespace QuanLyBanLaptop.DanhMuc
         private void btnTimKiem_Click(object sender, EventArgs e)
             => LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
 
+        // Xử lý sự kiện btnLamMoi_Click của giao diện.
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             txtTimKiem.Clear();
@@ -151,6 +155,7 @@ namespace QuanLyBanLaptop.DanhMuc
             SetFormMode(FormMode.View);
         }
 
+        // Xử lý sự kiện btnThem_Click của giao diện.
         private void btnThem_Click(object sender, EventArgs e)
         {
             _selectedMaNV = null;
@@ -159,24 +164,24 @@ namespace QuanLyBanLaptop.DanhMuc
             txtTenNV.Focus();
         }
 
+        // Xử lý sự kiện btnSua_Click của giao diện.
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (_selectedMaNV == null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên cần sửa.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Vui lòng chọn nhân viên cần sửa.", "Thông báo");
                 return;
             }
             SetFormMode(FormMode.Edit);
             txtTenNV.Focus();
         }
 
+        // Xử lý sự kiện btnLuu_Click của giao diện.
         private void btnLuu_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTenNV.Text))
             {
-                MessageBox.Show("Vui lòng nhập họ tên nhân viên.", "Cảnh báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng nhập họ tên nhân viên.", "Cảnh báo");
                 txtTenNV.Focus();
                 return;
             }
@@ -189,14 +194,12 @@ namespace QuanLyBanLaptop.DanhMuc
                 {
                     if (string.IsNullOrWhiteSpace(txtTenDN.Text))
                     {
-                        MessageBox.Show("Vui lòng nhập tên đăng nhập.", "Cảnh báo",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        Function.ThongBaoCanhBao("Vui lòng nhập tên đăng nhập.", "Cảnh báo");
                         return;
                     }
                     if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
                     {
-                        MessageBox.Show("Vui lòng nhập mật khẩu (ít nhất 6 ký tự).", "Cảnh báo",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        Function.ThongBaoCanhBao("Vui lòng nhập mật khẩu (ít nhất 6 ký tự).", "Cảnh báo");
                         return;
                     }
 
@@ -224,8 +227,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                     string newMa = maNVParam.Value?.ToString();
                     if (string.IsNullOrEmpty(newMa)) newMa = txtMaNV.Text;
-                    MessageBox.Show($"Thêm nhân viên thành công! Mã: {newMa}", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong($"Thêm nhân viên thành công! Mã: {newMa}", "Thành công");
                 }
                 else if (_mode == FormMode.Edit)
                 {
@@ -241,8 +243,7 @@ namespace QuanLyBanLaptop.DanhMuc
                         new SqlParameter("@TenDN",    txtTenDN.Text.Trim()),
                         new SqlParameter("@MatKhau",  string.IsNullOrWhiteSpace(txtMatKhau.Text) ? (object)DBNull.Value : txtMatKhau.Text.Trim()),
                     });
-                    MessageBox.Show("Cập nhật nhân viên thành công!", "Thành công",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Cập nhật nhân viên thành công!", "Thành công");
                 }
 
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
@@ -253,12 +254,12 @@ namespace QuanLyBanLaptop.DanhMuc
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
 
+        // Xử lý sự kiện btnXoa_Click của giao diện.
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (_selectedMaNV == null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên cần xóa.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Vui lòng chọn nhân viên cần xóa.", "Thông báo");
                 return;
             }
             var confirm = MessageBox.Show(
@@ -270,8 +271,7 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 DataProcesser.ExecProcNonQuery("sp_XoaNhanVien", new[]
                 { new SqlParameter("@MaNV", _selectedMaNV) });
-                MessageBox.Show("Xóa nhân viên thành công!", "Thành công",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Xóa nhân viên thành công!", "Thành công");
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
                 ClearForm();
@@ -280,51 +280,28 @@ namespace QuanLyBanLaptop.DanhMuc
             catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
         }
 
-        private void btnKhoa_Click(object sender, EventArgs e)
+        // Xử lý sự kiện btnHuy_Click của giao diện.
+        private void btnHuy_Click(object sender, EventArgs e)
         {
-            if (_selectedMaNV == null)
+            if (_selectedMaNV != null && dgvNhanVien.CurrentRow != null)
             {
-                MessageBox.Show("Vui lòng chọn nhân viên cần khóa/mở.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                FillFormFromGrid(dgvNhanVien.CurrentRow);
             }
-
-            // Lấy trạng thái hiện tại
-            DataGridViewRow row = dgvNhanVien.CurrentRow;
-            if (row == null) return;
-            string tt = row.Cells["TrangThai"]?.Value?.ToString() ?? "";
-            bool daNghi = (tt == "Đã nghỉ");
-            string action = daNghi ? "MỞ KHÓA" : "KHÓA";
-
-            var confirm = MessageBox.Show(
-                $"Bạn có chắc muốn {action} nhân viên \"{txtTenNV.Text}\" ({_selectedMaNV})?",
-                $"Xác nhận {action.ToLower()}", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (confirm != DialogResult.Yes) return;
-
-            try
+            else
             {
-                DataProcesser.ExecProcNonQuery("sp_KhoaNhanVien", new[]
-                {
-                    new SqlParameter("@MaNV",   _selectedMaNV),
-                    new SqlParameter("@DaNghi", !daNghi),
-                });
-                string msg = daNghi ? "Đã mở khóa nhân viên!" : "Đã khóa nhân viên!";
-                MessageBox.Show(msg, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
                 ClearForm();
-                SetFormMode(FormMode.View);
             }
-            catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
-        }
-
-        private void btnBoQua_Click(object sender, EventArgs e)
-        {
-            _selectedMaNV = null;
-            ClearForm();
             SetFormMode(FormMode.View);
         }
 
+        // Xử lý sự kiện btnThoat_Click của giao diện: Điều hướng về Trang Chủ
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+            NavigationManager.Navigate(NavigationMenu.TrangChu);
+        }
+
+        // Xử lý sự kiện dgvNhanVien_CellClick của giao diện.
         private void dgvNhanVien_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
@@ -335,6 +312,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 SetFormMode(FormMode.View);
         }
 
+        // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.
         private void txtTimKiem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)

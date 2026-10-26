@@ -45,9 +45,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblThaoTacLaptop = new System.Windows.Forms.Label();
             this.btnThem = new System.Windows.Forms.Button();
             this.btnSua = new System.Windows.Forms.Button();
-            this.btnKhoa = new System.Windows.Forms.Button();
             this.btnXoa = new System.Windows.Forms.Button();
-            this.btnLamMoi = new System.Windows.Forms.Button();
+            this.btnLuu = new System.Windows.Forms.Button();
+            this.btnHuy = new System.Windows.Forms.Button();
             this.btnThoat = new System.Windows.Forms.Button();
             this.pnlThongTinLaptop = new System.Windows.Forms.Panel();
             this.pnlFieldsLaptop = new System.Windows.Forms.Panel();
@@ -221,6 +221,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvLaptop.AllowUserToAddRows = false;
             this.dgvLaptop.AllowUserToDeleteRows = false;
             this.dgvLaptop.AllowUserToResizeRows = false;
+            this.dgvLaptop.AllowUserToResizeColumns = false;
+            this.dgvLaptop.AllowUserToOrderColumns = false;
             this.dgvLaptop.BackgroundColor = System.Drawing.Color.White;
             this.dgvLaptop.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvLaptop.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -401,9 +403,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.pnlThaoTacLaptop.Controls.Add(this.btnThem);
             this.pnlThaoTacLaptop.Controls.Add(this.btnSua);
             this.pnlThaoTacLaptop.Controls.Add(this.btnXoa);
-            this.pnlThaoTacLaptop.Controls.Add(this.btnLamMoi);
+            this.pnlThaoTacLaptop.Controls.Add(this.btnLuu);
+            this.pnlThaoTacLaptop.Controls.Add(this.btnHuy);
             this.pnlThaoTacLaptop.Controls.Add(this.btnThoat);
-            this.pnlThaoTacLaptop.Controls.Add(this.btnKhoa);
             this.pnlThaoTacLaptop.Controls.Add(this.lblThaoTacLaptop);
             this.pnlThaoTacLaptop.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlThaoTacLaptop.Location = new System.Drawing.Point(0, 552);
@@ -467,20 +469,35 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnXoa.Text = "Xóa";
             this.btnXoa.UseVisualStyleBackColor = false;
             // 
-            // btnLamMoi
+            // btnLuu
             // 
-            this.btnLamMoi.BackColor = System.Drawing.Color.White;
-            this.btnLamMoi.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnLamMoi.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(206)))), ((int)(((byte)(212)))), ((int)(((byte)(218)))));
-            this.btnLamMoi.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLamMoi.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnLamMoi.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
-            this.btnLamMoi.Location = new System.Drawing.Point(282, 18);
-            this.btnLamMoi.Name = "btnLamMoi";
-            this.btnLamMoi.Size = new System.Drawing.Size(85, 27);
-            this.btnLamMoi.TabIndex = 4;
-            this.btnLamMoi.Text = "Làm mới";
-            this.btnLamMoi.UseVisualStyleBackColor = false;
+            this.btnLuu.BackColor = System.Drawing.Color.White;
+            this.btnLuu.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnLuu.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(206)))), ((int)(((byte)(212)))), ((int)(((byte)(218)))));
+            this.btnLuu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLuu.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnLuu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
+            this.btnLuu.Location = new System.Drawing.Point(282, 18);
+            this.btnLuu.Name = "btnLuu";
+            this.btnLuu.Size = new System.Drawing.Size(85, 27);
+            this.btnLuu.TabIndex = 4;
+            this.btnLuu.Text = "Lưu";
+            this.btnLuu.UseVisualStyleBackColor = false;
+            // 
+            // btnHuy
+            // 
+            this.btnHuy.BackColor = System.Drawing.Color.White;
+            this.btnHuy.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHuy.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(206)))), ((int)(((byte)(212)))), ((int)(((byte)(218)))));
+            this.btnHuy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHuy.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnHuy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
+            this.btnHuy.Location = new System.Drawing.Point(373, 18);
+            this.btnHuy.Name = "btnHuy";
+            this.btnHuy.Size = new System.Drawing.Size(85, 27);
+            this.btnHuy.TabIndex = 5;
+            this.btnHuy.Text = "Hủy";
+            this.btnHuy.UseVisualStyleBackColor = false;
             // 
             // btnThoat
             // 
@@ -490,27 +507,12 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnThoat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThoat.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnThoat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
-            this.btnThoat.Location = new System.Drawing.Point(373, 18);
+            this.btnThoat.Location = new System.Drawing.Point(464, 18);
             this.btnThoat.Name = "btnThoat";
             this.btnThoat.Size = new System.Drawing.Size(85, 27);
-            this.btnThoat.TabIndex = 5;
+            this.btnThoat.TabIndex = 6;
             this.btnThoat.Text = "Thoát";
             this.btnThoat.UseVisualStyleBackColor = false;
-            // 
-            // btnKhoa
-            // 
-            this.btnKhoa.BackColor = System.Drawing.Color.White;
-            this.btnKhoa.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnKhoa.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(206)))), ((int)(((byte)(212)))), ((int)(((byte)(218)))));
-            this.btnKhoa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnKhoa.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnKhoa.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
-            this.btnKhoa.Location = new System.Drawing.Point(464, 18);
-            this.btnKhoa.Name = "btnKhoa";
-            this.btnKhoa.Size = new System.Drawing.Size(95, 27);
-            this.btnKhoa.TabIndex = 6;
-            this.btnKhoa.Text = "Khóa máy";
-            this.btnKhoa.UseVisualStyleBackColor = false;
             // 
             // pnlThongTinLaptop
             // 
@@ -912,6 +914,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvLoaiMay.AllowUserToAddRows = false;
             this.dgvLoaiMay.AllowUserToDeleteRows = false;
             this.dgvLoaiMay.AllowUserToResizeRows = false;
+            this.dgvLoaiMay.AllowUserToResizeColumns = false;
+            this.dgvLoaiMay.AllowUserToOrderColumns = false;
             this.dgvLoaiMay.BackgroundColor = System.Drawing.Color.White;
             this.dgvLoaiMay.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvLoaiMay.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -1163,6 +1167,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNCC.AllowUserToAddRows = false;
             this.dgvNCC.AllowUserToDeleteRows = false;
             this.dgvNCC.AllowUserToResizeRows = false;
+            this.dgvNCC.AllowUserToResizeColumns = false;
+            this.dgvNCC.AllowUserToOrderColumns = false;
             this.dgvNCC.BackgroundColor = System.Drawing.Color.White;
             this.dgvNCC.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvNCC.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -1717,9 +1723,9 @@ namespace QuanLyBanLaptop.DanhMuc
         private System.Windows.Forms.Label lblThaoTacLaptop;
         private System.Windows.Forms.Button btnThem;
         private System.Windows.Forms.Button btnSua;
-        private System.Windows.Forms.Button btnKhoa;
         private System.Windows.Forms.Button btnXoa;
-        private System.Windows.Forms.Button btnLamMoi;
+        private System.Windows.Forms.Button btnLuu;
+        private System.Windows.Forms.Button btnHuy;
         private System.Windows.Forms.Button btnThoat;
         private System.Windows.Forms.Label lblDangNhap;
 

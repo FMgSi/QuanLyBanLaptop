@@ -7,6 +7,7 @@ namespace QuanLyBanLaptop.Classes
 {
     public static class IconHelper
     {
+        // Thực hiện CreateLaptopLogo theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateLaptopLogo(int size = 52)
         {
             var bmp = new Bitmap(size, size);
@@ -49,6 +50,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateHomeIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateHomeIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -87,6 +89,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateLaptopIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateLaptopIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -117,6 +120,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateCartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateCartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -150,6 +154,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateImportCartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateImportCartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -194,6 +199,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateUserIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateUserIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -227,6 +233,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateChartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateChartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -257,6 +264,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateCustomerIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateCustomerIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -308,6 +316,7 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Thực hiện CreateInstallmentIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateInstallmentIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.FromArgb(245, 158, 11); // Gold / Amber
@@ -345,6 +354,29 @@ namespace QuanLyBanLaptop.Classes
             return bmp;
         }
 
+        // Tạo icon cờ lê / sửa chữa cho menu Bảo Hành Sửa Chữa
+        public static Bitmap CreateWrenchIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.White;
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
+                using (var pen = new Pen(c, 2f))
+                {
+                    // Tay cầm cờ lê chéo
+                    g.DrawLine(pen, size * 0.28f, size * 0.72f, size * 0.65f, size * 0.35f);
+                    // Đầu cờ lê (vòng tròn hở)
+                    g.DrawArc(pen, size * 0.5f, size * 0.12f, size * 0.38f, size * 0.38f, 40, 260);
+                    // Đuôi tay cầm
+                    g.DrawEllipse(pen, size * 0.16f, size * 0.68f, size * 0.18f, size * 0.18f);
+                }
+            }
+            return bmp;
+        }
+
+        // Thực hiện EnsureIconsSaved theo trạng thái và dữ liệu hiện tại.
         public static void EnsureIconsSaved(string baseDirectory)
         {
             try

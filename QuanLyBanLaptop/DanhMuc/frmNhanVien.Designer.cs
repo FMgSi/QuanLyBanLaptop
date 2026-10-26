@@ -45,9 +45,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnThem            = new System.Windows.Forms.Button();
             this.btnSua             = new System.Windows.Forms.Button();
             this.btnXoa             = new System.Windows.Forms.Button();
-            this.btnKhoa            = new System.Windows.Forms.Button();
             this.btnLuu             = new System.Windows.Forms.Button();
-            this.btnBoQua           = new System.Windows.Forms.Button();
+            this.btnHuy             = new System.Windows.Forms.Button();
+            this.btnThoat           = new System.Windows.Forms.Button();
             this.dgvNhanVien        = new System.Windows.Forms.DataGridView();
             this.colMaNV            = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTenNV           = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -236,9 +236,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.pnlButtons.Controls.Add(this.btnThem);
             this.pnlButtons.Controls.Add(this.btnSua);
             this.pnlButtons.Controls.Add(this.btnXoa);
-            this.pnlButtons.Controls.Add(this.btnKhoa);
             this.pnlButtons.Controls.Add(this.btnLuu);
-            this.pnlButtons.Controls.Add(this.btnBoQua);
+            this.pnlButtons.Controls.Add(this.btnHuy);
+            this.pnlButtons.Controls.Add(this.btnThoat);
             this.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlButtons.Location = new System.Drawing.Point(14, 648);
             this.pnlButtons.Name = "pnlButtons";
@@ -247,7 +247,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.pnlButtons.TabIndex = 3;
 
             System.Drawing.Font btnFont = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
-            int bW = 120; int bH = 38;
+            int bW = 100; int bH = 38;
 
             this.btnThem.BackColor = System.Drawing.Color.FromArgb(22, 163, 74); this.btnThem.FlatAppearance.BorderSize = 0; this.btnThem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThem.Font = btnFont; this.btnThem.ForeColor = System.Drawing.Color.White; this.btnThem.Location = new System.Drawing.Point(10, 8);
@@ -255,32 +255,35 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnThem.Cursor = System.Windows.Forms.Cursors.Hand; this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
 
             this.btnSua.BackColor = System.Drawing.Color.FromArgb(37, 99, 235); this.btnSua.FlatAppearance.BorderSize = 0; this.btnSua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSua.Font = btnFont; this.btnSua.ForeColor = System.Drawing.Color.White; this.btnSua.Location = new System.Drawing.Point(140, 8);
+            this.btnSua.Font = btnFont; this.btnSua.ForeColor = System.Drawing.Color.White; this.btnSua.Location = new System.Drawing.Point(120, 8);
             this.btnSua.Name = "btnSua"; this.btnSua.Size = new System.Drawing.Size(bW, bH); this.btnSua.Text = "✏  Sửa"; this.btnSua.UseVisualStyleBackColor = false;
             this.btnSua.Cursor = System.Windows.Forms.Cursors.Hand; this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
 
             this.btnXoa.BackColor = System.Drawing.Color.FromArgb(220, 38, 38); this.btnXoa.FlatAppearance.BorderSize = 0; this.btnXoa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnXoa.Font = btnFont; this.btnXoa.ForeColor = System.Drawing.Color.White; this.btnXoa.Location = new System.Drawing.Point(270, 8);
+            this.btnXoa.Font = btnFont; this.btnXoa.ForeColor = System.Drawing.Color.White; this.btnXoa.Location = new System.Drawing.Point(230, 8);
             this.btnXoa.Name = "btnXoa"; this.btnXoa.Size = new System.Drawing.Size(bW, bH); this.btnXoa.Text = "🗑  Xóa"; this.btnXoa.UseVisualStyleBackColor = false;
             this.btnXoa.Cursor = System.Windows.Forms.Cursors.Hand; this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
 
-            this.btnKhoa.BackColor = System.Drawing.Color.FromArgb(217, 119, 6); this.btnKhoa.FlatAppearance.BorderSize = 0; this.btnKhoa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnKhoa.Font = btnFont; this.btnKhoa.ForeColor = System.Drawing.Color.White; this.btnKhoa.Location = new System.Drawing.Point(400, 8);
-            this.btnKhoa.Name = "btnKhoa"; this.btnKhoa.Size = new System.Drawing.Size(145, bH); this.btnKhoa.Text = "🔒  Khóa / Mở"; this.btnKhoa.UseVisualStyleBackColor = false;
-            this.btnKhoa.Cursor = System.Windows.Forms.Cursors.Hand; this.btnKhoa.Click += new System.EventHandler(this.btnKhoa_Click);
-
             this.btnLuu.BackColor = System.Drawing.Color.FromArgb(148,163,184); this.btnLuu.FlatAppearance.BorderSize = 0; this.btnLuu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLuu.Font = btnFont; this.btnLuu.ForeColor = System.Drawing.Color.White; this.btnLuu.Location = new System.Drawing.Point(720, 8);
+            this.btnLuu.Font = btnFont; this.btnLuu.ForeColor = System.Drawing.Color.White; this.btnLuu.Location = new System.Drawing.Point(340, 8);
             this.btnLuu.Name = "btnLuu"; this.btnLuu.Size = new System.Drawing.Size(bW, bH); this.btnLuu.Text = "💾  Lưu"; this.btnLuu.UseVisualStyleBackColor = false;
             this.btnLuu.Cursor = System.Windows.Forms.Cursors.Hand; this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click);
 
-            this.btnBoQua.BackColor = System.Drawing.Color.FromArgb(148,163,184); this.btnBoQua.FlatAppearance.BorderSize = 0; this.btnBoQua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBoQua.Font = btnFont; this.btnBoQua.ForeColor = System.Drawing.Color.White; this.btnBoQua.Location = new System.Drawing.Point(850, 8);
-            this.btnBoQua.Name = "btnBoQua"; this.btnBoQua.Size = new System.Drawing.Size(bW, bH); this.btnBoQua.Text = "✕  Hủy"; this.btnBoQua.UseVisualStyleBackColor = false;
-            this.btnBoQua.Cursor = System.Windows.Forms.Cursors.Hand; this.btnBoQua.Click += new System.EventHandler(this.btnBoQua_Click);
+            this.btnHuy.BackColor = System.Drawing.Color.FromArgb(148,163,184); this.btnHuy.FlatAppearance.BorderSize = 0; this.btnHuy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHuy.Font = btnFont; this.btnHuy.ForeColor = System.Drawing.Color.White; this.btnHuy.Location = new System.Drawing.Point(450, 8);
+            this.btnHuy.Name = "btnHuy"; this.btnHuy.Size = new System.Drawing.Size(bW, bH); this.btnHuy.Text = "✕  Hủy"; this.btnHuy.UseVisualStyleBackColor = false;
+            this.btnHuy.Cursor = System.Windows.Forms.Cursors.Hand; this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
+
+            this.btnThoat.BackColor = System.Drawing.Color.FromArgb(100, 116, 139); this.btnThoat.FlatAppearance.BorderSize = 0; this.btnThoat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnThoat.Font = btnFont; this.btnThoat.ForeColor = System.Drawing.Color.White; this.btnThoat.Location = new System.Drawing.Point(560, 8);
+            this.btnThoat.Name = "btnThoat"; this.btnThoat.Size = new System.Drawing.Size(bW, bH); this.btnThoat.Text = "🚪  Thoát"; this.btnThoat.UseVisualStyleBackColor = false;
+            this.btnThoat.Cursor = System.Windows.Forms.Cursors.Hand; this.btnThoat.Click += new System.EventHandler(this.btnThoat_Click);
 
             // dgvNhanVien
             this.dgvNhanVien.AllowUserToAddRows = false; this.dgvNhanVien.AllowUserToDeleteRows = false;
+            this.dgvNhanVien.AllowUserToResizeRows = false;
+            this.dgvNhanVien.AllowUserToResizeColumns = false;
+            this.dgvNhanVien.AllowUserToOrderColumns = false;
             this.dgvNhanVien.AutoGenerateColumns = false;
             this.dgvNhanVien.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvNhanVien.BackgroundColor = System.Drawing.Color.White; this.dgvNhanVien.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -373,9 +376,9 @@ namespace QuanLyBanLaptop.DanhMuc
         private System.Windows.Forms.Button btnThem;
         private System.Windows.Forms.Button btnSua;
         private System.Windows.Forms.Button btnXoa;
-        private System.Windows.Forms.Button btnKhoa;
         private System.Windows.Forms.Button btnLuu;
-        private System.Windows.Forms.Button btnBoQua;
+        private System.Windows.Forms.Button btnHuy;
+        private System.Windows.Forms.Button btnThoat;
         private System.Windows.Forms.DataGridView dgvNhanVien;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaNV;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTenNV;

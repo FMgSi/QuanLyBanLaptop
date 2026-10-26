@@ -1,10 +1,8 @@
-using System;
+﻿using System;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    /// <summary>
-    /// Dữ liệu in phiếu thu tiền kỳ trả góp kèm mã QR hoặc tiền mặt
-    /// </summary>
+    // Dữ liệu in phiếu thu tiền kỳ trả góp kèm mã QR hoặc tiền mặt
     public class PhieuThuPrintData
     {
         public string MaHD { get; set; }

@@ -9,6 +9,7 @@ namespace QuanLyBanLaptop.Classes
         NhanVien,
         KhachHang,
         TheoDoiTraGop,
+        BaoHanhSuaChua,
         ThongKe
     }
 }

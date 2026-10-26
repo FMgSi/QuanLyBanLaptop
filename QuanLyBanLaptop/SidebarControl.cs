@@ -28,6 +28,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Thực hiện SidebarControl theo trạng thái và dữ liệu hiện tại.
         public SidebarControl()
         {
             InitializeComponent();
@@ -40,6 +41,7 @@ namespace QuanLyBanLaptop
             SetupEvents();
         }
 
+        // Thực hiện SetDoubleBuffered theo trạng thái và dữ liệu hiện tại.
         private static void SetDoubleBuffered(Control control)
         {
             typeof(Control).InvokeMember(
@@ -48,6 +50,7 @@ namespace QuanLyBanLaptop
                 null, control, new object[] { true });
         }
 
+        // Thực hiện ApplyThemeAndIcons theo trạng thái và dữ liệu hiện tại.
         private void ApplyThemeAndIcons()
         {
             BackColor = SidebarTheme.SidebarBack;
@@ -63,6 +66,7 @@ namespace QuanLyBanLaptop
             btnNhanVien.Image = IconHelper.CreateUserIcon(20);
             btnKhachHang.Image = IconHelper.CreateCustomerIcon(20);
             btnTheoDoiTraGop.Image = IconHelper.CreateInstallmentIcon(20);
+            btnBaoHanhSuaChua.Image = IconHelper.CreateWrenchIcon(20);
             btnThongKe.Image = IconHelper.CreateChartIcon(20);
 
             // Button tag mapping
@@ -73,6 +77,7 @@ namespace QuanLyBanLaptop
             btnNhanVien.Tag = NavigationMenu.NhanVien;
             btnKhachHang.Tag = NavigationMenu.KhachHang;
             btnTheoDoiTraGop.Tag = NavigationMenu.TheoDoiTraGop;
+            btnBaoHanhSuaChua.Tag = NavigationMenu.BaoHanhSuaChua;
             btnThongKe.Tag = NavigationMenu.ThongKe;
 
             // Common button appearance
@@ -80,10 +85,12 @@ namespace QuanLyBanLaptop
             {
                 if (c is Button btn)
                 {
+                    btn.UseVisualStyleBackColor = false;
+                    btn.FlatStyle = FlatStyle.Flat;
+                    btn.FlatAppearance.BorderSize = 0;
                     btn.ForeColor = SidebarTheme.TextWhite;
                     btn.Font = SidebarTheme.MenuFont;
                     btn.BackColor = SidebarTheme.SidebarBack;
-                    btn.FlatAppearance.BorderSize = 0;
                     btn.FlatAppearance.MouseDownBackColor = SidebarTheme.SidebarActive;
                     btn.FlatAppearance.MouseOverBackColor = SidebarTheme.SidebarHover;
                 }
@@ -122,6 +129,7 @@ namespace QuanLyBanLaptop
             UpdateMenuStyles();
         }
 
+        // Thực hiện RefreshOverdueBadge theo trạng thái và dữ liệu hiện tại.
         public void RefreshOverdueBadge()
         {
             try
@@ -134,6 +142,7 @@ namespace QuanLyBanLaptop
             catch { }
         }
 
+        // Khởi tạo cấu hình và liên kết cho SetupEvents.
         private void SetupEvents()
         {
             picLogo.Click += (s, e) => ToggleSidebar();
@@ -152,6 +161,7 @@ namespace QuanLyBanLaptop
             tmrCollapse.Tick += TmrCollapse_Tick;
         }
 
+        // Xử lý sự kiện MenuButton_Click của giao diện.
         private void MenuButton_Click(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -166,6 +176,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Xử lý sự kiện MenuButton_MouseEnter của giao diện.
         private void MenuButton_MouseEnter(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -177,6 +188,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Xử lý sự kiện MenuButton_MouseLeave của giao diện.
         private void MenuButton_MouseLeave(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -185,9 +197,14 @@ namespace QuanLyBanLaptop
                 {
                     btn.BackColor = SidebarTheme.SidebarBack;
                 }
+                else
+                {
+                    btn.BackColor = SidebarTheme.SidebarActive;
+                }
             }
         }
 
+        // Thực hiện UpdateMenuStyles theo trạng thái và dữ liệu hiện tại.
         public void UpdateMenuStyles()
         {
             foreach (Control c in pnlMenu.Controls)
@@ -195,17 +212,25 @@ namespace QuanLyBanLaptop
                 if (c is Button btn && btn.Tag is NavigationMenu menu)
                 {
                     bool isSelected = (menu == _selectedMenu);
+                    btn.UseVisualStyleBackColor = false;
+                    btn.FlatStyle = FlatStyle.Flat;
+                    btn.FlatAppearance.BorderSize = 0;
                     btn.BackColor = isSelected ? SidebarTheme.SidebarActive : SidebarTheme.SidebarBack;
+                    btn.ForeColor = SidebarTheme.TextWhite;
                     btn.Font = isSelected ? SidebarTheme.MenuActiveFont : SidebarTheme.MenuFont;
+                    btn.FlatAppearance.MouseDownBackColor = SidebarTheme.SidebarActive;
+                    btn.FlatAppearance.MouseOverBackColor = SidebarTheme.SidebarHover;
                 }
             }
         }
 
+        // Thực hiện ToggleSidebar theo trạng thái và dữ liệu hiện tại.
         public void ToggleSidebar()
         {
             tmrCollapse.Start();
         }
 
+        // Xử lý sự kiện TmrCollapse_Tick của giao diện.
         private void TmrCollapse_Tick(object sender, EventArgs e)
         {
             if (_isCollapsed)
@@ -236,6 +261,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Thực hiện SetButtonTextsVisible theo trạng thái và dữ liệu hiện tại.
         private void SetButtonTextsVisible(bool visible)
         {
             btnTrangChu.Text = visible ? "   Trang Chủ" : "";
@@ -245,6 +271,7 @@ namespace QuanLyBanLaptop
             btnNhanVien.Text = visible ? "   Nhân Viên" : "";
             btnKhachHang.Text = visible ? "   Khách Hàng" : "";
             btnTheoDoiTraGop.Text = visible ? "   Theo Dõi Trả Góp" : "";
+            btnBaoHanhSuaChua.Text = visible ? "   Sửa Chữa Bảo Hành" : "";
             btnThongKe.Text = visible ? "   Thống Kê" : "";
 
             int paddingLeft = visible ? 16 : 18;

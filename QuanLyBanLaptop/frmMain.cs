@@ -7,10 +7,11 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop
 {
-    public partial class frmMain : Form
+    public partial class frmMain : QuanLyBanLaptop.Classes.AppForm
     {
         public static frmMain Instance { get; private set; }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmMain()
         {
             Instance = this;
@@ -34,6 +35,7 @@ namespace QuanLyBanLaptop
             NavigationManager.InitHost(this, pnlNoiDung, sidebarControl1, lblTrang, lblNguoiDung);
         }
 
+        // Thực hiện SetDoubleBuffered theo trạng thái và dữ liệu hiện tại.
         private static void SetDoubleBuffered(Control control)
         {
             if (control == null) return;
@@ -43,6 +45,7 @@ namespace QuanLyBanLaptop
                 null, control, new object[] { true });
         }
 
+        // Khởi tạo cấu hình và liên kết cho SetupEvents.
         private void SetupEvents()
         {
             this.Load += FrmMain_Load;
@@ -52,8 +55,11 @@ namespace QuanLyBanLaptop
             lblNguoiDung.Click += LblNguoiDung_Click;
         }
 
+        // Xử lý sự kiện FrmMain_Load của giao diện.
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            this.WindowState = FormWindowState.Maximized;
+
             // Tải thông tin người dùng phiên làm việc mặc định nếu chưa đăng nhập
             if (string.IsNullOrEmpty(UserSession.MaNV))
             {
@@ -85,6 +91,7 @@ namespace QuanLyBanLaptop
             NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
 
+        // Xử lý sự kiện LblNguoiDung_Click của giao diện.
         private void LblNguoiDung_Click(object sender, EventArgs e)
         {
             // Mở hộp thoại đăng nhập để đổi tài khoản nếu muốn
@@ -97,6 +104,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Xử lý sự kiện BtnDangXuat_Click của giao diện.
         private void BtnDangXuat_Click(object sender, EventArgs e)
         {
             var dr = MessageBox.Show("Bạn có muốn đăng xuất tài khoản hiện tại không?",
@@ -126,6 +134,7 @@ namespace QuanLyBanLaptop
             }
         }
 
+        // Xử lý sự kiện FrmMain_FormClosing của giao diện.
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)

@@ -8,7 +8,7 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmQuanLyTraGop : Form
+    public partial class frmQuanLyTraGop : QuanLyBanLaptop.Classes.AppForm
     {
         private DataTable _dtMaster;
         private string _selectedMaHD = "";
@@ -16,6 +16,7 @@ namespace QuanLyBanLaptop.HoaDon
         private string _selectedSDT = "";
         private int _selectedChuKy = 0;
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmQuanLyTraGop()
         {
             InitializeComponent();
@@ -26,34 +27,38 @@ namespace QuanLyBanLaptop.HoaDon
             SetupGrids();
             SetupCardBordersAndIcons();
 
+            pnlSplit.IsSplitterFixed = true;
             pnlSplit.SizeChanged += (s, e) => AdjustSplitter();
             this.Resize += (s, e) => AdjustSplitter();
         }
 
+        // Thực hiện AdjustSplitter theo trạng thái và dữ liệu hiện tại.
         private void AdjustSplitter()
         {
             try
             {
                 if (pnlSplit.Width > 700)
                 {
-                    int detailWidth = 490;
-                    int target = pnlSplit.Width - detailWidth;
-                    if (target >= 580)
+                    // Duy trì tỉ lệ hiển thị cân đối ~58% danh sách HĐ và ~42% chi tiết lịch trả góp khi mở full màn hình
+                    int target = (int)(pnlSplit.Width * 0.58);
+                    int detailWidth = pnlSplit.Width - target;
+                    if (detailWidth < 460)
                     {
-                        pnlSplit.SplitterDistance = target;
+                        target = pnlSplit.Width - 460;
                     }
-                    else
-                    {
-                        pnlSplit.SplitterDistance = (int)(pnlSplit.Width * 0.58);
-                    }
+                    pnlSplit.SplitterDistance = target;
                 }
             }
             catch { }
         }
 
+        // Khởi tạo cấu hình và liên kết cho SetupGrids.
         private void SetupGrids()
         {
             // Cấu hình dgvHopDong (Master)
+            dgvHopDong.AllowUserToResizeColumns = false;
+            dgvHopDong.AllowUserToResizeRows = false;
+            dgvHopDong.AllowUserToOrderColumns = false;
             dgvHopDong.Columns.Clear();
             dgvHopDong.AutoGenerateColumns = false;
             dgvHopDong.ScrollBars = ScrollBars.Vertical;
@@ -143,6 +148,9 @@ namespace QuanLyBanLaptop.HoaDon
             dgvHopDong.CellPainting += DgvHopDong_CellPainting;
 
             // Cấu hình dgvLichTraGop (Detail)
+            dgvLichTraGop.AllowUserToResizeColumns = false;
+            dgvLichTraGop.AllowUserToResizeRows = false;
+            dgvLichTraGop.AllowUserToOrderColumns = false;
             dgvLichTraGop.Columns.Clear();
             dgvLichTraGop.AutoGenerateColumns = false;
             dgvLichTraGop.ScrollBars = ScrollBars.Vertical;
@@ -218,6 +226,7 @@ namespace QuanLyBanLaptop.HoaDon
             dgvLichTraGop.RowPrePaint += DgvLichTraGop_RowPrePaint;
         }
 
+        // Khởi tạo cấu hình và liên kết cho SetupCardBordersAndIcons.
         private void SetupCardBordersAndIcons()
         {
             // Viền và bo tròn cho các card KPI
@@ -238,6 +247,7 @@ namespace QuanLyBanLaptop.HoaDon
             UpdatePillRegion();
         }
 
+        // Thực hiện UpdatePillRegion theo trạng thái và dữ liệu hiện tại.
         private void UpdatePillRegion()
         {
             try
@@ -256,6 +266,7 @@ namespace QuanLyBanLaptop.HoaDon
             catch { }
         }
 
+        // Thực hiện PaintCardBorder theo trạng thái và dữ liệu hiện tại.
         private void PaintCardBorder(Control c, Color? borderColor = null)
         {
             Color color = borderColor ?? Color.FromArgb(226, 232, 240);
@@ -268,6 +279,7 @@ namespace QuanLyBanLaptop.HoaDon
             };
         }
 
+        // Thực hiện CreateKpiIcon theo trạng thái và dữ liệu hiện tại.
         private Bitmap CreateKpiIcon(int type)
         {
             var bmp = new Bitmap(24, 24);
@@ -320,6 +332,7 @@ namespace QuanLyBanLaptop.HoaDon
             return bmp;
         }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmQuanLyTraGop_Load(object sender, EventArgs e)
         {
             cboTrangThai.SelectedIndex = 0;
@@ -327,6 +340,7 @@ namespace QuanLyBanLaptop.HoaDon
             LoadData();
         }
 
+        // Tải dữ liệu phục vụ LoadData.
         public void LoadData()
         {
             LoadKPIs();
@@ -334,6 +348,7 @@ namespace QuanLyBanLaptop.HoaDon
             sidebarControl1.RefreshOverdueBadge();
         }
 
+        // Tải dữ liệu phục vụ LoadKPIs.
         private void LoadKPIs()
         {
             try
@@ -368,6 +383,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Tải dữ liệu phục vụ LoadDanhSachHopDong.
         private void LoadDanhSachHopDong()
         {
             string keyword = txtTimKiem.Text.Trim();
@@ -465,11 +481,11 @@ ORDER BY hd.MaHD DESC";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải danh sách hợp đồng trả góp: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi("Lỗi tải danh sách hợp đồng trả góp: " + ex.Message, "Lỗi");
             }
         }
 
+        // Xử lý sự kiện dgvHopDong_SelectionChanged của giao diện.
         private void dgvHopDong_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvHopDong.SelectedRows.Count > 0)
@@ -479,6 +495,7 @@ ORDER BY hd.MaHD DESC";
             }
         }
 
+        // Thực hiện HienThiChiTietDong theo trạng thái và dữ liệu hiện tại.
         private void HienThiChiTietDong(int rowIndex)
         {
             if (_dtMaster == null || rowIndex < 0 || rowIndex >= _dtMaster.Rows.Count) return;
@@ -524,6 +541,7 @@ ORDER BY hd.MaHD DESC";
             dgvLichTraGop.DataSource = null;
         }
 
+        // Tải dữ liệu phục vụ LoadLichTraGop.
         private void LoadLichTraGop(string maHD)
         {
             try
@@ -546,6 +564,14 @@ ORDER BY hd.MaHD DESC";
                 dtDetail.Columns.Add("IsDaDong", typeof(bool));
 
                 DateTime today = DateTime.Now.Date;
+                decimal mucPhatNgay = 20000m;
+                try
+                {
+                    object objPhat = DataProcesser.ExecuteScalar("SELECT GiaTri FROM CAU_HINH WHERE Khoa = 'TIEN_PHAT_NGAY'");
+                    if (objPhat != null && decimal.TryParse(objPhat.ToString(), out decimal p))
+                        mucPhatNgay = p;
+                }
+                catch { }
 
                 foreach (DataRow r in raw.Rows)
                 {
@@ -571,7 +597,7 @@ ORDER BY hd.MaHD DESC";
                         {
                             int days = (int)(today - han.Date).TotalDays;
                             quaHanStr = days + " ngày";
-                            decimal phat = days * 20000m;
+                            decimal phat = days * mucPhatNgay;
                             phatStr   = Function.FormatTien(phat);
                             trangThai = "Quá hạn";
                         }
@@ -648,6 +674,7 @@ ORDER BY hd.MaHD DESC";
             }
         }
 
+        // Xử lý sự kiện DgvLichTraGop_RowPrePaint của giao diện.
         private void DgvLichTraGop_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             if (e.RowIndex >= 0 && e.RowIndex < dgvLichTraGop.Rows.Count)
@@ -727,8 +754,10 @@ ORDER BY hd.MaHD DESC";
             }
         }
 
+        // Xử lý sự kiện btnTimKiem_Click của giao diện.
         private void btnTimKiem_Click(object sender, EventArgs e) => LoadDanhSachHopDong();
 
+        // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.
         private void txtTimKiem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -738,13 +767,25 @@ ORDER BY hd.MaHD DESC";
             }
         }
 
+        // Xử lý sự kiện cboTrangThai_SelectedIndexChanged của giao diện.
         private void cboTrangThai_SelectedIndexChanged(object sender, EventArgs e) => LoadDanhSachHopDong();
 
+        // Xử lý sự kiện btnLamMoi_Click của giao diện.
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             txtTimKiem.Clear();
             cboTrangThai.SelectedIndex = 0;
             LoadData();
+        }
+
+        // Xử lý mở form cấu hình lãi suất & tham số trả góp
+        private void btnCauHinh_Click(object sender, EventArgs e)
+        {
+            using (var frm = new QuanLyBanLaptop.DanhMuc.frmCauHinhTraGop())
+            {
+                frm.ShowDialog(this);
+                LoadData();
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════════
@@ -754,8 +795,7 @@ ORDER BY hd.MaHD DESC";
         {
             if (dgvLichTraGop.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Vui lòng nhấp chọn kỳ trả góp cần thu tiền trên bảng lịch!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng nhấp chọn kỳ trả góp cần thu tiền trên bảng lịch!", "Thông báo");
                 return;
             }
 
@@ -764,8 +804,7 @@ ORDER BY hd.MaHD DESC";
 
             if (trangThai.Contains("Đã đóng"))
             {
-                MessageBox.Show("Kỳ trả góp này đã được đóng trước đó rồi!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Kỳ trả góp này đã được đóng trước đó rồi!", "Thông báo");
                 return;
             }
 
@@ -806,8 +845,7 @@ ORDER BY hd.MaHD DESC";
         {
             if (string.IsNullOrEmpty(_selectedMaHD))
             {
-                MessageBox.Show("Vui lòng chọn một hợp đồng để in lịch trả góp!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng chọn một hợp đồng để in lịch trả góp!", "Thông báo");
                 return;
             }
 
@@ -825,16 +863,10 @@ ORDER BY hd.MaHD DESC";
                     "FROM CHI_TIET_HD ct JOIN LAPTOP lt ON ct.MaLaptop=lt.MaLaptop WHERE ct.MaHD=@Ma",
                     new[] { new SqlParameter("@Ma", _selectedMaHD) });
 
-                double laiSuat = 4.0;
-                if (_selectedChuKy == 3) laiSuat = 2.4;
-                else if (_selectedChuKy == 6) laiSuat = 4.0;
-                else if (_selectedChuKy == 9) laiSuat = 6.0;
-                else if (_selectedChuKy == 12) laiSuat = 8.0;
-
-                decimal downpayment = Math.Round(tongTien * 0.30m, 0);
-                decimal loan = tongTien - downpayment;
-                decimal interest = Math.Round(loan * (decimal)(laiSuat / 100.0), 0);
-                decimal monthly = Math.Floor((loan + interest) / Math.Max(1, _selectedChuKy));
+                var plan = Services.InstallmentCalculator.Load(_selectedMaHD, tongTien, _selectedChuKy);
+                double laiSuat = (double)plan.Rate;
+                decimal downpayment = plan.DownPayment, loan = plan.Principal;
+                decimal interest = plan.Interest, monthly = plan.Monthly;
 
                 var printData = new HoaDonPrintData
                 {
@@ -863,11 +895,11 @@ ORDER BY hd.MaHD DESC";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi in lịch trả góp: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi("Lỗi in lịch trả góp: " + ex.Message, "Lỗi");
             }
         }
 
+        // Xử lý sự kiện dgvLichTraGop_CellContentClick của giao diện.
         private void dgvLichTraGop_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 

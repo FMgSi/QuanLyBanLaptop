@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
@@ -6,8 +6,9 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmNhapHang : Form
+    public partial class frmNhapHang : QuanLyBanLaptop.Classes.AppForm
     {
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmNhapHang()
         {
             InitializeComponent();
@@ -16,6 +17,7 @@ namespace QuanLyBanLaptop.HoaDon
             sidebarControl1.SelectedMenu = NavigationMenu.NhapHang;
         }
 
+        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -26,7 +28,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
-        /// <summary>Tải danh sách NCC, nhân viên, laptop từ CSDL.</summary>
+        // Tải danh sách NCC, nhân viên, laptop từ CSDL.
         private void LoadDuLieu()
         {
             try
@@ -54,6 +56,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Tải dữ liệu phục vụ LoadLaptopTheoNCC.
         private void LoadLaptopTheoNCC()
         {
             if (cboNhaCungCap.SelectedValue == null) return;

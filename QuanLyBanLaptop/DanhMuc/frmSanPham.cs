@@ -8,11 +8,9 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.DanhMuc
 {
-    public partial class frmSanPham : Form
+    public partial class frmSanPham : QuanLyBanLaptop.Classes.AppForm
     {
-        /// <summary>
-        /// Biến toàn cục static nhận UserName từ frmDangNhap theo yêu cầu đề bài
-        /// </summary>
+        // Biến toàn cục static nhận UserName từ frmDangNhap theo yêu cầu đề bài
         public static string userName = "";
 
         private enum ActiveTab
@@ -26,6 +24,7 @@ namespace QuanLyBanLaptop.DanhMuc
         private readonly Color _colorNavy = Color.FromArgb(27, 42, 74);
         private readonly Color _colorWhite = Color.White;
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmSanPham()
         {
             InitializeComponent();
@@ -36,7 +35,6 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvLaptop.AutoGenerateColumns = false;
             dgvLoaiMay.AutoGenerateColumns = false;
             dgvNCC.AutoGenerateColumns = false;
-            this.WindowState = FormWindowState.Maximized;
 
             this.Load += FrmSanPham_Load;
 
@@ -46,10 +44,10 @@ namespace QuanLyBanLaptop.DanhMuc
             SetupNCCEvents();
         }
 
+        // Xử lý sự kiện FrmSanPham_Load của giao diện.
         private void FrmSanPham_Load(object sender, EventArgs e)
         {
-            // Tự động bổ sung các cột DonGiaNhap, Anh, GhiChu vào DB nếu chưa có
-            EnsureLaptopColumnsExist();
+
 
             // Kiểm tra trạng thái đăng nhập: Nếu chưa đăng nhập thì hiển thị frmDangNhap dạng hộp thoại ShowDialog()
             if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(UserSession.TenDN))
@@ -66,10 +64,12 @@ namespace QuanLyBanLaptop.DanhMuc
             LoadDataLoaiMay();
             LoadDataNCC();
             LamMoiLaptopInputs();
+            SetFormMode(FormMode.View);
 
             SwitchTab(ActiveTab.TatCaMay);
         }
 
+        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -81,31 +81,11 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
-        private void EnsureLaptopColumnsExist()
-        {
-            try
-            {
-                string sql = @"
-                    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('LAPTOP') AND name = 'DonGiaNhap')
-                    BEGIN
-                        ALTER TABLE LAPTOP ADD DonGiaNhap DECIMAL(18,0) NULL DEFAULT 0;
-                    END
-                    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('LAPTOP') AND name = 'Anh')
-                    BEGIN
-                        ALTER TABLE LAPTOP ADD Anh NVARCHAR(255) NULL;
-                    END
-                    IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('LAPTOP') AND name = 'GhiChu')
-                    BEGIN
-                        ALTER TABLE LAPTOP ADD GhiChu NVARCHAR(500) NULL;
-                    END
-                ";
-                DataProcesser.ChangeData(sql);
-            }
-            catch { }
-        }
+
 
         #region TAB SWITCHING
 
+        // Khởi tạo cấu hình và liên kết cho SetupTabEvents.
         private void SetupTabEvents()
         {
             btnTabTatCaMay.Click += (s, e) => SwitchTab(ActiveTab.TatCaMay);
@@ -113,6 +93,7 @@ namespace QuanLyBanLaptop.DanhMuc
             btnTabNhaCungCap.Click += (s, e) => SwitchTab(ActiveTab.NhaCungCap);
         }
 
+        // Thực hiện SwitchTab theo trạng thái và dữ liệu hiện tại.
         private void SwitchTab(ActiveTab tab)
         {
             _currentTab = tab;
@@ -140,29 +121,27 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
+        // Đánh dấu tab hiện tại bằng viền, giữ cùng nền và phông chữ.
         private void SetTabButtonStyle(Button btn, bool isActive)
         {
-            if (isActive)
-            {
-                btn.BackColor = _colorNavy;
-                btn.ForeColor = _colorWhite;
-                btn.FlatAppearance.BorderSize = 0;
-                btn.Font = new Font("Segoe UI", 9.25f, FontStyle.Bold);
-            }
-            else
-            {
-                btn.BackColor = _colorWhite;
-                btn.ForeColor = _colorNavy;
-                btn.FlatAppearance.BorderSize = 1;
-                btn.FlatAppearance.BorderColor = _colorNavy;
-                btn.Font = new Font("Segoe UI", 9.25f, FontStyle.Regular);
-            }
+            ButtonTheme.Apply(btn);
+            btn.FlatAppearance.BorderColor = isActive ? _colorNavy : Color.FromArgb(206, 212, 218);
         }
 
         #endregion
 
         #region TAB 1: TẤT CẢ CÁC MÁY (LAPTOP / SẢN PHẨM)
 
+        private enum FormMode
+        {
+            View,
+            Add,
+            Edit
+        }
+
+        private FormMode _mode = FormMode.View;
+
+        // Khởi tạo cấu hình và liên kết cho SetupLaptopEvents.
         private void SetupLaptopEvents()
         {
             dgvLaptop.CellClick += DgvLaptop_CellClick;
@@ -186,12 +165,41 @@ namespace QuanLyBanLaptop.DanhMuc
             // Các nút chức năng
             btnThem.Click += BtnThem_Click;
             btnSua.Click += BtnSua_Click;
-            btnKhoa.Click += BtnKhoa_Click;
             btnXoa.Click += BtnXoa_Click;
-            btnLamMoi.Click += (s, e) => LamMoiLaptopInputs();
+            btnLuu.Click += BtnLuu_Click;
+            btnHuy.Click += BtnHuy_Click;
             btnThoat.Click += BtnThoat_Click;
         }
 
+        // Thiết lập trạng thái chế độ thao tác form Laptop (chuẩn hóa View, Add, Edit)
+        private void SetFormMode(FormMode mode)
+        {
+            _mode = mode;
+            bool isEditing = (mode == FormMode.Add || mode == FormMode.Edit);
+            bool hasSelected = (dgvLaptop.CurrentRow != null && dgvLaptop.SelectedRows.Count > 0);
+
+            txtMaLaptop.ReadOnly = true;
+            txtTenLaptop.ReadOnly = !isEditing;
+            cboLoaiLaptop.Enabled = isEditing;
+            cboNhaCungCap.Enabled = isEditing;
+            txtCPU.ReadOnly = !isEditing;
+            cboRAM.Enabled = isEditing;
+            cboSSD.Enabled = isEditing;
+            txtSoLuong.ReadOnly = (mode != FormMode.Add);
+            txtDonGiaNhap.ReadOnly = !isEditing;
+            txtDonGiaBan.ReadOnly = !isEditing;
+            txtGhiChu.ReadOnly = !isEditing;
+            numBaoHanh.Enabled = isEditing;
+
+            btnThem.Enabled = !isEditing;
+            btnSua.Enabled = !isEditing && hasSelected;
+            btnXoa.Enabled = !isEditing && hasSelected;
+            btnLuu.Enabled = isEditing;
+            btnHuy.Enabled = isEditing;
+            btnThoat.Enabled = true;
+        }
+
+        // Xử lý sự kiện TxtChiNhapSoNguyen_KeyPress của giao diện.
         private void TxtChiNhapSoNguyen_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Các TextBox Số Lượng, Đơn giá Nhập, Đơn giá bán chỉ cho phép người dùng nhập số nguyên
@@ -201,6 +209,7 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
+        // Tải dữ liệu phục vụ LoadComboboxesLaptop.
         private void LoadComboboxesLaptop()
         {
             // Đổ danh sách loại máy vào form chỉnh sửa
@@ -225,6 +234,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 cboSSD.SelectedIndex = 1; // 512GB
         }
 
+        // Tải dữ liệu phục vụ LoadDataLaptop.
         private void LoadDataLaptop()
         {
             string sql = @"
@@ -266,6 +276,7 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvLaptop.DataSource = dt;
         }
 
+        // Xử lý sự kiện DgvLaptop_CellFormatting của giao diện.
         private void DgvLaptop_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.Value == null) return;
@@ -305,6 +316,7 @@ namespace QuanLyBanLaptop.DanhMuc
             }
         }
 
+        // Thực hiện GetCellString theo trạng thái và dữ liệu hiện tại.
         private string GetCellString(DataGridViewRow row, string colName)
         {
             if (row == null) return "";
@@ -323,11 +335,10 @@ namespace QuanLyBanLaptop.DanhMuc
             return "";
         }
 
-        private void DgvLaptop_CellClick(object sender, DataGridViewCellEventArgs e)
+        // Đổ dữ liệu từ một dòng GridView lên các control thông tin laptop
+        private void FillLaptopFromRow(DataGridViewRow row)
         {
-            if (e.RowIndex < 0 || e.RowIndex >= dgvLaptop.Rows.Count) return;
-
-            DataGridViewRow row = dgvLaptop.Rows[e.RowIndex];
+            if (row == null) return;
             txtMaLaptop.Text = GetCellString(row, "colMaLaptop");
             txtTenLaptop.Text = GetCellString(row, "colTenLaptop");
             cboLoaiLaptop.Text = GetCellString(row, "colLoai");
@@ -339,6 +350,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
             // Hiển thị số lượng, đơn giá nhập, đơn giá bán, ghi chú
             txtSoLuong.Text = GetCellString(row, "colSoLuongTon");
+            txtSoLuong.ReadOnly = true;
             txtDonGiaNhap.Text = GetCellString(row, "colDonGiaNhap");
             if (string.IsNullOrEmpty(txtDonGiaNhap.Text)) txtDonGiaNhap.Text = "0";
             txtDonGiaBan.Text = GetCellString(row, "colDonGia");
@@ -347,236 +359,104 @@ namespace QuanLyBanLaptop.DanhMuc
             string bhStr = GetCellString(row, "colBaoHanh");
             if (int.TryParse(bhStr, out int baoHanh))
                 numBaoHanh.Value = Math.Min(numBaoHanh.Maximum, Math.Max(numBaoHanh.Minimum, baoHanh));
-
-            string trangThai = GetCellString(row, "colTrangThai");
-            btnKhoa.Text = (trangThai == "Ngừng KD") ? "Mở khóa" : "Khóa máy";
         }
 
-        // them laptop moi
+        // Xử lý sự kiện DgvLaptop_CellClick của giao diện.
+        private void DgvLaptop_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.RowIndex >= dgvLaptop.Rows.Count) return;
+            FillLaptopFromRow(dgvLaptop.Rows[e.RowIndex]);
+            if (_mode == FormMode.View)
+            {
+                SetFormMode(FormMode.View);
+            }
+        }
+
+        // Bấm nút Thêm: Chuyển sang Add mode, xóa trắng các trường, sinh mã mới, focus ô nhập tên
         private void BtnThem_Click(object sender, EventArgs e)
         {
-            // Tu dong sinh ma MHxx neu de trong hoac ma da ton tai
-            object chkTonTai = null;
-            if (!string.IsNullOrWhiteSpace(txtMaLaptop.Text))
-            {
-                chkTonTai = DataProcesser.ExecuteScalar(
-                    "SELECT 1 FROM LAPTOP WHERE MaLaptop = @ma",
-                    new SqlParameter("@ma", txtMaLaptop.Text.Trim()));
-            }
+            _mode = FormMode.Add;
+            LamMoiLaptopInputs();
+            SetFormMode(FormMode.Add);
+            txtTenLaptop.Focus();
+        }
 
-            if (string.IsNullOrWhiteSpace(txtMaLaptop.Text) || (chkTonTai != null && chkTonTai != DBNull.Value))
+        // Bấm nút Sửa: Chuyển sang Edit mode, mở khóa các trường thông tin cho phép sửa
+        private void BtnSua_Click(object sender, EventArgs e)
+        {
+            if (dgvLaptop.CurrentRow == null || dgvLaptop.SelectedRows.Count == 0)
             {
-                txtMaLaptop.Text = Function.SinhMaTuDong("LAPTOP", "MaLaptop", "MH", 2);
+                Function.ThongBaoCanhBao("Vui lòng chọn sản phẩm cần sửa!");
+                return;
             }
-            string ma = txtMaLaptop.Text.Trim();
-            string ten = txtTenLaptop.Text.Trim();
-            string soLuongStr = txtSoLuong.Text.Trim();
-            string giaNhapStr = txtDonGiaNhap.Text.Trim();
-            string giaBanStr = txtDonGiaBan.Text.Trim();
+            _mode = FormMode.Edit;
+            SetFormMode(FormMode.Edit);
+            txtTenLaptop.Focus();
+        }
 
-            if (string.IsNullOrWhiteSpace(ten))
+        // Bấm nút Lưu: Lưu sản phẩm (Add hoặc Edit)
+        private void BtnLuu_Click(object sender, EventArgs e)
+        {
+            SaveProduct(_mode == FormMode.Add);
+        }
+
+        // Bấm nút Hủy: Hủy bỏ thêm/sửa, nạp lại dữ liệu dòng đang chọn hoặc xóa trắng và trở về View mode
+        private void BtnHuy_Click(object sender, EventArgs e)
+        {
+            if (dgvLaptop.CurrentRow != null && dgvLaptop.SelectedRows.Count > 0)
             {
-                MessageBox.Show("Vui lòng nhập tên sản phẩm!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                FillLaptopFromRow(dgvLaptop.CurrentRow);
+            }
+            else
+            {
+                LamMoiLaptopInputs();
+            }
+            SetFormMode(FormMode.View);
+        }
+
+        // Đọc và kiểm tra dữ liệu chung, gọi service rồi tải lại danh sách.
+        private void SaveProduct(bool isNew)
+        {
+            if (string.IsNullOrWhiteSpace(txtTenLaptop.Text))
+            {
+                Function.ThongBaoCanhBao("Vui lòng nhập tên laptop!");
                 txtTenLaptop.Focus();
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(soLuongStr))
+            if (!int.TryParse(txtSoLuong.Text, out int quantity) ||
+                !decimal.TryParse(txtDonGiaNhap.Text, out decimal purchasePrice) ||
+                !decimal.TryParse(txtDonGiaBan.Text, out decimal salePrice))
             {
-                MessageBox.Show("Vui lòng nhập số lượng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSoLuong.Focus();
+                Function.ThongBaoCanhBao("Số lượng và đơn giá phải là số hợp lệ.");
                 return;
             }
-
-            if (string.IsNullOrWhiteSpace(giaNhapStr))
+            try
             {
-                MessageBox.Show("Vui lòng nhập đơn giá nhập!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaNhap.Focus();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(giaBanStr))
-            {
-                MessageBox.Show("Vui lòng nhập đơn giá bán!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaBan.Focus();
-                return;
-            }
-
-            if (!int.TryParse(soLuongStr, out int soLuong) || soLuong < 0)
-            {
-                MessageBox.Show("Số lượng phải là số nguyên không âm!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSoLuong.Focus();
-                return;
-            }
-
-            if (!decimal.TryParse(giaNhapStr, out decimal donGiaNhap) || donGiaNhap < 0)
-            {
-                MessageBox.Show("Đơn giá nhập phải là số hợp lệ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaNhap.Focus();
-                return;
-            }
-
-            if (!decimal.TryParse(giaBanStr, out decimal donGiaBan) || donGiaBan < 0)
-            {
-                MessageBox.Show("Đơn giá bán phải là số hợp lệ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaBan.Focus();
-                return;
-            }
-
-            // 2. Đơn giá bán phải lớn hơn đơn giá nhập
-            if (donGiaBan <= donGiaNhap)
-            {
-                MessageBox.Show("Đơn giá bán phải lớn hơn đơn giá nhập!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaBan.Focus();
-                return;
-            }
-
-            // 3. Kiểm tra mã sản phẩm không được trùng
-            object check = DataProcesser.ExecuteScalar("SELECT COUNT(*) FROM LAPTOP WHERE MaLaptop = @ma", new SqlParameter("@ma", ma));
-            if (check != null && Convert.ToInt32(check) > 0)
-            {
-                MessageBox.Show("Mã sản phẩm đã tồn tại, vui lòng chọn mã khác!", "Cảnh báo trùng mã", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtMaLaptop.Focus();
-                return;
-            }
-
-            string loai = cboLoaiLaptop.Text.Trim();
-            string ncc = cboNhaCungCap.SelectedValue != null ? cboNhaCungCap.SelectedValue.ToString() : (cboNhaCungCap.Items.Count > 0 ? "NCC01" : "");
-            string cpu = string.IsNullOrWhiteSpace(txtCPU.Text) ? "Core i5" : txtCPU.Text.Trim();
-            string ram = string.IsNullOrWhiteSpace(cboRAM.Text) ? "8GB" : cboRAM.Text.Trim();
-            string ssd = string.IsNullOrWhiteSpace(cboSSD.Text) ? "512GB" : cboSSD.Text.Trim();
-            int bh = (int)numBaoHanh.Value;
-            string anh = "";
-            string ghiChu = txtGhiChu.Text.Trim();
-
-            // 4. Thêm vào bảng LAPTOP (Ảnh chỉ lưu tên)
-            string sql = @"
-                INSERT INTO LAPTOP (MaLaptop, TenLaptop, Loai, CPU, RAM, SSD, DonGiaNhap, DonGia, SoLuongTon, ThoiGianBaoHanh, MaNCC, Anh, GhiChu, NgungKinhDoanh)
-                VALUES (@ma, @ten, @loai, @cpu, @ram, @ssd, @giaNhap, @giaBan, @ton, @bh, @ncc, @anh, @ghichu, 0)";
-
-            int rows = DataProcesser.ChangeData(sql,
-                new SqlParameter("@ma", ma),
-                new SqlParameter("@ten", ten),
-                new SqlParameter("@loai", loai),
-                new SqlParameter("@cpu", cpu),
-                new SqlParameter("@ram", ram),
-                new SqlParameter("@ssd", ssd),
-                new SqlParameter("@giaNhap", donGiaNhap),
-                new SqlParameter("@giaBan", donGiaBan),
-                new SqlParameter("@ton", soLuong),
-                new SqlParameter("@bh", bh),
-                new SqlParameter("@ncc", ncc),
-                new SqlParameter("@anh", anh),
-                new SqlParameter("@ghichu", ghiChu));
-
-            if (rows > 0)
-            {
-                MessageBox.Show("Thêm sản phẩm thành công! Mã: " + ma, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                new Services.ProductService().Save(new Models.Product
+                {
+                    Id = txtMaLaptop.Text.Trim(), Name = txtTenLaptop.Text.Trim(),
+                    Category = cboLoaiLaptop.Text.Trim(),
+                    SupplierId = Convert.ToString(cboNhaCungCap.SelectedValue),
+                    Cpu = txtCPU.Text.Trim(), Ram = cboRAM.Text, Ssd = cboSSD.Text,
+                    PurchasePrice = purchasePrice, SalePrice = salePrice, OpeningQuantity = quantity,
+                    WarrantyMonths = (int)numBaoHanh.Value, Notes = txtGhiChu.Text.Trim()
+                }, isNew);
                 LoadDataLaptop();
-                // 5. Sau khi thêm sẽ xóa trắng các TextBox nhập liệu trên form
-                LamMoiLaptopInputs();
+                SetFormMode(FormMode.View);
+                Function.ThongBaoThanhCong("Đã lưu sản phẩm thành công!");
             }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
 
-        private void BtnSua_Click(object sender, EventArgs e)
-        {
-            string ma = txtMaLaptop.Text.Trim();
-            if (string.IsNullOrEmpty(ma))
-            {
-                MessageBox.Show("Vui lòng chọn sản phẩm cần sửa từ danh sách!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string ten = txtTenLaptop.Text.Trim();
-            string soLuongStr = txtSoLuong.Text.Trim();
-            string giaNhapStr = txtDonGiaNhap.Text.Trim();
-            string giaBanStr = txtDonGiaBan.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(ten) || string.IsNullOrWhiteSpace(soLuongStr) ||
-                string.IsNullOrWhiteSpace(giaNhapStr) || string.IsNullOrWhiteSpace(giaBanStr))
-            {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin sản phẩm!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (!int.TryParse(soLuongStr, out int soLuong) || soLuong < 0 ||
-                !decimal.TryParse(giaNhapStr, out decimal donGiaNhap) || donGiaNhap < 0 ||
-                !decimal.TryParse(giaBanStr, out decimal donGiaBan) || donGiaBan < 0)
-            {
-                MessageBox.Show("Số lượng, đơn giá nhập và đơn giá bán phải là số hợp lệ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (donGiaBan <= donGiaNhap)
-            {
-                MessageBox.Show("Đơn giá bán phải lớn hơn đơn giá nhập!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDonGiaBan.Focus();
-                return;
-            }
-
-            string loai = cboLoaiLaptop.Text.Trim();
-            string ncc = cboNhaCungCap.SelectedValue?.ToString() ?? "";
-            string cpu = string.IsNullOrWhiteSpace(txtCPU.Text) ? "Core i5" : txtCPU.Text.Trim();
-            string ram = string.IsNullOrWhiteSpace(cboRAM.Text) ? "8GB" : cboRAM.Text.Trim();
-            string ssd = string.IsNullOrWhiteSpace(cboSSD.Text) ? "512GB" : cboSSD.Text.Trim();
-            int bh = (int)numBaoHanh.Value;
-            string anh = "";
-            string ghiChu = txtGhiChu.Text.Trim();
-
-            string sql = @"
-                UPDATE LAPTOP 
-                SET TenLaptop = @ten, Loai = @loai, CPU = @cpu, RAM = @ram, SSD = @ssd, 
-                    DonGiaNhap = @giaNhap, DonGia = @giaBan, SoLuongTon = @ton, ThoiGianBaoHanh = @bh, 
-                    MaNCC = @ncc, Anh = @anh, GhiChu = @ghichu
-                WHERE MaLaptop = @ma";
-
-            int rows = DataProcesser.ChangeData(sql,
-                new SqlParameter("@ma", ma),
-                new SqlParameter("@ten", ten),
-                new SqlParameter("@loai", loai),
-                new SqlParameter("@cpu", cpu),
-                new SqlParameter("@ram", ram),
-                new SqlParameter("@ssd", ssd),
-                new SqlParameter("@giaNhap", donGiaNhap),
-                new SqlParameter("@giaBan", donGiaBan),
-                new SqlParameter("@ton", soLuong),
-                new SqlParameter("@bh", bh),
-                new SqlParameter("@ncc", ncc),
-                new SqlParameter("@anh", anh),
-                new SqlParameter("@ghichu", ghiChu));
-
-            if (rows > 0)
-            {
-                MessageBox.Show("Cập nhật thông tin sản phẩm thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadDataLaptop();
-            }
-        }
-
-        private void BtnKhoa_Click(object sender, EventArgs e)
-        {
-            string ma = txtMaLaptop.Text.Trim();
-            if (string.IsNullOrEmpty(ma))
-            {
-                MessageBox.Show("Vui lòng chọn sản phẩm cần khóa / mở khóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string sql = "UPDATE LAPTOP SET NgungKinhDoanh = CASE WHEN NgungKinhDoanh = 1 THEN 0 ELSE 1 END WHERE MaLaptop = @ma";
-            int rows = DataProcesser.ChangeData(sql, new SqlParameter("@ma", ma));
-            if (rows > 0)
-            {
-                MessageBox.Show("Đã cập nhật trạng thái kinh doanh của máy " + ma, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadDataLaptop();
-            }
-        }
-
+        // Xử lý sự kiện BtnXoa_Click của giao diện.
         private void BtnXoa_Click(object sender, EventArgs e)
         {
             string ma = txtMaLaptop.Text.Trim();
             // Kiểm tra xem người dùng đã chọn hàng để xóa chưa
             if (string.IsNullOrEmpty(ma))
             {
-                MessageBox.Show("Bạn chưa chọn hàng để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Bạn chưa chọn hàng để xóa!", "Thông báo");
                 return;
             }
 
@@ -596,9 +476,10 @@ namespace QuanLyBanLaptop.DanhMuc
                     if (drSoft == DialogResult.Yes)
                     {
                         DataProcesser.ChangeData("UPDATE LAPTOP SET NgungKinhDoanh = 1 WHERE MaLaptop = @ma", new SqlParameter("@ma", ma));
-                        MessageBox.Show("Đã chuyển trạng thái sang 'Ngừng kinh doanh'!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        Function.ThongBaoThanhCong("Đã chuyển trạng thái sang 'Ngừng kinh doanh'!", "Thông báo");
                         LoadDataLaptop();
                         LamMoiLaptopInputs();
+                        SetFormMode(FormMode.View);
                     }
                     return;
                 }
@@ -606,30 +487,29 @@ namespace QuanLyBanLaptop.DanhMuc
                 int rows = DataProcesser.ChangeData("DELETE FROM LAPTOP WHERE MaLaptop = @ma", new SqlParameter("@ma", ma));
                 if (rows > 0)
                 {
-                    MessageBox.Show("Đã xóa sản phẩm thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Đã xóa sản phẩm thành công!", "Thành công");
                     // Sau đó load lại dữ liệu lên GridView
                     LoadDataLaptop();
                     LamMoiLaptopInputs();
+                    SetFormMode(FormMode.View);
                 }
             }
         }
 
+        // Xử lý sự kiện BtnThoat_Click của giao diện: Điều hướng về Trang Chủ
         private void BtnThoat_Click(object sender, EventArgs e)
         {
-            DialogResult dr = MessageBox.Show("Bạn có muốn thoát khỏi danh mục sản phẩm không?", "Xác nhận thoát", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dr == DialogResult.Yes)
-            {
-                this.Close();
-            }
+            NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
 
-        // lam moi cac o nhap lieu va sinh ma hang MHxx tu dong
+        // làm mới các ô nhập liệu và sinh mã hàng MHxx tự động
         private void LamMoiLaptopInputs()
         {
             txtMaLaptop.Text = Function.SinhMaTuDong("LAPTOP", "MaLaptop", "MH", 2);
             txtMaLaptop.ReadOnly = true;
             txtTenLaptop.Clear();
-            txtSoLuong.Clear();
+            txtSoLuong.Text = "0";
+            txtSoLuong.ReadOnly = false;
             txtDonGiaNhap.Clear();
             txtDonGiaBan.Clear();
             txtGhiChu.Clear();
@@ -640,7 +520,6 @@ namespace QuanLyBanLaptop.DanhMuc
             if (cboRAM.Items.Count > 0) cboRAM.SelectedIndex = 1;
             if (cboSSD.Items.Count > 0) cboSSD.SelectedIndex = 1;
             numBaoHanh.Value = 12;
-            btnKhoa.Text = "Khóa máy";
             txtTenLaptop.Focus();
         }
 
@@ -648,6 +527,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
         #region TAB 2: ĐIỀU CHỈNH LOẠI MÁY
 
+        // Khởi tạo cấu hình và liên kết cho SetupLoaiMayEvents.
         private void SetupLoaiMayEvents()
         {
             dgvLoaiMay.CellClick += DgvLoaiMay_CellClick;
@@ -657,7 +537,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 string ten = txtTenLoaiMay.Text.Trim();
                 if (string.IsNullOrEmpty(ten))
                 {
-                    MessageBox.Show("Vui lòng nhập tên loại máy!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng nhập tên loại máy!", "Thông báo");
                     txtTenLoaiMay.Focus();
                     return;
                 }
@@ -665,7 +545,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 object check = DataProcesser.ExecuteScalar("SELECT COUNT(*) FROM LOAI_MAY WHERE TenLoai = @ten", new SqlParameter("@ten", ten));
                 if (check != null && Convert.ToInt32(check) > 0)
                 {
-                    MessageBox.Show("Loại máy này đã tồn tại!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Loại máy này đã tồn tại!", "Cảnh báo");
                     return;
                 }
 
@@ -673,7 +553,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     new SqlParameter("@ten", ten),
                     new SqlParameter("@mota", txtMoTaLoaiMay.Text.Trim()));
 
-                MessageBox.Show("Thêm loại máy thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Thêm loại máy thành công!", "Thông báo");
                 LoadDataLoaiMay();
                 LoadComboboxesLaptop();
             };
@@ -683,7 +563,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 string ten = txtTenLoaiMay.Text.Trim();
                 if (string.IsNullOrEmpty(ten))
                 {
-                    MessageBox.Show("Vui lòng chọn loại máy cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng chọn loại máy cần sửa!", "Thông báo");
                     return;
                 }
 
@@ -691,7 +571,7 @@ namespace QuanLyBanLaptop.DanhMuc
                     new SqlParameter("@ten", ten),
                     new SqlParameter("@mota", txtMoTaLoaiMay.Text.Trim()));
 
-                MessageBox.Show("Cập nhật loại máy thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Cập nhật loại máy thành công!", "Thông báo");
                 LoadDataLoaiMay();
             };
 
@@ -700,14 +580,14 @@ namespace QuanLyBanLaptop.DanhMuc
                 string ten = txtTenLoaiMay.Text.Trim();
                 if (string.IsNullOrEmpty(ten))
                 {
-                    MessageBox.Show("Vui lòng chọn loại máy cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng chọn loại máy cần xóa!", "Thông báo");
                     return;
                 }
 
                 object count = DataProcesser.ExecuteScalar("SELECT COUNT(*) FROM LAPTOP WHERE Loai = @ten", new SqlParameter("@ten", ten));
                 if (count != null && Convert.ToInt32(count) > 0)
                 {
-                    MessageBox.Show("Có " + count + " laptop đang thuộc loại máy này, không thể xóa trực tiếp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Có " + count + " laptop đang thuộc loại máy này, không thể xóa trực tiếp!", "Cảnh báo");
                     return;
                 }
 
@@ -715,7 +595,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 if (dr == DialogResult.Yes)
                 {
                     DataProcesser.ChangeData("DELETE FROM LOAI_MAY WHERE TenLoai = @ten", new SqlParameter("@ten", ten));
-                    MessageBox.Show("Đã xóa loại máy thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Đã xóa loại máy thành công!", "Thông báo");
                     LoadDataLoaiMay();
                     LoadComboboxesLaptop();
                     txtTenLoaiMay.Clear();
@@ -731,6 +611,7 @@ namespace QuanLyBanLaptop.DanhMuc
             };
         }
 
+        // Tải dữ liệu phục vụ LoadDataLoaiMay.
         private void LoadDataLoaiMay()
         {
             string sql = @"
@@ -744,6 +625,7 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvLoaiMay.DataSource = dt;
         }
 
+        // Xử lý sự kiện DgvLoaiMay_CellClick của giao diện.
         private void DgvLoaiMay_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvLoaiMay.Rows.Count) return;
@@ -756,6 +638,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
         #region TAB 3: NHÀ CUNG CẤP
 
+        // Khởi tạo cấu hình và liên kết cho SetupNCCEvents.
         private void SetupNCCEvents()
         {
             dgvNCC.CellClick += DgvNCC_CellClick;
@@ -764,7 +647,7 @@ namespace QuanLyBanLaptop.DanhMuc
             {
                 if (string.IsNullOrWhiteSpace(txtTenNCC.Text))
                 {
-                    MessageBox.Show("Vui lòng nhập tên nhà cung cấp!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng nhập tên nhà cung cấp!", "Thông báo");
                     txtTenNCC.Focus();
                     return;
                 }
@@ -790,7 +673,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 if (rows > 0)
                 {
-                    MessageBox.Show("Thêm nhà cung cấp thành công! Mã: " + ma, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Thêm nhà cung cấp thành công! Mã: " + ma, "Thông báo");
                     LoadDataNCC();
                     LoadComboboxesLaptop();
                 }
@@ -801,7 +684,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 string ma = txtMaNCC.Text.Trim();
                 if (string.IsNullOrEmpty(ma))
                 {
-                    MessageBox.Show("Vui lòng chọn nhà cung cấp cần sửa từ bảng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng chọn nhà cung cấp cần sửa từ bảng!", "Thông báo");
                     return;
                 }
 
@@ -814,7 +697,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
                 if (rows > 0)
                 {
-                    MessageBox.Show("Cập nhật thông tin NCC thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Cập nhật thông tin NCC thành công!", "Thông báo");
                     LoadDataNCC();
                     LoadComboboxesLaptop();
                 }
@@ -825,14 +708,14 @@ namespace QuanLyBanLaptop.DanhMuc
                 string ma = txtMaNCC.Text.Trim();
                 if (string.IsNullOrEmpty(ma))
                 {
-                    MessageBox.Show("Vui lòng chọn NCC cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng chọn NCC cần xóa!", "Thông báo");
                     return;
                 }
 
                 object count = DataProcesser.ExecuteScalar("SELECT COUNT(*) FROM LAPTOP WHERE MaNCC = @ma", new SqlParameter("@ma", ma));
                 if (count != null && Convert.ToInt32(count) > 0)
                 {
-                    MessageBox.Show("Có " + count + " dòng laptop thuộc nhà cung cấp này, không thể xóa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Có " + count + " dòng laptop thuộc nhà cung cấp này, không thể xóa!", "Cảnh báo");
                     return;
                 }
 
@@ -840,7 +723,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 if (dr == DialogResult.Yes)
                 {
                     DataProcesser.ChangeData("DELETE FROM NHA_CUNG_CAP WHERE MaNCC = @ma", new SqlParameter("@ma", ma));
-                    MessageBox.Show("Đã xóa nhà cung cấp!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Đã xóa nhà cung cấp!", "Thông báo");
                     LoadDataNCC();
                     LoadComboboxesLaptop();
                     txtMaNCC.Clear();
@@ -860,6 +743,7 @@ namespace QuanLyBanLaptop.DanhMuc
             };
         }
 
+        // Tải dữ liệu phục vụ LoadDataNCC.
         private void LoadDataNCC()
         {
             string sql = @"
@@ -875,6 +759,7 @@ namespace QuanLyBanLaptop.DanhMuc
             txtMaNCC.Text = Function.SinhMaTuDong("NHA_CUNG_CAP", "MaNCC", "NCC", 2);
         }
 
+        // Xử lý sự kiện DgvNCC_CellClick của giao diện.
         private void DgvNCC_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvNCC.Rows.Count) return;

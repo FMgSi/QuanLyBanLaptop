@@ -1,11 +1,9 @@
-using System;
+﻿using System;
 using System.Data;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    /// <summary>
-    /// Chứa toàn bộ dữ liệu cần thiết để in hóa đơn bán hàng / hóa đơn trả góp.
-    /// </summary>
+    // Chứa toàn bộ dữ liệu cần thiết để in hóa đơn bán hàng / hóa đơn trả góp.
     public class HoaDonPrintData
     {
         // Thông tin hóa đơn

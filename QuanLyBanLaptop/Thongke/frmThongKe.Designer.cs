@@ -19,7 +19,13 @@ namespace QuanLyBanLaptop.Thongke
         {
             this.sidebarControl1 = new QuanLyBanLaptop.SidebarControl();
             this.pnlMain = new System.Windows.Forms.Panel();
+            this.tlpDataAndChart = new System.Windows.Forms.TableLayoutPanel();
+            this.pnlGridBox = new System.Windows.Forms.Panel();
+            this.lblGridTitle = new System.Windows.Forms.Label();
             this.dgvThongKe = new System.Windows.Forms.DataGridView();
+            this.pnlChartBox = new System.Windows.Forms.Panel();
+            this.lblChartTitle = new System.Windows.Forms.Label();
+            this.chartDoanhthu = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.colThoiGian = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSoLuongBan = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDoanhThu = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -36,6 +42,7 @@ namespace QuanLyBanLaptop.Thongke
             this.lblValDoanhThu = new System.Windows.Forms.Label();
             this.lblTitleDoanhThu = new System.Windows.Forms.Label();
             this.grpBoLoc = new System.Windows.Forms.GroupBox();
+            this.btnInBaoCao = new System.Windows.Forms.Button();
             this.btnXuatExcel = new System.Windows.Forms.Button();
             this.btnThongKe = new System.Windows.Forms.Button();
             this.cboLoaiThongKe = new System.Windows.Forms.ComboBox();
@@ -46,8 +53,16 @@ namespace QuanLyBanLaptop.Thongke
             this.lblTuNgay = new System.Windows.Forms.Label();
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.pnlMain.SuspendLayout();
+            this.tlpDataAndChart.SuspendLayout();
+            this.pnlGridBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvThongKe)).BeginInit();
+            this.pnlChartBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDoanhthu)).BeginInit();
             this.pnlKpiCards.SuspendLayout();
             this.pnlKpiLoiNhuan.SuspendLayout();
             this.pnlKpiNhap.SuspendLayout();
@@ -68,7 +83,7 @@ namespace QuanLyBanLaptop.Thongke
             // pnlMain
             // 
             this.pnlMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(242)))), ((int)(((byte)(245)))));
-            this.pnlMain.Controls.Add(this.dgvThongKe);
+            this.pnlMain.Controls.Add(this.tlpDataAndChart);
             this.pnlMain.Controls.Add(this.pnlKpiCards);
             this.pnlMain.Controls.Add(this.grpBoLoc);
             this.pnlMain.Controls.Add(this.pnlHeader);
@@ -79,24 +94,115 @@ namespace QuanLyBanLaptop.Thongke
             this.pnlMain.Size = new System.Drawing.Size(959, 661);
             this.pnlMain.TabIndex = 1;
             // 
+            // tlpDataAndChart
+            // 
+            this.tlpDataAndChart.ColumnCount = 2;
+            this.tlpDataAndChart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55F));
+            this.tlpDataAndChart.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45F));
+            this.tlpDataAndChart.Controls.Add(this.pnlGridBox, 0, 0);
+            this.tlpDataAndChart.Controls.Add(this.pnlChartBox, 1, 0);
+            this.tlpDataAndChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpDataAndChart.Location = new System.Drawing.Point(16, 236);
+            this.tlpDataAndChart.Name = "tlpDataAndChart";
+            this.tlpDataAndChart.RowCount = 1;
+            this.tlpDataAndChart.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpDataAndChart.Size = new System.Drawing.Size(927, 409);
+            this.tlpDataAndChart.TabIndex = 3;
+            // 
+            // pnlGridBox
+            // 
+            this.pnlGridBox.BackColor = System.Drawing.Color.White;
+            this.pnlGridBox.Controls.Add(this.dgvThongKe);
+            this.pnlGridBox.Controls.Add(this.lblGridTitle);
+            this.pnlGridBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlGridBox.Location = new System.Drawing.Point(0, 0);
+            this.pnlGridBox.Margin = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.pnlGridBox.Name = "pnlGridBox";
+            this.pnlGridBox.Padding = new System.Windows.Forms.Padding(8);
+            this.pnlGridBox.Size = new System.Drawing.Size(503, 409);
+            this.pnlGridBox.TabIndex = 0;
+            // 
+            // lblGridTitle
+            // 
+            this.lblGridTitle.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblGridTitle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblGridTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(108)))), ((int)(((byte)(189)))));
+            this.lblGridTitle.Location = new System.Drawing.Point(8, 8);
+            this.lblGridTitle.Name = "lblGridTitle";
+            this.lblGridTitle.Size = new System.Drawing.Size(487, 26);
+            this.lblGridTitle.TabIndex = 0;
+            this.lblGridTitle.Text = "BẢNG SỐ LIỆU CHI TIẾT";
+            this.lblGridTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // dgvThongKe
             // 
             this.dgvThongKe.AllowUserToAddRows = false;
-            this.dgvThongKe.BackgroundColor = System.Drawing.Color.Silver;
+            this.dgvThongKe.AllowUserToDeleteRows = false;
+            this.dgvThongKe.AllowUserToResizeColumns = false;
+            this.dgvThongKe.AllowUserToResizeRows = false;
+            this.dgvThongKe.AllowUserToOrderColumns = false;
+            this.dgvThongKe.BackgroundColor = System.Drawing.Color.White;
+            this.dgvThongKe.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvThongKe.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvThongKe.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colThoiGian,
-            this.colSoLuongBan,
-            this.colDoanhThu,
-            this.colTienNhap,
-            this.colLoiNhuan});
             this.dgvThongKe.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvThongKe.Location = new System.Drawing.Point(16, 236);
+            this.dgvThongKe.Location = new System.Drawing.Point(8, 34);
             this.dgvThongKe.Name = "dgvThongKe";
             this.dgvThongKe.ReadOnly = true;
             this.dgvThongKe.RowHeadersWidth = 30;
-            this.dgvThongKe.Size = new System.Drawing.Size(927, 409);
-            this.dgvThongKe.TabIndex = 3;
+            this.dgvThongKe.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvThongKe.Size = new System.Drawing.Size(487, 367);
+            this.dgvThongKe.TabIndex = 1;
+            // 
+            // pnlChartBox
+            // 
+            this.pnlChartBox.BackColor = System.Drawing.Color.White;
+            this.pnlChartBox.Controls.Add(this.chartDoanhthu);
+            this.pnlChartBox.Controls.Add(this.lblChartTitle);
+            this.pnlChartBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlChartBox.Location = new System.Drawing.Point(515, 0);
+            this.pnlChartBox.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
+            this.pnlChartBox.Name = "pnlChartBox";
+            this.pnlChartBox.Padding = new System.Windows.Forms.Padding(8);
+            this.pnlChartBox.Size = new System.Drawing.Size(412, 409);
+            this.pnlChartBox.TabIndex = 1;
+            // 
+            // lblChartTitle
+            // 
+            this.lblChartTitle.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblChartTitle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            this.lblChartTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(108)))), ((int)(((byte)(189)))));
+            this.lblChartTitle.Location = new System.Drawing.Point(8, 8);
+            this.lblChartTitle.Name = "lblChartTitle";
+            this.lblChartTitle.Size = new System.Drawing.Size(396, 26);
+            this.lblChartTitle.TabIndex = 0;
+            this.lblChartTitle.Text = "BIỂU ĐỒ TRỰC QUAN DOANH THU && LỢI NHUẬN";
+            this.lblChartTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // chartDoanhthu
+            // 
+            chartArea1.Name = "ChartArea1";
+            chartArea1.BackColor = System.Drawing.Color.Transparent;
+            this.chartDoanhthu.ChartAreas.Add(chartArea1);
+            this.chartDoanhthu.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend1.Name = "Legend1";
+            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend1.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+            this.chartDoanhthu.Legends.Add(legend1);
+            this.chartDoanhthu.Location = new System.Drawing.Point(8, 34);
+            this.chartDoanhthu.Name = "chartDoanhthu";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Doanh thu";
+            series1.Color = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(108)))), ((int)(((byte)(189)))));
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Lợi nhuận";
+            series2.Color = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
+            this.chartDoanhthu.Series.Add(series1);
+            this.chartDoanhthu.Series.Add(series2);
+            this.chartDoanhthu.Size = new System.Drawing.Size(396, 367);
+            this.chartDoanhthu.TabIndex = 1;
+            this.chartDoanhthu.Text = "chartDoanhthu";
             // 
             // colThoiGian
             // 
@@ -247,6 +353,7 @@ namespace QuanLyBanLaptop.Thongke
             // grpBoLoc
             // 
             this.grpBoLoc.Controls.Add(this.btnXuatExcel);
+            this.grpBoLoc.Controls.Add(this.btnInBaoCao);
             this.grpBoLoc.Controls.Add(this.btnThongKe);
             this.grpBoLoc.Controls.Add(this.cboLoaiThongKe);
             this.grpBoLoc.Controls.Add(this.lblLoai);
@@ -265,30 +372,45 @@ namespace QuanLyBanLaptop.Thongke
             // 
             // btnXuatExcel
             // 
-            this.btnXuatExcel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(167)))), ((int)(((byte)(69)))));
+            this.btnXuatExcel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(163)))), ((int)(((byte)(74)))));
             this.btnXuatExcel.FlatAppearance.BorderSize = 0;
             this.btnXuatExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnXuatExcel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnXuatExcel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnXuatExcel.ForeColor = System.Drawing.Color.White;
-            this.btnXuatExcel.Location = new System.Drawing.Point(800, 31);
+            this.btnXuatExcel.Location = new System.Drawing.Point(765, 31);
             this.btnXuatExcel.Name = "btnXuatExcel";
-            this.btnXuatExcel.Size = new System.Drawing.Size(100, 30);
-            this.btnXuatExcel.TabIndex = 7;
+            this.btnXuatExcel.Size = new System.Drawing.Size(95, 30);
+            this.btnXuatExcel.TabIndex = 8;
             this.btnXuatExcel.Text = "Xuất Excel";
             this.btnXuatExcel.UseVisualStyleBackColor = false;
             // 
+            // btnInBaoCao
+            // 
+            this.btnInBaoCao.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(34)))), ((int)(((byte)(206)))));
+            this.btnInBaoCao.FlatAppearance.BorderSize = 0;
+            this.btnInBaoCao.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInBaoCao.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnInBaoCao.ForeColor = System.Drawing.Color.White;
+            this.btnInBaoCao.Location = new System.Drawing.Point(865, 31);
+            this.btnInBaoCao.Name = "btnInBaoCao";
+            this.btnInBaoCao.Size = new System.Drawing.Size(90, 30);
+            this.btnInBaoCao.TabIndex = 7;
+            this.btnInBaoCao.Text = "In báo cáo";
+            this.btnInBaoCao.UseVisualStyleBackColor = false;
+            this.btnInBaoCao.Visible = false;
+            // 
             // btnThongKe
             // 
-            this.btnThongKe.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(2)))), ((int)(((byte)(117)))), ((int)(((byte)(216)))));
+            this.btnThongKe.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(108)))), ((int)(((byte)(189)))));
             this.btnThongKe.FlatAppearance.BorderSize = 0;
             this.btnThongKe.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnThongKe.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnThongKe.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnThongKe.ForeColor = System.Drawing.Color.White;
-            this.btnThongKe.Location = new System.Drawing.Point(685, 31);
+            this.btnThongKe.Location = new System.Drawing.Point(665, 31);
             this.btnThongKe.Name = "btnThongKe";
-            this.btnThongKe.Size = new System.Drawing.Size(100, 30);
+            this.btnThongKe.Size = new System.Drawing.Size(95, 30);
             this.btnThongKe.TabIndex = 6;
-            this.btnThongKe.Text = "Xem thống kê";
+            this.btnThongKe.Text = "Thống kê";
             this.btnThongKe.UseVisualStyleBackColor = false;
             // 
             // cboLoaiThongKe
@@ -373,11 +495,17 @@ namespace QuanLyBanLaptop.Thongke
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.sidebarControl1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "frmThongKe";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "TRANG THỐNG KÊ";
             this.pnlMain.ResumeLayout(false);
+            this.tlpDataAndChart.ResumeLayout(false);
+            this.pnlGridBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvThongKe)).EndInit();
+            this.pnlChartBox.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartDoanhthu)).EndInit();
             this.pnlKpiCards.ResumeLayout(false);
             this.pnlKpiLoiNhuan.ResumeLayout(false);
             this.pnlKpiLoiNhuan.PerformLayout();
@@ -407,6 +535,7 @@ namespace QuanLyBanLaptop.Thongke
         private System.Windows.Forms.ComboBox cboLoaiThongKe;
         private System.Windows.Forms.Label lblLoai;
         private System.Windows.Forms.Button btnThongKe;
+        private System.Windows.Forms.Button btnInBaoCao;
         private System.Windows.Forms.Button btnXuatExcel;
         private System.Windows.Forms.Panel pnlKpiCards;
         private System.Windows.Forms.Panel pnlKpiDoanhThu;
@@ -418,7 +547,13 @@ namespace QuanLyBanLaptop.Thongke
         private System.Windows.Forms.Panel pnlKpiLoiNhuan;
         private System.Windows.Forms.Label lblValLoiNhuan;
         private System.Windows.Forms.Label lblTitleLoiNhuan;
+        private System.Windows.Forms.TableLayoutPanel tlpDataAndChart;
+        private System.Windows.Forms.Panel pnlGridBox;
+        private System.Windows.Forms.Label lblGridTitle;
         private System.Windows.Forms.DataGridView dgvThongKe;
+        private System.Windows.Forms.Panel pnlChartBox;
+        private System.Windows.Forms.Label lblChartTitle;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartDoanhthu;
         private System.Windows.Forms.DataGridViewTextBoxColumn colThoiGian;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSoLuongBan;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDoanhThu;

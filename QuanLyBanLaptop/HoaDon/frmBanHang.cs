@@ -9,7 +9,7 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmBanHang : Form
+    public partial class frmBanHang : QuanLyBanLaptop.Classes.AppForm
     {
         // DataTable lưu danh sách hàng trong hóa đơn
         private DataTable _dtGioHang;
@@ -32,6 +32,7 @@ namespace QuanLyBanLaptop.HoaDon
         private static readonly Color ColorIndigo   = Color.FromArgb(99, 102, 241);  // Tím xanh (In hóa đơn)
         private static readonly Color ColorGray     = Color.FromArgb(100, 116, 139); // Xám (Đóng)
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmBanHang()
         {
             InitializeComponent();
@@ -45,12 +46,13 @@ namespace QuanLyBanLaptop.HoaDon
             SetFormMode(FormMode.View);
         }
 
+        // Dùng kiểu nút chung khi đổi trạng thái thao tác.
         private void StyleButton(Button btn, Color back, Color fore)
         {
-            btn.BackColor = back;
-            btn.ForeColor = fore;
+            ButtonTheme.Apply(btn);
         }
 
+        // Thực hiện SetFormMode theo trạng thái và dữ liệu hiện tại.
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
@@ -76,9 +78,10 @@ namespace QuanLyBanLaptop.HoaDon
             cboMaHDTim.Enabled  = isView;
             btnTimKiem.Enabled  = isView;
 
-            // 5 nút chức năng luôn hiển thị cố định theo giao diện chuẩn PDF
+            // 6 nút chức năng luôn hiển thị cố định theo giao diện chuẩn
             btnThemHD.Visible = true;
             btnLuuHD.Visible  = true;
+            btnHuy.Visible    = true;
             btnHuyHD.Visible  = true;
             btnInHD.Visible   = true;
             btnDong.Visible   = true;
@@ -90,6 +93,7 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 btnThemHD.Enabled = true;
                 btnLuuHD.Enabled  = false;
+                btnHuy.Enabled    = false;
                 btnHuyHD.Enabled  = hasInvoice;
                 btnInHD.Enabled   = hasInvoice && _dtGioHang.Rows.Count > 0;
                 btnDong.Enabled   = true;
@@ -98,13 +102,15 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 btnThemHD.Enabled = false;
                 btnLuuHD.Enabled  = true;
-                btnHuyHD.Enabled  = true;
+                btnHuy.Enabled    = true;
+                btnHuyHD.Enabled  = false;
                 btnInHD.Enabled   = false;
                 btnDong.Enabled   = true;
             }
 
             StyleButton(btnThemHD, btnThemHD.Enabled ? ColorGreen : ColorDisabled, Color.White);
             StyleButton(btnLuuHD,  btnLuuHD.Enabled  ? ColorBlue  : ColorDisabled, Color.White);
+            StyleButton(btnHuy,    btnHuy.Enabled    ? ColorRed   : ColorDisabled, Color.White);
             StyleButton(btnHuyHD,  btnHuyHD.Enabled  ? ColorRed   : ColorDisabled, Color.White);
             StyleButton(btnInHD,   btnInHD.Enabled   ? ColorIndigo: ColorDisabled, Color.White);
             StyleButton(btnDong,   ColorGray, Color.White);
@@ -169,6 +175,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Thực hiện ClearForm theo trạng thái và dữ liệu hiện tại.
         private void ClearForm()
         {
             txtMaHD.Clear();
@@ -280,8 +287,7 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 if (string.IsNullOrEmpty(txtMaHD.Text) || !_isSaved)
                 {
-                    MessageBox.Show("Vui lòng chọn hoặc tìm kiếm hóa đơn cần sửa.", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong("Vui lòng chọn hoặc tìm kiếm hóa đơn cần sửa.", "Thông báo");
                     return;
                 }
                 SetFormMode(FormMode.Edit);
@@ -295,6 +301,17 @@ namespace QuanLyBanLaptop.HoaDon
                     LuuHoaDon();
                 else if (_mode == FormMode.Edit)
                     CapNhatHoaDon();
+            };
+
+            // Nút Hủy (thoát khỏi trạng thái thêm mới hóa đơn)
+            btnHuy.Click += (s, e) =>
+            {
+                if (_mode == FormMode.Add || _mode == FormMode.Edit)
+                {
+                    ClearForm();
+                    _isSaved = false;
+                    SetFormMode(FormMode.View);
+                }
             };
 
             // Nút Hủy hóa đơn (Yêu cầu 10)
@@ -322,8 +339,7 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 if (_dtGioHang.Rows.Count == 0)
                 {
-                    MessageBox.Show("Không có dữ liệu mặt hàng để in hóa đơn!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Không có dữ liệu mặt hàng để in hóa đơn!", "Thông báo");
                     return;
                 }
                 InHoaDonExcel();
@@ -372,8 +388,8 @@ namespace QuanLyBanLaptop.HoaDon
             // Nút trợ giúp '...'
             btnChonNV.Click += (s, e) =>
             {
-                MessageBox.Show("Mã nhân viên và tên nhân viên được cố định theo tài khoản đang đăng nhập.",
-                    "Thông tin nhân viên", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Mã nhân viên và tên nhân viên được cố định theo tài khoản đang đăng nhập.",
+                    "Thông tin nhân viên");
             };
             btnChonKH.Click += (s, e) => cboMaKH.DroppedDown = true;
         }
@@ -436,8 +452,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi nạp thông tin nhân viên: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Lỗi nạp thông tin nhân viên: " + ex.Message, "Lỗi");
             }
         }
 
@@ -455,8 +470,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải danh sách khách hàng: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Lỗi tải danh sách khách hàng: " + ex.Message, "Lỗi");
             }
         }
 
@@ -541,17 +555,15 @@ namespace QuanLyBanLaptop.HoaDon
                 if (frm.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(frm.SelectedMaLaptop))
                 {
                     cboMaHang.SelectedValue = frm.SelectedMaLaptop;
-                    if (cboMaHang.SelectedIndex == -1)
-                    {
-                        cboMaHang.Text    = frm.SelectedMaLaptop;
-                        txtTenHang.Text   = frm.SelectedTenLaptop;
-                        txtDonGia.Text    = frm.SelectedDonGia.ToString("0");
-                        txtBaoHanh.Text   = frm.SelectedBaoHanh.ToString();
-                        txtSoLuong.Text   = "1";
-                        decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(txtHangKhach.Text);
-                        txtGiamGia.Text   = phanTramGiam.ToString("0");
-                        TinhThanhTien();
-                    }
+                    cboMaHang.Text    = frm.SelectedMaLaptop;
+                    txtTenHang.Text   = frm.SelectedTenLaptop;
+                    txtDonGia.Text    = frm.SelectedDonGia.ToString("0");
+                    txtBaoHanh.Text   = frm.SelectedBaoHanh > 0 ? frm.SelectedBaoHanh.ToString() : "12";
+                    txtSoLuong.Text   = "1";
+                    decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(txtHangKhach.Text);
+                    txtGiamGia.Text   = phanTramGiam.ToString("0");
+                    TinhThanhTien();
+
                     txtSoLuong.Focus();
                     txtSoLuong.SelectAll();
                 }
@@ -576,24 +588,25 @@ namespace QuanLyBanLaptop.HoaDon
         // ─── Thêm / cập nhật mặt hàng vào DataGridView ────────────────────
         private bool ThemMatHangVaoLuoi()
         {
-            if (cboMaHang.SelectedItem == null || string.IsNullOrEmpty(cboMaHang.Text))
+            string maHang = !string.IsNullOrEmpty(cboMaHang.Text) ? cboMaHang.Text.Trim() : (cboMaHang.SelectedValue?.ToString() ?? "");
+            if (string.IsNullOrEmpty(maHang))
+            {
+                Function.ThongBaoCanhBao("Vui lòng nhấn nút 'Tìm máy' để chọn sản phẩm trước.", "Thông báo");
                 return false;
+            }
 
-            string maHang = cboMaHang.Text.Trim();
             string tenHang = txtTenHang.Text.Trim();
 
             if (!int.TryParse(txtSoLuong.Text.Trim(), out int sl) || sl <= 0)
             {
-                MessageBox.Show("Số lượng phải là số nguyên dương lớn hơn 0.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Số lượng phải là số nguyên dương lớn hơn 0.", "Thông báo");
                 txtSoLuong.Focus();
                 return false;
             }
 
             if (!decimal.TryParse(txtGiamGia.Text.Trim(), out decimal giam) || giam < 0 || giam > 100)
             {
-                MessageBox.Show("Giảm giá phải từ 0% đến 100%.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Giảm giá phải từ 0% đến 100%.", "Thông báo");
                 txtGiamGia.Focus();
                 return false;
             }
@@ -625,8 +638,8 @@ namespace QuanLyBanLaptop.HoaDon
                 int slTong = sl;
                 if (slTong > tonKho)
                 {
-                    MessageBox.Show($"Mặt hàng [{tenHang}] chỉ còn {tonKho} máy trong kho, không đủ số lượng ({slTong})!",
-                        "Không đủ tồn kho", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao($"Mặt hàng [{tenHang}] chỉ còn {tonKho} máy trong kho, không đủ số lượng ({slTong})!",
+                        "Không đủ tồn kho");
                     return false;
                 }
 
@@ -640,8 +653,8 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 if (sl > tonKho)
                 {
-                    MessageBox.Show($"Mặt hàng [{tenHang}] chỉ còn {tonKho} máy trong kho, không đủ số lượng ({sl})!",
-                        "Không đủ tồn kho", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao($"Mặt hàng [{tenHang}] chỉ còn {tonKho} máy trong kho, không đủ số lượng ({sl})!",
+                        "Không đủ tồn kho");
                     return false;
                 }
 
@@ -666,12 +679,7 @@ namespace QuanLyBanLaptop.HoaDon
             lblBangChu.Text  = "Bằng chữ: " + Function.ChuyenSoThanhChu(tong);
         }
 
-        /// <summary>
-        /// Lấy phần trăm giảm giá tự động theo hạng thành viên khách hàng:
-        /// - Vàng / VIP: 15%
-        /// - Bạc: 5%
-        /// - Đồng / Chưa có hạng: 0%
-        /// </summary>
+        // Lấy phần trăm giảm giá tự động theo hạng thành viên khách hàng: - Vàng / VIP: 15% - Bạc: 5% - Đồng / Chưa có hạng: 0%
         private decimal LayPhanTramGiamGiaTheoHang(string hang)
         {
             if (string.IsNullOrWhiteSpace(hang)) return 0;
@@ -779,8 +787,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tạo mới hóa đơn: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Lỗi tạo mới hóa đơn: " + ex.Message, "Lỗi");
             }
         }
 
@@ -796,8 +803,8 @@ namespace QuanLyBanLaptop.HoaDon
 
             if (_dtGioHang.Rows.Count == 0)
             {
-                MessageBox.Show("Hóa đơn phải có ít nhất một mặt hàng. Vui lòng chọn mặt hàng trước!",
-                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Hóa đơn phải có ít nhất một mặt hàng. Vui lòng chọn mặt hàng trước!",
+                    "Thông báo");
                 cboMaHang.Focus();
                 return;
             }
@@ -817,8 +824,8 @@ namespace QuanLyBanLaptop.HoaDon
                 }
                 else
                 {
-                    MessageBox.Show("Vui lòng chọn khách hàng trước khi thanh toán.",
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Function.ThongBaoCanhBao("Vui lòng chọn khách hàng trước khi thanh toán.",
+                        "Thông báo");
                     cboMaKH.Focus();
                     return;
                 }
@@ -879,6 +886,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
         }
 
+        // Thực hiện XemTruocHoaDonHienTai theo trạng thái và dữ liệu hiện tại.
         private void XemTruocHoaDonHienTai()
         {
             string maHD = txtMaHD.Text.Trim();
@@ -914,16 +922,12 @@ namespace QuanLyBanLaptop.HoaDon
 
             if (isTraGop)
             {
-                if (chuKy == 3) laiSuat = 2.4;
-                else if (chuKy == 6) laiSuat = 4.0;
-                else if (chuKy == 9) laiSuat = 6.0;
-                else if (chuKy == 12) laiSuat = 8.0;
-
-                downpayment = Math.Round(tongTien * 0.30m, 0);
-                loan = tongTien - downpayment;
-                interest = Math.Round(loan * (decimal)(laiSuat / 100.0), 0);
-                int k = chuKy > 0 ? chuKy : 6;
-                monthly = Math.Floor((loan + interest) / k);
+                var plan = Services.InstallmentCalculator.Load(maHD, tongTien, chuKy);
+                laiSuat = (double)plan.Rate;
+                downpayment = plan.DownPayment;
+                loan = plan.Principal;
+                interest = plan.Interest;
+                monthly = plan.Monthly;
             }
 
             var printData = new HoaDonPrintData
@@ -958,624 +962,73 @@ namespace QuanLyBanLaptop.HoaDon
         }
 
         // ─── Yêu cầu 8: Lưu hóa đơn vào CSDL và trừ tồn kho ───────────────
-        private void LuuHoaDon()
-        {
-            // Nếu trên ô chọn mặt hàng đang có dữ liệu hợp lệ mà chưa nhấn Enter để đưa vào lưới
-            if (cboMaHang.SelectedItem != null && !string.IsNullOrEmpty(txtTenHang.Text.Trim()))
-            {
-                if (int.TryParse(txtSoLuong.Text.Trim(), out int slNhap) && slNhap > 0)
-                {
-                    ThemMatHangVaoLuoi();
-                }
-            }
-
-            if (_dtGioHang.Rows.Count == 0)
-            {
-                MessageBox.Show("Hóa đơn phải có ít nhất một mặt hàng. Vui lòng chọn mặt hàng và số lượng!",
-                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cboMaHang.Focus();
-                return;
-            }
-
-            string maHD = txtMaHD.Text.Trim();
-            if (string.IsNullOrEmpty(maHD))
-            {
-                MessageBox.Show("Mã hóa đơn không được để trống.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (_isSaved)
-            {
-                MessageBox.Show("Hóa đơn này đã được lưu trong CSDL rồi. Nhấn 'Thêm hóa đơn' để tạo mới hóa đơn khác.",
-                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // Kiểm tra chọn khách hàng
-            string maKH = cboMaKH.Text.Trim();
-            if (string.IsNullOrEmpty(maKH))
-            {
-                MessageBox.Show("Vui lòng nhập số điện thoại hoặc chọn mã khách hàng.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSDT.Focus();
-                return;
-            }
-
-            string maNV = txtMaNV.Text.Trim();
-            if (string.IsNullOrEmpty(maNV)) maNV = Function.CurrentMaNV ?? "NV001";
-
-            // Kiểm tra số lượng tồn kho từng mặt hàng trước khi lưu
-            foreach (DataRow r in _dtGioHang.Rows)
-            {
-                if (r.RowState == DataRowState.Deleted) continue;
-                string maLT = r["MaLaptop"].ToString();
-                string tenLT = r["TenLaptop"].ToString();
-                int slMua = Convert.ToInt32(r["SoLuong"]);
-
-                object tonObj = DataProcesser.ExecuteScalar(
-                    "SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop = @Ma",
-                    new[] { new SqlParameter("@Ma", maLT) });
-                int tonKho = tonObj != null && tonObj != DBNull.Value ? Convert.ToInt32(tonObj) : 0;
-
-                if (slMua > tonKho)
-                {
-                    MessageBox.Show($"Mặt hàng [{tenLT}] ({maLT}) trong kho chỉ còn {tonKho} máy, không đủ số lượng bán ({slMua})!\nVui lòng điều chỉnh lại số lượng.",
-                        "Không đủ hàng", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-            }
-
-            try
-            {
-                using (var conn = DataProcesser.GetConnection())
-                using (var trans = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        // Kiểm tra khách hàng đã có trong CSDL chưa, nếu chưa có (lần đầu đến mua) thì thêm vào theo Yêu cầu 4
-                        using (var cmdKtraKH = new SqlCommand("SELECT COUNT(*) FROM KHACH_HANG WHERE MaKH = @MaKH", conn, trans))
-                        {
-                            cmdKtraKH.Parameters.AddWithValue("@MaKH", maKH);
-                            int tonTaiKH = Convert.ToInt32(cmdKtraKH.ExecuteScalar());
-                            if (tonTaiKH == 0)
-                            {
-                                string tenKhach = txtTenKhach.Text.Trim();
-                                if (string.IsNullOrEmpty(tenKhach)) tenKhach = "Khách hàng " + maKH;
-                                string diaChi = txtDiaChi.Text.Trim();
-                                string sdt = txtSDT.Text.Trim();
-
-                                using (var cmdThemKH = new SqlCommand(
-                                    @"INSERT INTO KHACH_HANG (MaKH, TenKH, GioiTinh, Sdt, DiaChi, HangThanhVien)
-                                      VALUES (@MaKH, @TenKH, N'Nam', @Sdt, @DiaChi, N'Đồng')", conn, trans))
-                                {
-                                    cmdThemKH.Parameters.AddWithValue("@MaKH", maKH);
-                                    cmdThemKH.Parameters.AddWithValue("@TenKH", tenKhach);
-                                    cmdThemKH.Parameters.AddWithValue("@Sdt", sdt);
-                                    cmdThemKH.Parameters.AddWithValue("@DiaChi", diaChi);
-                                    cmdThemKH.ExecuteNonQuery();
-                                }
-                            }
-                        }
-
-                        // 1. Tính tổng tiền hóa đơn
-                        decimal tongTien = 0;
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState != DataRowState.Deleted)
-                                tongTien += Convert.ToDecimal(r["ThanhTien"]);
-                        }
-
-                        // 2. Thêm vào HOA_DON
-                        using (var cmdHD = new SqlCommand(
-                            @"INSERT INTO HOA_DON (MaHD, MaKH, MaNV, NgayLap, PhuongThucThanhToan, ChuKyTraGop, TinhTrang, TongTien)
-                              VALUES (@MaHD, @MaKH, @MaNV, @NgayLap, N'Tiền mặt', 0, N'Đã thanh toán', @TongTien)", conn, trans))
-                        {
-                            cmdHD.Parameters.AddWithValue("@MaHD", maHD);
-                            cmdHD.Parameters.AddWithValue("@MaKH", maKH);
-                            cmdHD.Parameters.AddWithValue("@MaNV", maNV);
-                            cmdHD.Parameters.AddWithValue("@NgayLap", dtpNgayBan.Value);
-                            cmdHD.Parameters.AddWithValue("@TongTien", tongTien);
-                            cmdHD.ExecuteNonQuery();
-                        }
-
-                        // 3. Thêm từng dòng vào CHI_TIET_HD, trừ tồn kho và gán serial
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState == DataRowState.Deleted) continue;
-                            string maLT   = r["MaLaptop"].ToString();
-                            decimal donGia = Convert.ToDecimal(r["DonGia"]);
-                            int sl        = Convert.ToInt32(r["SoLuong"]);
-                            decimal giam  = Convert.ToDecimal(r["GiamGia"]);
-                            decimal tt    = Convert.ToDecimal(r["ThanhTien"]);
-                            int tgBH      = r.Table.Columns.Contains("ThoiGianBaoHanh") && r["ThoiGianBaoHanh"] != DBNull.Value
-                                ? Convert.ToInt32(r["ThoiGianBaoHanh"]) : 12;
-
-                            // Lưu CHI_TIET_HD với thời gian bảo hành
-                            using (var cmdCT = new SqlCommand(
-                                @"INSERT INTO CHI_TIET_HD (MaHD, MaLaptop, SoLuong, DonGia, GiaVon, ThoiGianBaoHanh, GiamGia, ThanhTien)
-                                  VALUES (@MaHD, @MaLaptop, @SoLuong, @DonGia, @GiaVon, @ThoiGianBaoHanh, @GiamGia, @ThanhTien)", conn, trans))
-                            {
-                                cmdCT.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdCT.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdCT.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdCT.Parameters.AddWithValue("@DonGia", donGia);
-                                cmdCT.Parameters.AddWithValue("@GiaVon", donGia * 0.8m);
-                                cmdCT.Parameters.AddWithValue("@ThoiGianBaoHanh", tgBH);
-                                cmdCT.Parameters.AddWithValue("@GiamGia", giam);
-                                cmdCT.Parameters.AddWithValue("@ThanhTien", tt);
-                                cmdCT.ExecuteNonQuery();
-                            }
-
-                            // Trừ số lượng tồn kho của mặt hàng
-                            using (var cmdKho = new SqlCommand(
-                                "UPDATE LAPTOP SET SoLuongTon = SoLuongTon - @SoLuong WHERE MaLaptop = @MaLaptop", conn, trans))
-                            {
-                                cmdKho.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdKho.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdKho.ExecuteNonQuery();
-                            }
-
-                            // Gán serial cho các máy bán ra nếu có trong kho
-                            using (var cmdSerial = new SqlCommand(
-                                @";WITH xepHang AS (
-                                      SELECT SerialNo, ROW_NUMBER() OVER (ORDER BY SerialNo) AS rn
-                                      FROM LAPTOP_SERIAL
-                                      WHERE MaLaptop = @MaLaptop AND TrangThai = N'Trong kho'
-                                  )
-                                  UPDATE s
-                                  SET s.TrangThai = N'Đã bán', s.MaHD = @MaHD, s.NgayHetBH = DATEADD(MONTH, @TgBH, @Ngay)
-                                  FROM LAPTOP_SERIAL s
-                                  JOIN xepHang x ON s.SerialNo = x.SerialNo
-                                  WHERE x.rn <= @SoLuong", conn, trans))
-                            {
-                                cmdSerial.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdSerial.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdSerial.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdSerial.Parameters.AddWithValue("@TgBH", tgBH);
-                                cmdSerial.Parameters.AddWithValue("@Ngay", dtpNgayBan.Value);
-                                cmdSerial.ExecuteNonQuery();
-                            }
-                        }
-
-                        trans.Commit();
-                        _isSaved = true;
-
-                        // Cập nhật lại tổng tiền trên form
-                        CapNhatTongTien();
-
-                        // Nạp lại danh sách mã hóa đơn và tồn kho
-                        LoadDanhSachMaHDTim();
-                        LoadDanhSachMatHang();
-                        LoadDanhSachKhachHang();
-
-                        MessageBox.Show($"Lưu hóa đơn [{maHD}] thành công!\nTổng tiền: {Function.FormatTien(tongTien)}",
-                            "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        SetFormMode(FormMode.View);
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        throw ex;
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                DataProcesser.ShowSqlError(ex);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi lưu hóa đơn: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        // Dùng cùng màn hình xác nhận thanh toán cho mọi đường lưu hóa đơn.
+        private void LuuHoaDon() { MoFormThanhToan(); }
 
         // ─── Yêu cầu 9: Kích đúp dòng hàng để xóa / trả hàng ──────────────
+        // Xóa dòng nháp hoặc trả dòng đã bán thông qua service giao dịch.
         private void DgvGioHang_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= _dtGioHang.Rows.Count) return;
-
-            DataRow row = _dtGioHang.Rows[e.RowIndex];
-            string maHang = row["MaLaptop"].ToString();
-            string tenHang = row["TenLaptop"].ToString();
-            int sl = Convert.ToInt32(row["SoLuong"]);
-
-            var hoi = MessageBox.Show($"Bạn có chắc chắn muốn trả / xóa sản phẩm [{tenHang}] ({maHang}) khỏi hóa đơn không?",
-                "Xác nhận xóa mặt hàng", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (hoi != DialogResult.Yes) return;
-
-            // Nếu hóa đơn đã lưu trong CSDL -> hoàn tồn kho và cập nhật DB theo Yêu cầu 9 & 10
-            if (_isSaved && !string.IsNullOrEmpty(txtMaHD.Text))
+            var row = _dtGioHang.Rows[e.RowIndex];
+            if (Function.XacNhan("Trả/xóa sản phẩm " + row["TenLaptop"] + "?") != DialogResult.Yes) return;
+            try
             {
-                string maHD = txtMaHD.Text.Trim();
-                try
-                {
-                    using (var conn = DataProcesser.GetConnection())
-                    using (var trans = conn.BeginTransaction())
-                    {
-                        try
-                        {
-                            // 1. Cộng dồn lại số lượng hàng vào kho
-                            using (var cmdTon = new SqlCommand(
-                                "UPDATE LAPTOP SET SoLuongTon = SoLuongTon + @sl WHERE MaLaptop = @ma", conn, trans))
-                            {
-                                cmdTon.Parameters.AddWithValue("@sl", sl);
-                                cmdTon.Parameters.AddWithValue("@ma", maHang);
-                                cmdTon.ExecuteNonQuery();
-                            }
-
-                            // 2. Trả serials về kho
-                            using (var cmdSerial = new SqlCommand(
-                                @"UPDATE LAPTOP_SERIAL
-                                  SET TrangThai = N'Trong kho', MaHD = NULL, NgayHetBH = NULL
-                                  WHERE MaHD = @MaHD AND MaLaptop = @ma", conn, trans))
-                            {
-                                cmdSerial.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdSerial.Parameters.AddWithValue("@ma", maHang);
-                                cmdSerial.ExecuteNonQuery();
-                            }
-
-                            // 3. Xóa chi tiết hóa đơn
-                            using (var cmdCT = new SqlCommand(
-                                "DELETE FROM CHI_TIET_HD WHERE MaHD = @MaHD AND MaLaptop = @ma", conn, trans))
-                            {
-                                cmdCT.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdCT.Parameters.AddWithValue("@ma", maHang);
-                                cmdCT.ExecuteNonQuery();
-                            }
-
-                            // 4. Cập nhật lại tổng tiền trong HOA_DON
-                            decimal ttXoa = Convert.ToDecimal(row["ThanhTien"]);
-                            using (var cmdUpHD = new SqlCommand(
-                                "UPDATE HOA_DON SET TongTien = TongTien - @tt WHERE MaHD = @MaHD", conn, trans))
-                            {
-                                cmdUpHD.Parameters.AddWithValue("@tt", ttXoa);
-                                cmdUpHD.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdUpHD.ExecuteNonQuery();
-                            }
-
-                            trans.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            trans.Rollback();
-                            throw ex;
-                        }
-                    }
-
-                    LoadDanhSachMatHang();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi trả sản phẩm: " + ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                if (_isSaved)
+                    new Services.SaleService().RemoveLine(txtMaHD.Text.Trim(), Convert.ToString(row["MaLaptop"]));
+                _dtGioHang.Rows.RemoveAt(e.RowIndex);
+                CapNhatTongTien();
+                LoadDanhSachMatHang();
             }
-
-            _dtGioHang.Rows.RemoveAt(e.RowIndex);
-            CapNhatTongTien();
-
-            MessageBox.Show($"Đã trả/xóa sản phẩm [{tenHang}] thành công!",
-                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
 
         // ─── Cập nhật hóa đơn khi nhấn Lưu ở chế độ Sửa ────────────────────
+        // Gửi dữ liệu chỉnh sửa cho service thay vì lặp lại SQL trong form.
         private void CapNhatHoaDon()
         {
-            // Nếu trên ô chọn mặt hàng đang có dữ liệu hợp lệ mà chưa nhấn Enter để đưa vào lưới
-            if (cboMaHang.SelectedItem != null && !string.IsNullOrEmpty(txtTenHang.Text.Trim()))
-            {
-                if (int.TryParse(txtSoLuong.Text.Trim(), out int slNhap) && slNhap > 0)
-                {
-                    ThemMatHangVaoLuoi();
-                }
-            }
-
-            if (_dtGioHang.Rows.Count == 0)
-            {
-                MessageBox.Show("Hóa đơn phải có ít nhất một mặt hàng. Vui lòng chọn mặt hàng và số lượng!",
-                    "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cboMaHang.Focus();
-                return;
-            }
-
-            string maHD = txtMaHD.Text.Trim();
-            if (string.IsNullOrEmpty(maHD))
-            {
-                MessageBox.Show("Mã hóa đơn không được để trống.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Kiểm tra chọn khách hàng
-            if (cboMaKH.SelectedItem == null || string.IsNullOrEmpty(cboMaKH.Text.Trim()))
-            {
-                MessageBox.Show("Vui lòng chọn mã khách hàng từ danh sách.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cboMaKH.Focus();
-                return;
-            }
-
-            string maKH = cboMaKH.Text.Trim();
-            string maNV = txtMaNV.Text.Trim();
-            if (string.IsNullOrEmpty(maNV)) maNV = Function.CurrentMaNV ?? "NV001";
-
+            if (cboMaHang.SelectedItem != null && int.TryParse(txtSoLuong.Text, out int quantity) && quantity > 0)
+                if (!ThemMatHangVaoLuoi()) return;
             try
             {
-                using (var conn = DataProcesser.GetConnection())
-                using (var trans = conn.BeginTransaction())
+                new Services.SaleService().Update(new Services.SaleRequest
                 {
-                    try
-                    {
-                        // 1. Trả lại serials cũ về kho
-                        using (var cmdSerialOld = new SqlCommand(
-                            @"UPDATE LAPTOP_SERIAL
-                              SET TrangThai = N'Trong kho', MaHD = NULL, NgayHetBH = NULL
-                              WHERE MaHD = @MaHD", conn, trans))
-                        {
-                            cmdSerialOld.Parameters.AddWithValue("@MaHD", maHD);
-                            cmdSerialOld.ExecuteNonQuery();
-                        }
-
-                        // 2. Hoàn lại số lượng tồn kho của các mặt hàng cũ trong hóa đơn
-                        using (var cmdTonOld = new SqlCommand(
-                            @"UPDATE l
-                              SET l.SoLuongTon = l.SoLuongTon + ct.SoLuong
-                              FROM LAPTOP l
-                              JOIN CHI_TIET_HD ct ON l.MaLaptop = ct.MaLaptop
-                              WHERE ct.MaHD = @MaHD", conn, trans))
-                        {
-                            cmdTonOld.Parameters.AddWithValue("@MaHD", maHD);
-                            cmdTonOld.ExecuteNonQuery();
-                        }
-
-                        // 3. Kiểm tra số lượng tồn kho từng mặt hàng mới trước khi cập nhật
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState == DataRowState.Deleted) continue;
-                            string maLT = r["MaLaptop"].ToString();
-                            string tenLT = r["TenLaptop"].ToString();
-                            int slMua = Convert.ToInt32(r["SoLuong"]);
-
-                            using (var cmdTonKtra = new SqlCommand(
-                                "SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop = @Ma", conn, trans))
-                            {
-                                cmdTonKtra.Parameters.AddWithValue("@Ma", maLT);
-                                object tonObj = cmdTonKtra.ExecuteScalar();
-                                int tonKho = tonObj != null && tonObj != DBNull.Value ? Convert.ToInt32(tonObj) : 0;
-
-                                if (slMua > tonKho)
-                                {
-                                    trans.Rollback();
-                                    MessageBox.Show($"Mặt hàng [{tenLT}] ({maLT}) trong kho chỉ còn {tonKho} máy, không đủ số lượng bán ({slMua})!\nVui lòng điều chỉnh lại số lượng.",
-                                        "Không đủ hàng", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                    return;
-                                }
-                            }
-                        }
-
-                        // 4. Xóa chi tiết hóa đơn cũ
-                        using (var cmdDelCT = new SqlCommand("DELETE FROM CHI_TIET_HD WHERE MaHD = @MaHD", conn, trans))
-                        {
-                            cmdDelCT.Parameters.AddWithValue("@MaHD", maHD);
-                            cmdDelCT.ExecuteNonQuery();
-                        }
-
-                        // 5. Tính tổng tiền mới và cập nhật HOA_DON
-                        decimal tongTien = 0;
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState != DataRowState.Deleted)
-                                tongTien += Convert.ToDecimal(r["ThanhTien"]);
-                        }
-
-                        using (var cmdUpHD = new SqlCommand(
-                            @"UPDATE HOA_DON
-                              SET MaKH = @MaKH,
-                                  MaNV = @MaNV,
-                                  NgayLap = @NgayLap,
-                                  TongTien = @TongTien
-                              WHERE MaHD = @MaHD", conn, trans))
-                        {
-                            cmdUpHD.Parameters.AddWithValue("@MaHD", maHD);
-                            cmdUpHD.Parameters.AddWithValue("@MaKH", maKH);
-                            cmdUpHD.Parameters.AddWithValue("@MaNV", maNV);
-                            cmdUpHD.Parameters.AddWithValue("@NgayLap", dtpNgayBan.Value);
-                            cmdUpHD.Parameters.AddWithValue("@TongTien", tongTien);
-                            cmdUpHD.ExecuteNonQuery();
-                        }
-
-                        // 6. Thêm các dòng CHI_TIET_HD mới, trừ tồn kho và gán serial
-                        foreach (DataRow r in _dtGioHang.Rows)
-                        {
-                            if (r.RowState == DataRowState.Deleted) continue;
-                            string maLT   = r["MaLaptop"].ToString();
-                            decimal donGia = Convert.ToDecimal(r["DonGia"]);
-                            int sl        = Convert.ToInt32(r["SoLuong"]);
-                            decimal giam  = Convert.ToDecimal(r["GiamGia"]);
-                            decimal tt    = Convert.ToDecimal(r["ThanhTien"]);
-                            int tgBH      = r.Table.Columns.Contains("ThoiGianBaoHanh") && r["ThoiGianBaoHanh"] != DBNull.Value
-                                ? Convert.ToInt32(r["ThoiGianBaoHanh"]) : 12;
-
-                            using (var cmdCT = new SqlCommand(
-                                @"INSERT INTO CHI_TIET_HD (MaHD, MaLaptop, SoLuong, DonGia, GiaVon, ThoiGianBaoHanh, GiamGia, ThanhTien)
-                                  VALUES (@MaHD, @MaLaptop, @SoLuong, @DonGia, @GiaVon, @ThoiGianBaoHanh, @GiamGia, @ThanhTien)", conn, trans))
-                            {
-                                cmdCT.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdCT.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdCT.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdCT.Parameters.AddWithValue("@DonGia", donGia);
-                                cmdCT.Parameters.AddWithValue("@GiaVon", donGia * 0.8m);
-                                cmdCT.Parameters.AddWithValue("@ThoiGianBaoHanh", tgBH);
-                                cmdCT.Parameters.AddWithValue("@GiamGia", giam);
-                                cmdCT.Parameters.AddWithValue("@ThanhTien", tt);
-                                cmdCT.ExecuteNonQuery();
-                            }
-
-                            using (var cmdKho = new SqlCommand(
-                                "UPDATE LAPTOP SET SoLuongTon = SoLuongTon - @SoLuong WHERE MaLaptop = @MaLaptop", conn, trans))
-                            {
-                                cmdKho.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdKho.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdKho.ExecuteNonQuery();
-                            }
-
-                            using (var cmdSerial = new SqlCommand(
-                                @";WITH xepHang AS (
-                                      SELECT SerialNo, ROW_NUMBER() OVER (ORDER BY SerialNo) AS rn
-                                      FROM LAPTOP_SERIAL
-                                      WHERE MaLaptop = @MaLaptop AND TrangThai = N'Trong kho'
-                                  )
-                                  UPDATE s
-                                  SET s.TrangThai = N'Đã bán', s.MaHD = @MaHD, s.NgayHetBH = DATEADD(MONTH, @TgBH, @Ngay)
-                                  FROM LAPTOP_SERIAL s
-                                  JOIN xepHang x ON s.SerialNo = x.SerialNo
-                                  WHERE x.rn <= @SoLuong", conn, trans))
-                            {
-                                cmdSerial.Parameters.AddWithValue("@MaLaptop", maLT);
-                                cmdSerial.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdSerial.Parameters.AddWithValue("@SoLuong", sl);
-                                cmdSerial.Parameters.AddWithValue("@TgBH", tgBH);
-                                cmdSerial.Parameters.AddWithValue("@Ngay", dtpNgayBan.Value);
-                                cmdSerial.ExecuteNonQuery();
-                            }
-                        }
-
-                        trans.Commit();
-                        _isSaved = true;
-
-                        CapNhatTongTien();
-                        LoadDanhSachMaHDTim();
-                        LoadDanhSachMatHang();
-                        LoadDanhSachKhachHang();
-
-                        MessageBox.Show($"Cập nhật hóa đơn [{maHD}] thành công!\nTổng tiền mới: {Function.FormatTien(tongTien)}",
-                            "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        SetFormMode(FormMode.View);
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        throw ex;
-                    }
-                }
+                    InvoiceId = txtMaHD.Text.Trim(), CustomerId = cboMaKH.Text.Trim(),
+                    EmployeeId = UserSession.MaNV, Date = dtpNgayBan.Value, Items = _dtGioHang
+                });
+                RefreshSale();
+                Function.ThongBaoThanhCong("Đã cập nhật hóa đơn.");
             }
-            catch (SqlException ex)
-            {
-                DataProcesser.ShowSqlError(ex);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi cập nhật hóa đơn: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
+        }
+
+        // Đồng bộ danh sách và trạng thái sau khi lưu hóa đơn.
+        private void RefreshSale()
+        {
+            _isSaved = true;
+            CapNhatTongTien();
+            LoadDanhSachMaHDTim();
+            LoadDanhSachMatHang();
+            LoadDanhSachKhachHang();
+            SetFormMode(FormMode.View);
         }
 
         // ─── Xóa hóa đơn khỏi CSDL và hoàn tồn kho ─────────────────────────
+        // Xác nhận trước khi gọi service xóa hóa đơn và hoàn serial.
         private void XoaHoaDon()
         {
-            string maHD = txtMaHD.Text.Trim();
-            if (string.IsNullOrEmpty(maHD))
+            if (!_isSaved) { ClearForm(); SetFormMode(FormMode.View); return; }
+            if (Function.XacNhan("Xóa hóa đơn " + txtMaHD.Text + " và hoàn lại hàng vào kho?") != DialogResult.Yes) return;
+            try
             {
-                MessageBox.Show("Chưa có hóa đơn nào được chọn.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                new Services.SaleService().Delete(txtMaHD.Text.Trim());
+                ClearForm();
+                _isSaved = false;
+                LoadDanhSachMatHang();
+                LoadDanhSachMaHDTim();
+                SetFormMode(FormMode.View);
             }
-
-            object exist = DataProcesser.ExecuteScalar(
-                "SELECT COUNT(*) FROM HOA_DON WHERE MaHD = @MaHD",
-                new[] { new SqlParameter("@MaHD", maHD) });
-            bool daCoTrongDB = (exist != null && Convert.ToInt32(exist) > 0);
-
-            if (daCoTrongDB)
-            {
-                var dialog = MessageBox.Show(
-                    $"Bạn có chắc chắn muốn XÓA hóa đơn [{maHD}] không?\nChương trình sẽ xóa hóa đơn này khỏi CSDL và CỘNG DỒN lại toàn bộ số lượng vào kho.",
-                    "Xác nhận xóa hóa đơn", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialog != DialogResult.Yes) return;
-
-                try
-                {
-                    using (var conn = DataProcesser.GetConnection())
-                    using (var trans = conn.BeginTransaction())
-                    {
-                        try
-                        {
-                            // 1. Cộng dồn lại số lượng tồn kho từ chi tiết hóa đơn
-                            using (var cmdTon = new SqlCommand(
-                                @"UPDATE l
-                                  SET l.SoLuongTon = l.SoLuongTon + ct.SoLuong
-                                  FROM LAPTOP l
-                                  JOIN CHI_TIET_HD ct ON l.MaLaptop = ct.MaLaptop
-                                  WHERE ct.MaHD = @MaHD", conn, trans))
-                            {
-                                cmdTon.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdTon.ExecuteNonQuery();
-                            }
-
-                            // 2. Trả serial về kho
-                            using (var cmdSerial = new SqlCommand(
-                                @"UPDATE LAPTOP_SERIAL
-                                  SET TrangThai = N'Trong kho', MaHD = NULL, NgayHetBH = NULL
-                                  WHERE MaHD = @MaHD", conn, trans))
-                            {
-                                cmdSerial.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdSerial.ExecuteNonQuery();
-                            }
-
-                            // 3. Xóa lịch trả góp nếu có
-                            using (var cmdLich = new SqlCommand("DELETE FROM LICH_TRA_GOP WHERE MaHD = @MaHD", conn, trans))
-                            {
-                                cmdLich.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdLich.ExecuteNonQuery();
-                            }
-
-                            // 4. Xóa chi tiết hóa đơn
-                            using (var cmdCT = new SqlCommand("DELETE FROM CHI_TIET_HD WHERE MaHD = @MaHD", conn, trans))
-                            {
-                                cmdCT.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdCT.ExecuteNonQuery();
-                            }
-
-                            // 5. Xóa hóa đơn
-                            using (var cmdHD = new SqlCommand("DELETE FROM HOA_DON WHERE MaHD = @MaHD", conn, trans))
-                            {
-                                cmdHD.Parameters.AddWithValue("@MaHD", maHD);
-                                cmdHD.ExecuteNonQuery();
-                            }
-
-                            trans.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            trans.Rollback();
-                            throw ex;
-                        }
-                    }
-
-                    LoadDanhSachMatHang();
-                    LoadDanhSachMaHDTim();
-                    MessageBox.Show($"Đã xóa hóa đơn [{maHD}] và hoàn trả tồn kho thành công!",
-                        "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi xóa hóa đơn: " + ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            // Reset form về trạng thái Xem ban đầu
-            ClearForm();
-            _isSaved = false;
-            SetFormMode(FormMode.View);
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
 
         // ─── Yêu cầu 3: Tìm kiếm hóa đơn -> hiển thị thông tin chung & chi tiết
@@ -1584,8 +1037,7 @@ namespace QuanLyBanLaptop.HoaDon
             string maHD = cboMaHDTim.Text.Trim();
             if (string.IsNullOrEmpty(maHD))
             {
-                MessageBox.Show("Vui lòng nhập hoặc chọn mã hóa đơn cần tìm.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Vui lòng nhập hoặc chọn mã hóa đơn cần tìm.", "Thông báo");
                 cboMaHDTim.Focus();
                 return;
             }
@@ -1609,8 +1061,7 @@ namespace QuanLyBanLaptop.HoaDon
 
                 if (dtHD == null || dtHD.Rows.Count == 0)
                 {
-                    MessageBox.Show($"Không tìm thấy hóa đơn có mã [{maHD}] trong CSDL.", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Function.ThongBaoThanhCong($"Không tìm thấy hóa đơn có mã [{maHD}] trong CSDL.", "Thông báo");
                     return false;
                 }
 
@@ -1684,8 +1135,7 @@ namespace QuanLyBanLaptop.HoaDon
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tìm kiếm hóa đơn: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi("Lỗi khi tìm kiếm hóa đơn: " + ex.Message, "Lỗi");
                 return false;
             }
         }
@@ -1695,8 +1145,7 @@ namespace QuanLyBanLaptop.HoaDon
         {
             if (_dtGioHang.Rows.Count == 0)
             {
-                MessageBox.Show("Không có dữ liệu mặt hàng để in hóa đơn!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Function.ThongBaoCanhBao("Không có dữ liệu mặt hàng để in hóa đơn!", "Thông báo");
                 return;
             }
 
@@ -1917,13 +1366,13 @@ namespace QuanLyBanLaptop.HoaDon
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Lỗi lưu file Excel: " + ex.Message, "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Function.ThongBaoLoi("Lỗi lưu file Excel: " + ex.Message, "Lỗi");
                     }
                 }
             }
         }
 
+        // Xử lý sự kiện lblBaoHanh_Click của giao diện.
         private void lblBaoHanh_Click(object sender, EventArgs e)
         {
 

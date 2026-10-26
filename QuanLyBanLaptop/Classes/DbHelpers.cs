@@ -1,85 +1,100 @@
-using System;
-using System.Configuration;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace QuanLyBanLaptop.Classes
 {
-    /// <summary>
-    /// Lớp hỗ trợ giao tiếp cơ sở dữ liệu (tương thích 100% với DbHelpers của LibraryManagerWF)
-    /// </summary>
+    // Một phiên DB sở hữu kết nối và transaction, tự rollback khi chưa commit.
     public class DbHelpers : IDisposable
     {
-        SqlConnection conn;
-        SqlTransaction tran;
+        private readonly SqlConnection connection;
+        private SqlTransaction transaction;
 
-        public DbHelpers()
+        // Mở đúng kết nối được cấu hình cho ứng dụng.
+        public DbHelpers() { connection = DataProcesser.GetOpenConnection(); }
+
+        // Tạo lệnh dùng chung cho truy vấn, cập nhật và stored procedure.
+        internal static SqlCommand CreateCommand(SqlConnection connection, SqlTransaction transaction,
+            string sql, SqlParameter[] parameters, CommandType type = CommandType.Text)
         {
-            string strConnect = ConfigurationManager.ConnectionStrings["QuanLyBanLaptop"]?.ConnectionString
-                ?? ConfigurationManager.ConnectionStrings["LibraryDB"]?.ConnectionString
-                ?? @"Server=.\SQLEXPRESS;Database=QuanLyBanLaptop_V2;Integrated Security=True;";
-            conn = new SqlConnection(strConnect);
-            conn.Open();
+            var command = new SqlCommand(sql, connection, transaction) { CommandType = type };
+            if (parameters != null) command.Parameters.AddRange(parameters);
+            return command;
         }
 
-        SqlCommand TaoLenh(string sql, object[] giaTri)
+        // Chuyển tham số vị trí thành @0, @1, ... và xử lý giá trị null.
+        internal static SqlParameter[] Parameters(object[] values)
         {
-            SqlCommand cmd = new SqlCommand(sql, conn, tran);
-            if (giaTri != null)
+            if (values == null) return new SqlParameter[0];
+            var result = new SqlParameter[values.Length];
+            for (int i = 0; i < values.Length; i++)
+                result[i] = new SqlParameter("@" + i, values[i] ?? DBNull.Value);
+            return result;
+        }
+
+        // Đọc bảng trong cùng phiên và transaction.
+        public DataTable DocBang(string sql, params object[] values)
+        {
+            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
+            using (var adapter = new SqlDataAdapter(command))
             {
-                for (int i = 0; i < giaTri.Length; i++)
-                    cmd.Parameters.AddWithValue("@" + i, giaTri[i] ?? DBNull.Value);
+                var table = new DataTable();
+                adapter.Fill(table);
+                return table;
             }
-            return cmd;
         }
 
-        public DataTable DocBang(string sql, params object[] giaTri)
+        // Ghi dữ liệu trong transaction hiện tại.
+        public int CapNhat(string sql, params object[] values)
         {
-            DataTable dt = new DataTable();
-            new SqlDataAdapter(TaoLenh(sql, giaTri)).Fill(dt);
-            return dt;
+            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
+                return command.ExecuteNonQuery();
         }
 
-        public int CapNhat(string sql, params object[] giaTri)
+        // Giữ tương thích API cũ nhưng không mở kết nối ngoài transaction.
+        public int CapNhatDuLieu(string sql) { return CapNhat(sql); }
+
+        // Đọc một giá trị và chuyển SQL NULL thành null.
+        public object LayMotGiaTri(string sql, params object[] values)
         {
-            return TaoLenh(sql, giaTri).ExecuteNonQuery();
+            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
+            {
+                var result = command.ExecuteScalar();
+                return result == DBNull.Value ? null : result;
+            }
         }
 
-        public object LayMotGiaTri(string sql, params object[] giaTri)
+        // Lấy khóa identity trong cùng phạm vi câu INSERT.
+        public int ThemLayMa(string sql, params object[] values)
         {
-            object v = TaoLenh(sql, giaTri).ExecuteScalar();
-            return v == DBNull.Value ? null : v;
+            return Convert.ToInt32(LayMotGiaTri(sql + "; SELECT CAST(SCOPE_IDENTITY() AS INT)", values));
         }
 
-        public int ThemLayMa(string sql, params object[] giaTri)
-        {
-            return Convert.ToInt32(LayMotGiaTri(sql + "; SELECT CAST(SCOPE_IDENTITY() AS INT)", giaTri));
-        }
-
+        // Ngăn mở transaction lồng ngoài ý muốn.
         public void BatDauGiaoDich()
         {
-            tran = conn.BeginTransaction();
+            if (transaction != null) throw new InvalidOperationException("Giao dịch đã bắt đầu.");
+            transaction = connection.BeginTransaction();
         }
 
+        // Commit và giải phóng transaction đã hoàn tất.
         public void XacNhan()
         {
-            tran.Commit();
-            tran = null;
+            if (transaction == null) throw new InvalidOperationException("Chưa bắt đầu giao dịch.");
+            transaction.Commit();
+            transaction.Dispose();
+            transaction = null;
         }
 
+        // Đóng kết nối kể cả khi rollback gặp lỗi.
         public void Dispose()
         {
-            if (tran != null)
+            try { if (transaction != null) transaction.Rollback(); }
+            finally
             {
-                tran.Rollback();
-                tran = null;
-            }
-            if (conn != null)
-            {
-                if (conn.State != ConnectionState.Closed)
-                    conn.Close();
-                conn.Dispose();
-                conn = null;
+                if (transaction != null) transaction.Dispose();
+                transaction = null;
+                connection.Dispose();
             }
         }
     }

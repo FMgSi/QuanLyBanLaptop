@@ -21,6 +21,7 @@ namespace QuanLyBanLaptop.Classes
 
         public static bool IsHosted => _hostForm != null && !_hostForm.IsDisposed && _containerPanel != null && !_containerPanel.IsDisposed;
 
+        // Thực hiện InitHost theo trạng thái và dữ liệu hiện tại.
         public static void InitHost(Form hostForm, Panel containerPanel, SidebarControl sidebar, Label lblTitle = null, Label lblUser = null)
         {
             _hostForm = hostForm;
@@ -32,6 +33,7 @@ namespace QuanLyBanLaptop.Classes
             UpdateUserInfo();
         }
 
+        // Thực hiện UpdateUserInfo theo trạng thái và dữ liệu hiện tại.
         public static void UpdateUserInfo()
         {
             if (_lblUser != null && !_lblUser.IsDisposed)
@@ -43,6 +45,7 @@ namespace QuanLyBanLaptop.Classes
             }
         }
 
+        // Thực hiện GetForm theo trạng thái và dữ liệu hiện tại.
         public static Form GetForm(NavigationMenu menu)
         {
             if (_forms.TryGetValue(menu, out Form existing) && existing != null && !existing.IsDisposed)
@@ -73,6 +76,9 @@ namespace QuanLyBanLaptop.Classes
                     break;
                 case NavigationMenu.TheoDoiTraGop:
                     newForm = new frmQuanLyTraGop();
+                    break;
+                case NavigationMenu.BaoHanhSuaChua:
+                    newForm = new frmBaoHanhSuaChua();
                     break;
                 case NavigationMenu.ThongKe:
                     newForm = new frmThongKe();
@@ -106,6 +112,7 @@ namespace QuanLyBanLaptop.Classes
             return newForm;
         }
 
+        // Thực hiện RegisterForm theo trạng thái và dữ liệu hiện tại.
         public static void RegisterForm(NavigationMenu menu, Form form)
         {
             if (form != null && !form.IsDisposed)
@@ -132,11 +139,13 @@ namespace QuanLyBanLaptop.Classes
             }
         }
 
+        // Thực hiện Navigate theo trạng thái và dữ liệu hiện tại.
         public static void Navigate(NavigationMenu targetMenu)
         {
             Navigate(null, targetMenu);
         }
 
+        // Thực hiện Navigate theo trạng thái và dữ liệu hiện tại.
         public static void Navigate(Form currentForm, NavigationMenu targetMenu)
         {
             if (IsHosted)
@@ -224,6 +233,7 @@ namespace QuanLyBanLaptop.Classes
             }
         }
 
+        // Thực hiện GetMenuTitle theo trạng thái và dữ liệu hiện tại.
         public static string GetMenuTitle(NavigationMenu menu)
         {
             switch (menu)
@@ -235,6 +245,7 @@ namespace QuanLyBanLaptop.Classes
                 case NavigationMenu.NhanVien: return "Quản Lý Nhân Viên";
                 case NavigationMenu.KhachHang: return "Quản Lý Khách Hàng";
                 case NavigationMenu.TheoDoiTraGop: return "Theo Dõi & Thu Tiền Trả Góp";
+                case NavigationMenu.BaoHanhSuaChua: return "Quản Lý Tiếp Nhận Bảo Hành & Sửa Chữa";
                 case NavigationMenu.ThongKe: return "Báo Cáo & Thống Kê Doanh Thu";
                 default: return "Hệ Thống Quản Lý Bán Laptop";
             }

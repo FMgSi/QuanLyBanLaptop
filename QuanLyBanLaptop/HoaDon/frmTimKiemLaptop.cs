@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
@@ -6,7 +6,7 @@ using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.HoaDon
 {
-    public partial class frmTimKiemLaptop : Form
+    public partial class frmTimKiemLaptop : QuanLyBanLaptop.Classes.AppForm
     {
         private const string PlaceholderText = "Nhập tên máy, hãng, chip xử lý...";
         private DataTable _dtSource;
@@ -18,17 +18,20 @@ namespace QuanLyBanLaptop.HoaDon
         public int SelectedBaoHanh { get; private set; }
         public int SelectedSoLuongTon { get; private set; }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmTimKiemLaptop()
         {
             InitializeComponent();
         }
 
+        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmTimKiemLaptop_Load(object sender, EventArgs e)
         {
             LoadData();
             txtTimKiem.Focus();
         }
 
+        // Tải dữ liệu phục vụ LoadData.
         private void LoadData()
         {
             try
@@ -79,11 +82,11 @@ ORDER BY l.TenLaptop";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải danh sách laptop: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Function.ThongBaoLoi("Lỗi tải danh sách laptop: " + ex.Message, "Lỗi");
             }
         }
 
+        // Thực hiện BindData theo trạng thái và dữ liệu hiện tại.
         private void BindData()
         {
             if (_dv == null) return;
@@ -111,6 +114,7 @@ ORDER BY l.TenLaptop";
             lblHienThi.Text = $"Hiển thị: {_dv.Count} sản phẩm";
         }
 
+        // Thực hiện FilterData theo trạng thái và dữ liệu hiện tại.
         private void FilterData()
         {
             if (_dtSource == null || _dv == null) return;
@@ -131,6 +135,7 @@ ORDER BY l.TenLaptop";
             BindData();
         }
 
+        // Thực hiện ChonSanPhamHienTai theo trạng thái và dữ liệu hiện tại.
         private void ChonSanPhamHienTai()
         {
             if (dgvLaptop.CurrentRow != null && dgvLaptop.CurrentRow.Index >= 0)
@@ -153,16 +158,17 @@ ORDER BY l.TenLaptop";
             }
             else
             {
-                MessageBox.Show("Vui lòng chọn một sản phẩm trong danh sách.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Function.ThongBaoThanhCong("Vui lòng chọn một sản phẩm trong danh sách.", "Thông báo");
             }
         }
 
+        // Xử lý sự kiện btnTimKiem_Click của giao diện.
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
             FilterData();
         }
 
+        // Xử lý sự kiện txtTimKiem_TextChanged của giao diện.
         private void txtTimKiem_TextChanged(object sender, EventArgs e)
         {
             if (txtTimKiem.Text != PlaceholderText)
@@ -171,6 +177,7 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.
         private void txtTimKiem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -192,6 +199,7 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện txtTimKiem_Enter của giao diện.
         private void txtTimKiem_Enter(object sender, EventArgs e)
         {
             if (txtTimKiem.Text == PlaceholderText)
@@ -201,6 +209,7 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện txtTimKiem_Leave của giao diện.
         private void txtTimKiem_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTimKiem.Text))
@@ -210,6 +219,7 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện dgvLaptop_CellDoubleClick của giao diện.
         private void dgvLaptop_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -218,6 +228,7 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện dgvLaptop_KeyDown của giao diện.
         private void dgvLaptop_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -227,11 +238,13 @@ ORDER BY l.TenLaptop";
             }
         }
 
+        // Xử lý sự kiện btnChon_Click của giao diện.
         private void btnChon_Click(object sender, EventArgs e)
         {
             ChonSanPhamHienTai();
         }
 
+        // Xử lý sự kiện btnDong_Click của giao diện.
         private void btnDong_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;

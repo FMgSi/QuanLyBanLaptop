@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.Classes
+﻿namespace QuanLyBanLaptop.Classes
 {
     public static class UserSession
     {
@@ -9,6 +9,7 @@ namespace QuanLyBanLaptop.Classes
 
         public static bool IsAdmin => ChucVu == "Quản trị viên";
 
+        // Thực hiện Logout theo trạng thái và dữ liệu hiện tại.
         public static void Logout()
         {
             MaNV = null;

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
+using QuanLyBanLaptop.Services;
+using QuanLyBanLaptop.Models;
 
 namespace QuanLyBanLaptop.DanhMuc
 {
@@ -15,8 +17,6 @@ namespace QuanLyBanLaptop.DanhMuc
         private enum FormMode { Normal, Adding, Selected, Editing }
         private FormMode _mode = FormMode.Normal;
         private string _selectedMaKH = null;
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmKhachHang()
         {
             InitializeComponent();
@@ -35,8 +35,6 @@ namespace QuanLyBanLaptop.DanhMuc
 
             SetFormMode(FormMode.Normal);
         }
-
-        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -56,11 +54,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             try
             {
-                DataTable dt = DataProcesser.ExecProc("sp_TimKiemKhachHang", new[]
-                {
-                    new SqlParameter("@TuKhoa", SqlDbType.NVarChar, 100)
-                    { Value = string.IsNullOrEmpty(tuKhoa) ? (object)DBNull.Value : tuKhoa }
-                });
+                DataTable dt = new CustomerService().Search(tuKhoa);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
@@ -82,14 +76,17 @@ namespace QuanLyBanLaptop.DanhMuc
         private void SetGridHeaders()
         {
             if (dgvKhachHang.Columns.Count == 0) return;
-            Function.DatTieuDeCot(dgvKhachHang, "MaKH",          "Mã khách hàng", 110);
-            Function.DatTieuDeCot(dgvKhachHang, "TenKH",         "Họ tên",         160);
+            Function.DatTieuDeCot(dgvKhachHang, "MaKH",          "Mã khách hàng", 115);
+            Function.DatTieuDeCot(dgvKhachHang, "TenKH",         "Họ tên",         180);
             Function.DatTieuDeCot(dgvKhachHang, "GioiTinh",      "Giới tính",       85);
-            Function.DatTieuDeCot(dgvKhachHang, "HangThanhVien", "Hạng thành viên", 120);
-            Function.DatTieuDeCot(dgvKhachHang, "NgaySinh",      "Ngày sinh",       100);
-            Function.DatTieuDeCot(dgvKhachHang, "Sdt",           "Số điện thoại",   115);
-            Function.DatTieuDeCot(dgvKhachHang, "DiaChi",        "Địa chỉ",         200);
-            Function.DatTieuDeCot(dgvKhachHang, "TrangThai",     "Trạng thái",      100);
+            Function.DatTieuDeCot(dgvKhachHang, "HangThanhVien", "Hạng thành viên", 130);
+            Function.DatTieuDeCot(dgvKhachHang, "NgaySinh",      "Ngày sinh",       110);
+            Function.DatTieuDeCot(dgvKhachHang, "Sdt",           "Số điện thoại",   120);
+            Function.DatTieuDeCot(dgvKhachHang, "DiaChi",        "Địa chỉ",         220);
+            Function.DatTieuDeCot(dgvKhachHang, "TrangThai",     "Trạng thái",      115);
+            dgvKhachHang.AllowUserToResizeColumns = true;
+            dgvKhachHang.ScrollBars = ScrollBars.Both;
+            dgvKhachHang.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
         }
 
         // Thiết lập chế độ thao tác form khách hàng theo chuẩn ButtonTheme
@@ -237,56 +234,25 @@ namespace QuanLyBanLaptop.DanhMuc
         // ─── Nút Lưu ─────────────────────────────────────────────────────
         private void btnLuu_Click(object sender, EventArgs e)
         {
+            if (_mode != FormMode.Adding && _mode != FormMode.Editing) return;
+            if (!ValidateInput()) return;
             try
             {
-                if (_mode == FormMode.Adding)
+                new CustomerService().Save(new Customer
                 {
-                    if (!ValidateInput()) return;
-
-                    // Thêm mới: Mã KH do nhân viên tự nhập hoặc sinh tự động
-                    string maKH = txtMaKH.Text.Trim().ToUpper();
-                    DataProcesser.ExecProcNonQuery("sp_ThemKhachHang", new[]
-                    {
-                        new SqlParameter("@MaKH",          maKH),
-                        new SqlParameter("@TenKH",         txtHoTen.Text.Trim()),
-                        new SqlParameter("@GioiTinh",       cboGioiTinh.SelectedItem.ToString()),
-                        new SqlParameter("@NgaySinh",       dtpNgaySinh.Value.Date),
-                        new SqlParameter("@Sdt",            txtSDT.Text.Trim()),
-                        new SqlParameter("@DiaChi",         txtDiaChi.Text.Trim()),
-                        new SqlParameter("@HangThanhVien",  cboHangThanhVien.SelectedItem.ToString()),
-                    });
-
-                    Function.ThongBaoThanhCong($"Thêm khách hàng \"{maKH}\" thành công!", "Thành công");
-                }
-                else if (_mode == FormMode.Editing)
-                {
-                    if (!ValidateInput()) return;
-
-                    // Cập nhật
-                    DataProcesser.ExecProcNonQuery("sp_CapNhatKhachHang", new[]
-                    {
-                        new SqlParameter("@MaKH",          _selectedMaKH),
-                        new SqlParameter("@TenKH",         txtHoTen.Text.Trim()),
-                        new SqlParameter("@GioiTinh",       cboGioiTinh.SelectedItem.ToString()),
-                        new SqlParameter("@NgaySinh",       dtpNgaySinh.Value.Date),
-                        new SqlParameter("@Sdt",            txtSDT.Text.Trim()),
-                        new SqlParameter("@DiaChi",         txtDiaChi.Text.Trim()),
-                        new SqlParameter("@HangThanhVien",  cboHangThanhVien.SelectedItem.ToString()),
-                    });
-                    Function.ThongBaoThanhCong("Cập nhật thông tin khách hàng thành công!", "Thành công");
-                }
-                else
-                {
-                    return;
-                }
-
+                    Id = _mode == FormMode.Adding ? txtMaKH.Text.Trim().ToUpper() : _selectedMaKH,
+                    Name = txtHoTen.Text.Trim(), Gender = Convert.ToString(cboGioiTinh.SelectedItem),
+                    BirthDate = dtpNgaySinh.Value.Date, Phone = txtSDT.Text.Trim(),
+                    Address = txtDiaChi.Text.Trim(), Membership = Convert.ToString(cboHangThanhVien.SelectedItem)
+                }, _mode == FormMode.Adding);
+                Function.ThongBaoThanhCong("Đã lưu khách hàng thành công.");
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
                 _selectedMaKH = null;
                 ClearForm();
                 dgvKhachHang.ClearSelection();
                 SetFormMode(FormMode.Normal);
             }
-            catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
 
         // ─── Nút Xóa ─────────────────────────────────────────────────────
@@ -306,10 +272,7 @@ namespace QuanLyBanLaptop.DanhMuc
 
             try
             {
-                DataProcesser.ExecProcNonQuery("sp_XoaKhachHang", new[]
-                {
-                    new SqlParameter("@MaKH", _selectedMaKH)
-                });
+                new CustomerService().Delete(_selectedMaKH);
                 Function.ThongBaoThanhCong("Xóa khách hàng thành công!", "Thành công");
                 LoadDanhSachKhachHang(txtTimKiem.Text.Trim());
                 _selectedMaKH = null;
@@ -363,8 +326,6 @@ namespace QuanLyBanLaptop.DanhMuc
         }
 
         // ─── Tách số thứ tự từ mã KH để tự động sắp xếp (001 -> 002 -> 003...) ───
-
-        // Thực hiện GetMaKHSortKey theo trạng thái và dữ liệu hiện tại.
         private static int GetMaKHSortKey(string maKH)
         {
             if (string.IsNullOrEmpty(maKH)) return int.MaxValue;

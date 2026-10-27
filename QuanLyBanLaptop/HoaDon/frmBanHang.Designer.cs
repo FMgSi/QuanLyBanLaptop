@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.HoaDon
+﻿namespace QuanLyBanLaptop.HoaDon
 {
     partial class frmBanHang
     {
@@ -358,7 +358,8 @@ namespace QuanLyBanLaptop.HoaDon
             this.dgvGioHang.AllowUserToAddRows = false;
             this.dgvGioHang.AllowUserToDeleteRows = false;
             this.dgvGioHang.AllowUserToResizeRows = false;
-            this.dgvGioHang.AllowUserToResizeColumns = false;
+            this.dgvGioHang.AllowUserToResizeColumns = true;
+            this.dgvGioHang.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvGioHang.AllowUserToOrderColumns = false;
             this.dgvGioHang.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 

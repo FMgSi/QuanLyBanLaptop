@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
 
@@ -6,7 +6,6 @@ namespace QuanLyBanLaptop
 {
     public partial class frmTrangChu : QuanLyBanLaptop.Classes.AppForm
     {
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmTrangChu()
         {
             InitializeComponent();
@@ -17,8 +16,6 @@ namespace QuanLyBanLaptop
             WireNavigationCards();
             CapNhatThongTinNguoiDung();
         }
-
-        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -28,17 +25,14 @@ namespace QuanLyBanLaptop
                 CapNhatThongTinNguoiDung();
             }
         }
-
-        // Thực hiện CapNhatThongTinNguoiDung theo trạng thái và dữ liệu hiện tại.
         private void CapNhatThongTinNguoiDung()
         {
             if (!string.IsNullOrEmpty(UserSession.TenNV))
             {
                 lblSubtitle.Text = $"Xin chào {UserSession.TenNV} ({UserSession.ChucVu})! Chọn chức năng từ danh mục để bắt đầu làm việc.";
             }
+            pnlCardNhanVien.Visible = UserSession.IsAdmin;
         }
-
-        // Thực hiện WireNavigationCards theo trạng thái và dữ liệu hiện tại.
         private void WireNavigationCards()
         {
             // Thẻ Quản lý Laptop

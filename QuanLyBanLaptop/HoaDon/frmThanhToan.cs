@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -49,8 +49,6 @@ namespace QuanLyBanLaptop.HoaDon
             (9,  6.0, "9 Tháng (Lãi suất 6.0%)"),
             (12, 8.0, "12 Tháng (Lãi suất 8.0%)")
         };
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmThanhToan(
             string maHD, string maKH, string tenKH, string hangKhach,
             string maNV, string tenNV, string diaChi, string sdt,
@@ -141,8 +139,6 @@ namespace QuanLyBanLaptop.HoaDon
                 }
             };
         }
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmThanhToan_Load(object sender, EventArgs e)
         {
             pnlTitleBar.BringToFront();
@@ -189,8 +185,6 @@ namespace QuanLyBanLaptop.HoaDon
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
-
-        // Xử lý sự kiện btnHuy_Click của giao diện.
         private void btnHuy_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
@@ -199,19 +193,16 @@ namespace QuanLyBanLaptop.HoaDon
 
         // Chuyển đổi Tab Trả Thẳng / Trả Góp
         private void btnTabThang_Click(object sender, EventArgs e) => ChonTab(1);
-        // Xử lý sự kiện btnTabGop_Click của giao diện.
         private void btnTabGop_Click(object sender, EventArgs e)   => ChonTab(2);
-
-        // Thực hiện ChonTab theo trạng thái và dữ liệu hiện tại.
         private void ChonTab(int tabIndex)
         {
             if (tabIndex == 1)
             {
                 // Tab 1 Active
                 ButtonTheme.Apply(btnTabThang);
-                
+
                 ButtonTheme.Apply(btnTabGop);
-                
+
 
                 pnlTabIndicator.Location = new Point(btnTabThang.Left, pnlTabBar.Height - 4);
                 pnlTabIndicator.Width    = btnTabThang.Width;
@@ -224,9 +215,9 @@ namespace QuanLyBanLaptop.HoaDon
             {
                 // Tab 2 Active
                 ButtonTheme.Apply(btnTabGop);
-                
+
                 ButtonTheme.Apply(btnTabThang);
-                
+
 
                 pnlTabIndicator.Location = new Point(btnTabGop.Left, pnlTabBar.Height - 4);
                 pnlTabIndicator.Width    = btnTabGop.Width;
@@ -243,8 +234,6 @@ namespace QuanLyBanLaptop.HoaDon
         // TAB 1: TÍNH TIỀN THỪA TRẢ KHÁCH
         // ═══════════════════════════════════════════════════════════════════
         private void txtKhachDua_TextChanged(object sender, EventArgs e) => TinhTienThua();
-
-        // Thực hiện TinhTienThua theo trạng thái và dữ liệu hiện tại.
         private void TinhTienThua()
         {
             string raw = txtKhachDua.Text.Trim().Replace(",", "").Replace(".", "");
@@ -272,8 +261,6 @@ namespace QuanLyBanLaptop.HoaDon
         // TAB 2: TÍNH LỊCH TRẢ GÓP & LÃI SUẤT
         // ═══════════════════════════════════════════════════════════════════
         private void cboChuKy_SelectedIndexChanged(object sender, EventArgs e) => TinhLichTraGop();
-
-        // Thực hiện TinhLichTraGop theo trạng thái và dữ liệu hiện tại.
         private void TinhLichTraGop()
         {
             if (cboChuKy.SelectedIndex < 0 || cboChuKy.SelectedIndex >= _goiTraGop.Length) return;
@@ -326,8 +313,6 @@ namespace QuanLyBanLaptop.HoaDon
                 XacNhanTraGop();
             }
         }
-
-        // Thực hiện XacNhanTraThang theo trạng thái và dữ liệu hiện tại.
         private void XacNhanTraThang()
         {
             string phuongThucUI = cboPhuongThuc.SelectedItem?.ToString() ?? "Chuyển khoản ngân hàng";
@@ -364,8 +349,6 @@ namespace QuanLyBanLaptop.HoaDon
                 this.Close();
             }
         }
-
-        // Thực hiện XacNhanTraGop theo trạng thái và dữ liệu hiện tại.
         private void XacNhanTraGop()
         {
             if (cboChuKy.SelectedIndex < 0)
@@ -395,8 +378,6 @@ namespace QuanLyBanLaptop.HoaDon
                 this.Close();
             }
         }
-
-        // Thực hiện InHoaDonPreview theo trạng thái và dữ liệu hiện tại.
         private void InHoaDonPreview(bool isTraGop, int chuKy, double laiSuat,
             decimal downpayment, decimal loan, decimal interest, decimal monthly,
             decimal khachDua, decimal tienThua)
@@ -511,8 +492,6 @@ namespace QuanLyBanLaptop.HoaDon
                 }
             }
         }
-
-        // Xử lý sự kiện lblHangKhach_Click của giao diện.
         private void lblHangKhach_Click(object sender, EventArgs e)
         {
 

@@ -7,7 +7,6 @@ namespace QuanLyBanLaptop.Classes
 {
     public static class IconHelper
     {
-        // Thực hiện CreateLaptopLogo theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateLaptopLogo(int size = 52)
         {
             var bmp = new Bitmap(size, size);
@@ -49,8 +48,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateHomeIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateHomeIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -88,8 +85,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateLaptopIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateLaptopIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -119,8 +114,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateCartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateCartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -153,8 +146,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateImportCartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateImportCartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -198,8 +189,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateUserIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateUserIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -232,8 +221,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateChartIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateChartIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -263,8 +250,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateCustomerIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateCustomerIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.White;
@@ -315,8 +300,6 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
-
-        // Thực hiện CreateInstallmentIcon theo trạng thái và dữ liệu hiện tại.
         public static Bitmap CreateInstallmentIcon(int size = 20, Color? color = null)
         {
             Color c = color ?? Color.FromArgb(245, 158, 11); // Gold / Amber
@@ -375,8 +358,42 @@ namespace QuanLyBanLaptop.Classes
             }
             return bmp;
         }
+        public static Bitmap CreateSettingsIcon(int size = 20, Color? color = null)
+        {
+            Color c = color ?? Color.White;
+            var bmp = new Bitmap(size, size);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(Color.Transparent);
 
-        // Thực hiện EnsureIconsSaved theo trạng thái và dữ liệu hiện tại.
+                using (var pen = new Pen(c, 1.8f))
+                {
+                    float cx = size / 2f;
+                    float cy = size / 2f;
+                    float rOuter = size * 0.40f;
+                    float rInner = size * 0.22f;
+                    float rCenter = size * 0.11f;
+
+                    for (int i = 0; i < 6; i++)
+                    {
+                        double angle = i * Math.PI / 3.0;
+                        float x1 = cx + (float)(Math.Cos(angle) * rOuter);
+                        float y1 = cy + (float)(Math.Sin(angle) * rOuter);
+                        float x2 = cx + (float)(Math.Cos(angle) * (rOuter - 3));
+                        float y2 = cy + (float)(Math.Sin(angle) * (rOuter - 3));
+                        using (var gearPen = new Pen(c, 2.6f))
+                        {
+                            g.DrawLine(gearPen, x2, y2, x1, y1);
+                        }
+                    }
+
+                    g.DrawEllipse(pen, cx - rInner, cy - rInner, rInner * 2, rInner * 2);
+                    g.DrawEllipse(pen, cx - rCenter, cy - rCenter, rCenter * 2, rCenter * 2);
+                }
+            }
+            return bmp;
+        }
         public static void EnsureIconsSaved(string baseDirectory)
         {
             try

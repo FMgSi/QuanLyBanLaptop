@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace QuanLyBanLaptop.Classes
 {
     // Một phiên DB sở hữu kết nối và transaction, tự rollback khi chưa commit.
-    public class DbHelpers : IDisposable
+    public class DbHelpers : IDatabaseSession
     {
         private readonly SqlConnection connection;
         private SqlTransaction transaction;
@@ -89,7 +89,9 @@ namespace QuanLyBanLaptop.Classes
         // Đóng kết nối kể cả khi rollback gặp lỗi.
         public void Dispose()
         {
-            try { if (transaction != null) transaction.Rollback(); }
+            // Procedure/trigger có thể đã rollback toàn bộ giao dịch khi THROW.
+            // Không rollback lần hai rồi che mất thông báo lỗi nghiệp vụ gốc.
+            try { if (transaction != null && transaction.Connection != null) transaction.Rollback(); }
             finally
             {
                 if (transaction != null) transaction.Dispose();

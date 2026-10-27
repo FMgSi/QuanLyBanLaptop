@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
@@ -8,7 +8,6 @@ namespace QuanLyBanLaptop.HoaDon
 {
     public partial class frmNhapHang : QuanLyBanLaptop.Classes.AppForm
     {
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmNhapHang()
         {
             InitializeComponent();
@@ -16,8 +15,6 @@ namespace QuanLyBanLaptop.HoaDon
             NavigationManager.RegisterForm(NavigationMenu.NhapHang, this);
             sidebarControl1.SelectedMenu = NavigationMenu.NhapHang;
         }
-
-        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -55,8 +52,6 @@ namespace QuanLyBanLaptop.HoaDon
                 DataProcesser.ShowSqlError(ex);
             }
         }
-
-        // Tải dữ liệu phục vụ LoadLaptopTheoNCC.
         private void LoadLaptopTheoNCC()
         {
             if (cboNhaCungCap.SelectedValue == null) return;

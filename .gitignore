@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 # Scratch tools
 .codex-work/
+
+# Test executables
+Tests/*.exe
+*.exe

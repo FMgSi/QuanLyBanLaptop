@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.DanhMuc
+﻿namespace QuanLyBanLaptop.DanhMuc
 {
     partial class frmCauHinhTraGop
     {
@@ -27,6 +27,7 @@ namespace QuanLyBanLaptop.DanhMuc
         private System.Windows.Forms.Button btnSua;
         private System.Windows.Forms.Button btnLuu;
         private System.Windows.Forms.Button btnHuy;
+        private QuanLyBanLaptop.SidebarControl sidebarControl1;
 
         protected override void Dispose(bool disposing)
         {
@@ -38,6 +39,7 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.sidebarControl1 = new QuanLyBanLaptop.SidebarControl();
             this.rootLayout = new System.Windows.Forms.TableLayoutPanel();
             this.headerPanel = new System.Windows.Forms.Panel();
             this.lblRole = new System.Windows.Forms.Label();
@@ -113,9 +115,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.lblRole.Dock = System.Windows.Forms.DockStyle.Right;
             this.lblRole.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.lblRole.ForeColor = System.Drawing.Color.White;
-            this.lblRole.Location = new System.Drawing.Point(886, 0);
+            this.lblRole.Location = new System.Drawing.Point(766, 0);
             this.lblRole.Name = "lblRole";
-            this.lblRole.Size = new System.Drawing.Size(160, 42);
+            this.lblRole.Size = new System.Drawing.Size(280, 42);
             this.lblRole.TabIndex = 0;
             this.lblRole.Text = "Quản trị viên";
             this.lblRole.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -280,7 +282,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvCauHinh.AllowUserToAddRows = false;
             this.dgvCauHinh.AllowUserToDeleteRows = false;
             this.dgvCauHinh.AllowUserToResizeRows = false;
-            this.dgvCauHinh.AllowUserToResizeColumns = false;
+            this.dgvCauHinh.AllowUserToResizeColumns = true;
+            this.dgvCauHinh.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvCauHinh.AllowUserToOrderColumns = false;
             this.dgvCauHinh.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvCauHinh.BackgroundColor = System.Drawing.Color.White;
@@ -312,14 +315,14 @@ namespace QuanLyBanLaptop.DanhMuc
             // 
             // MoTa
             // 
-            this.MoTa.FillWeight = 48F;
+            this.MoTa.FillWeight = 48F; this.MoTa.MinimumWidth = 220;
             this.MoTa.HeaderText = "Quy định / Mô tả";
             this.MoTa.Name = "MoTa";
             this.MoTa.ReadOnly = true;
             // 
             // Khoa
             // 
-            this.Khoa.FillWeight = 24F;
+            this.Khoa.FillWeight = 24F; this.Khoa.MinimumWidth = 150;
             this.Khoa.HeaderText = "Mã tham số (Khoa)";
             this.Khoa.Name = "Khoa";
             this.Khoa.ReadOnly = true;
@@ -328,14 +331,14 @@ namespace QuanLyBanLaptop.DanhMuc
             // 
             dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
             this.GiaTri.DefaultCellStyle = dataGridViewCellStyle20;
-            this.GiaTri.FillWeight = 13F;
+            this.GiaTri.FillWeight = 13F; this.GiaTri.MinimumWidth = 90;
             this.GiaTri.HeaderText = "Giá trị";
             this.GiaTri.Name = "GiaTri";
             this.GiaTri.ReadOnly = true;
             // 
             // DonVi
             // 
-            this.DonVi.FillWeight = 15F;
+            this.DonVi.FillWeight = 15F; this.DonVi.MinimumWidth = 80;
             this.DonVi.HeaderText = "Đơn vị";
             this.DonVi.Name = "DonVi";
             this.DonVi.ReadOnly = true;
@@ -459,13 +462,23 @@ namespace QuanLyBanLaptop.DanhMuc
             this.btnHuy.Text = "⊘  Hủy bỏ";
             this.btnHuy.UseVisualStyleBackColor = false;
             // 
+            // sidebarControl1
+            // 
+            this.sidebarControl1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.sidebarControl1.Location = new System.Drawing.Point(0, 0);
+            this.sidebarControl1.Name = "sidebarControl1";
+            this.sidebarControl1.SelectedMenu = QuanLyBanLaptop.Classes.NavigationMenu.CauHinh;
+            this.sidebarControl1.Size = new System.Drawing.Size(230, 740);
+            this.sidebarControl1.TabIndex = 1;
+            // 
             // frmCauHinhTraGop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(247)))), ((int)(((byte)(250)))));
-            this.ClientSize = new System.Drawing.Size(1100, 740);
+            this.ClientSize = new System.Drawing.Size(1280, 740);
             this.Controls.Add(this.rootLayout);
+            this.Controls.Add(this.sidebarControl1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.5F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;

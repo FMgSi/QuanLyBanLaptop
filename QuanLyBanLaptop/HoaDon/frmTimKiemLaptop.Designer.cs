@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.HoaDon
+﻿namespace QuanLyBanLaptop.HoaDon
 {
     partial class frmTimKiemLaptop
     {
@@ -120,6 +120,8 @@ namespace QuanLyBanLaptop.HoaDon
             this.dgvLaptop.AllowUserToAddRows = false;
             this.dgvLaptop.AllowUserToDeleteRows = false;
             this.dgvLaptop.AllowUserToResizeRows = false;
+            this.dgvLaptop.AllowUserToResizeColumns = true;
+            this.dgvLaptop.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvLaptop.BackgroundColor = System.Drawing.Color.White;
             this.dgvLaptop.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvLaptop.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -170,7 +172,7 @@ namespace QuanLyBanLaptop.HoaDon
             // 
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             this.colSTT.DefaultCellStyle = dataGridViewCellStyle3;
-            this.colSTT.HeaderText = "STT";
+            this.colSTT.HeaderText = "STT"; this.colSTT.MinimumWidth = 50;
             this.colSTT.Name = "colSTT";
             this.colSTT.ReadOnly = true;
             this.colSTT.Width = 55;

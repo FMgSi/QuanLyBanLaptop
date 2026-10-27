@@ -10,8 +10,6 @@ namespace QuanLyBanLaptop
     public partial class frmMain : QuanLyBanLaptop.Classes.AppForm
     {
         public static frmMain Instance { get; private set; }
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmMain()
         {
             Instance = this;
@@ -34,8 +32,6 @@ namespace QuanLyBanLaptop
 
             NavigationManager.InitHost(this, pnlNoiDung, sidebarControl1, lblTrang, lblNguoiDung);
         }
-
-        // Thực hiện SetDoubleBuffered theo trạng thái và dữ liệu hiện tại.
         private static void SetDoubleBuffered(Control control)
         {
             if (control == null) return;
@@ -54,44 +50,13 @@ namespace QuanLyBanLaptop
             btnDangXuat.Click += BtnDangXuat_Click;
             lblNguoiDung.Click += LblNguoiDung_Click;
         }
-
-        // Xử lý sự kiện FrmMain_Load của giao diện.
         private void FrmMain_Load(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Maximized;
-
-            // Tải thông tin người dùng phiên làm việc mặc định nếu chưa đăng nhập
-            if (string.IsNullOrEmpty(UserSession.MaNV))
-            {
-                try
-                {
-                    DataTable dt = Function.DocBang("SELECT TOP 1 MaNV, TenNV, ChucVu FROM NHAN_VIEN WHERE DaNghi = 0 ORDER BY MaNV");
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        UserSession.MaNV = dt.Rows[0]["MaNV"]?.ToString() ?? "NV001";
-                        UserSession.TenNV = dt.Rows[0]["TenNV"]?.ToString() ?? "Nguyễn Văn An";
-                        UserSession.ChucVu = dt.Rows[0]["ChucVu"]?.ToString() ?? "Quản lý";
-                    }
-                    else
-                    {
-                        UserSession.MaNV = "NV001";
-                        UserSession.TenNV = "Nguyễn Văn An";
-                        UserSession.ChucVu = "Quản lý";
-                    }
-                }
-                catch
-                {
-                    UserSession.MaNV = "NV001";
-                    UserSession.TenNV = "Nguyễn Văn An";
-                    UserSession.ChucVu = "Quản trị viên";
-                }
-            }
-
+            WindowState = FormWindowState.Maximized;
+            if (string.IsNullOrWhiteSpace(UserSession.MaNV)) { Close(); return; }
             NavigationManager.UpdateUserInfo();
             NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
-
-        // Xử lý sự kiện LblNguoiDung_Click của giao diện.
         private void LblNguoiDung_Click(object sender, EventArgs e)
         {
             // Mở hộp thoại đăng nhập để đổi tài khoản nếu muốn
@@ -100,26 +65,24 @@ namespace QuanLyBanLaptop
                 if (login.ShowDialog(this) == DialogResult.OK)
                 {
                     NavigationManager.UpdateUserInfo();
+                    NavigationManager.Navigate(NavigationMenu.TrangChu);
                 }
             }
         }
-
-        // Xử lý sự kiện BtnDangXuat_Click của giao diện.
         private void BtnDangXuat_Click(object sender, EventArgs e)
         {
             var dr = MessageBox.Show("Bạn có muốn đăng xuất tài khoản hiện tại không?",
                 "Xác nhận đăng xuất", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dr == DialogResult.Yes)
             {
-                UserSession.MaNV = "";
-                UserSession.TenNV = "";
-                UserSession.ChucVu = "";
+                UserSession.Logout();
 
                 using (var login = new frmDangNhap())
                 {
                     if (login.ShowDialog(this) == DialogResult.OK)
                     {
                         NavigationManager.UpdateUserInfo();
+                    NavigationManager.Navigate(NavigationMenu.TrangChu);
                         NavigationManager.Navigate(NavigationMenu.TrangChu);
                     }
                     else
@@ -133,8 +96,6 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-
-        // Xử lý sự kiện FrmMain_FormClosing của giao diện.
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)

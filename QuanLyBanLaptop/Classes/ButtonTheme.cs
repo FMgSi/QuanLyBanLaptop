@@ -71,6 +71,21 @@ namespace QuanLyBanLaptop.Classes
     // Form cơ sở áp dụng giao diện nút sau khi các form con tải xong.
     public class AppForm : Form
     {
+        protected virtual bool RequiresAdmin => false;
+        public AppForm()
+        {
+            UserSession.Changed += OnSessionChanged;
+            Disposed += (sender, args) => UserSession.Changed -= OnSessionChanged;
+        }
+        private void OnSessionChanged(object sender, EventArgs args)
+        {
+            if (RequiresAdmin && !UserSession.IsAdmin) Hide();
+        }
+        protected override void SetVisibleCore(bool value)
+        {
+            if (value && RequiresAdmin && !DesignMode) UserSession.RequireAdmin();
+            base.SetVisibleCore(value);
+        }
         // Áp dụng sau sự kiện Load để ghi đè định dạng cũ.
         protected override void OnLoad(EventArgs e)
         {

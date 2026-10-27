@@ -4,16 +4,17 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
+using QuanLyBanLaptop.Services;
+using QuanLyBanLaptop.Models;
 
 namespace QuanLyBanLaptop.DanhMuc
 {
     public partial class frmNhanVien : QuanLyBanLaptop.Classes.AppForm
     {
+        protected override bool RequiresAdmin => true;
         private enum FormMode { Normal, Adding, Selected, Editing }
         private FormMode _mode = FormMode.Normal;
         private string _selectedMaNV = null;
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmNhanVien()
         {
             InitializeComponent();
@@ -27,8 +28,6 @@ namespace QuanLyBanLaptop.DanhMuc
 
             SetFormMode(FormMode.Normal);
         }
-
-        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -48,31 +47,31 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             try
             {
-                DataTable dt = DataProcesser.ExecProc("sp_TimKiemNhanVien", new[]
-                {
-                    new SqlParameter("@TuKhoa", SqlDbType.NVarChar, 100)
-                    { Value = string.IsNullOrEmpty(tuKhoa) ? (object)DBNull.Value : tuKhoa }
-                });
+                DataTable dt = new EmployeeService().Search(tuKhoa);
                 dgvNhanVien.DataSource = dt;
                 SetGridHeaders();
                 dgvNhanVien.ClearSelection();
             }
-            catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
 
         // doi tieu de cot datagridview
         private void SetGridHeaders()
         {
             if (dgvNhanVien.Columns.Count == 0) return;
-            Function.DatTieuDeCot(dgvNhanVien, "MaNV",      "Mã NV");
-            Function.DatTieuDeCot(dgvNhanVien, "TenNV",     "Họ tên");
-            Function.DatTieuDeCot(dgvNhanVien, "GioiTinh",  "Giới tính");
-            Function.DatTieuDeCot(dgvNhanVien, "NgaySinh",  "Ngày sinh");
-            Function.DatTieuDeCot(dgvNhanVien, "SDT",       "SĐT");
-            Function.DatTieuDeCot(dgvNhanVien, "DiaChi",    "Địa chỉ");
-            Function.DatTieuDeCot(dgvNhanVien, "ChucVu",    "Chức vụ");
-            Function.DatTieuDeCot(dgvNhanVien, "TenDN",     "Tên đăng nhập");
-            Function.DatTieuDeCot(dgvNhanVien, "TrangThai", "Trạng thái");
+            Function.DatTieuDeCot(dgvNhanVien, "MaNV",      "Mã NV", 95);
+            Function.DatTieuDeCot(dgvNhanVien, "TenNV",     "Họ tên", 180);
+            Function.DatTieuDeCot(dgvNhanVien, "GioiTinh",  "Giới tính", 85);
+            Function.DatTieuDeCot(dgvNhanVien, "NgaySinh",  "Ngày sinh", 110);
+            Function.DatTieuDeCot(dgvNhanVien, "SDT",       "SĐT", 120);
+            Function.DatTieuDeCot(dgvNhanVien, "DiaChi",    "Địa chỉ", 220);
+            Function.DatTieuDeCot(dgvNhanVien, "ChucVu",    "Chức vụ", 120);
+            Function.DatTieuDeCot(dgvNhanVien, "TenDN",     "Tên đăng nhập", 130);
+            Function.DatTieuDeCot(dgvNhanVien, "MatKhau",   "Mật khẩu", 120);
+            Function.DatTieuDeCot(dgvNhanVien, "TrangThai", "Trạng thái", 125);
+            dgvNhanVien.AllowUserToResizeColumns = true;
+            dgvNhanVien.ScrollBars = ScrollBars.Both;
+            dgvNhanVien.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
         }
 
         // Thiết lập chế độ thao tác form nhân viên theo chuẩn ButtonTheme
@@ -149,7 +148,7 @@ namespace QuanLyBanLaptop.DanhMuc
             txtSDT.Text     = Function.LayGiaTriCell(row, "SDT");
             txtDiaChi.Text  = Function.LayGiaTriCell(row, "DiaChi");
             txtTenDN.Text   = Function.LayGiaTriCell(row, "TenDN");
-            txtMatKhau.Clear();
+            txtMatKhau.Text = Function.LayGiaTriCell(row, "MatKhau");
 
             string gt = Function.LayGiaTriCell(row, "GioiTinh", "Nam");
             radNam.Checked = (gt == "Nam");
@@ -170,8 +169,6 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             return Function.SinhMaTuDong("NHAN_VIEN", "MaNV", "NV", 2);
         }
-
-        // Thực hiện ClearForm theo trạng thái và dữ liệu hiện tại.
         private void ClearForm()
         {
             txtMaNV.Text    = "";
@@ -188,8 +185,6 @@ namespace QuanLyBanLaptop.DanhMuc
         // ─── Events ──────────────────────────────────────────────────────────
         private void btnTimKiem_Click(object sender, EventArgs e)
             => LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
-
-        // Xử lý sự kiện btnLamMoi_Click của giao diện.
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             txtTimKiem.Clear();
@@ -199,8 +194,6 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvNhanVien.ClearSelection();
             SetFormMode(FormMode.Normal);
         }
-
-        // Xử lý sự kiện btnThem_Click của giao diện.
         private void btnThem_Click(object sender, EventArgs e)
         {
             _selectedMaNV = null;
@@ -210,8 +203,6 @@ namespace QuanLyBanLaptop.DanhMuc
             SetFormMode(FormMode.Adding);
             txtTenNV.Focus();
         }
-
-        // Xử lý sự kiện btnSua_Click của giao diện.
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (_selectedMaNV == null)
@@ -222,91 +213,28 @@ namespace QuanLyBanLaptop.DanhMuc
             SetFormMode(FormMode.Editing);
             txtTenNV.Focus();
         }
-
-        // Xử lý sự kiện btnLuu_Click của giao diện.
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtTenNV.Text))
-            {
-                Function.ThongBaoCanhBao("Vui lòng nhập họ tên nhân viên.", "Cảnh báo");
-                txtTenNV.Focus();
-                return;
-            }
-
+            if (_mode != FormMode.Adding && _mode != FormMode.Editing) return;
             try
             {
-                string gioiTinh = radNam.Checked ? "Nam" : "Nữ";
-
-                if (_mode == FormMode.Adding)
+                string id = new EmployeeService().Save(new Employee
                 {
-                    if (string.IsNullOrWhiteSpace(txtTenDN.Text))
-                    {
-                        Function.ThongBaoCanhBao("Vui lòng nhập tên đăng nhập.", "Cảnh báo");
-                        return;
-                    }
-                    if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
-                    {
-                        Function.ThongBaoCanhBao("Vui lòng nhập mật khẩu (ít nhất 6 ký tự).", "Cảnh báo");
-                        return;
-                    }
-
-                    var maNVParam = new SqlParameter("@MaNV", SqlDbType.VarChar, 10)
-                    {
-                        Direction = ParameterDirection.InputOutput,
-                        Value = string.IsNullOrWhiteSpace(txtMaNV.Text) ? (object)DBNull.Value : txtMaNV.Text.Trim()
-                    };
-
-                    using (var conn = DataProcesser.GetConnection())
-                    using (var cmd = new SqlCommand("sp_ThemNhanVien", conn)
-                    { CommandType = System.Data.CommandType.StoredProcedure })
-                    {
-                        cmd.Parameters.Add(maNVParam);
-                        cmd.Parameters.AddWithValue("@TenNV",    txtTenNV.Text.Trim());
-                        cmd.Parameters.AddWithValue("@GioiTinh", gioiTinh);
-                        cmd.Parameters.AddWithValue("@NgaySinh", dtpNgaySinh.Value.Date);
-                        cmd.Parameters.AddWithValue("@SDT",      txtSDT.Text.Trim());
-                        cmd.Parameters.AddWithValue("@DiaChi",   txtDiaChi.Text.Trim());
-                        cmd.Parameters.AddWithValue("@ChucVu",   cboChucVu.SelectedItem.ToString());
-                        cmd.Parameters.AddWithValue("@TenDN",    txtTenDN.Text.Trim());
-                        cmd.Parameters.AddWithValue("@MatKhau",  txtMatKhau.Text);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    string newMa = maNVParam.Value?.ToString();
-                    if (string.IsNullOrEmpty(newMa)) newMa = txtMaNV.Text;
-                    Function.ThongBaoThanhCong($"Thêm nhân viên thành công! Mã: {newMa}", "Thành công");
-                }
-                else if (_mode == FormMode.Editing)
-                {
-                    DataProcesser.ExecProcNonQuery("sp_CapNhatNhanVien", new[]
-                    {
-                        new SqlParameter("@MaNV",     _selectedMaNV),
-                        new SqlParameter("@TenNV",    txtTenNV.Text.Trim()),
-                        new SqlParameter("@GioiTinh", gioiTinh),
-                        new SqlParameter("@NgaySinh", dtpNgaySinh.Value.Date),
-                        new SqlParameter("@SDT",      txtSDT.Text.Trim()),
-                        new SqlParameter("@DiaChi",   txtDiaChi.Text.Trim()),
-                        new SqlParameter("@ChucVu",   cboChucVu.SelectedItem.ToString()),
-                        new SqlParameter("@TenDN",    txtTenDN.Text.Trim()),
-                        new SqlParameter("@MatKhau",  string.IsNullOrWhiteSpace(txtMatKhau.Text) ? (object)DBNull.Value : txtMatKhau.Text.Trim()),
-                    });
-                    Function.ThongBaoThanhCong("Cập nhật nhân viên thành công!", "Thành công");
-                }
-                else
-                {
-                    return;
-                }
-
+                    Id = _mode == FormMode.Adding ? txtMaNV.Text.Trim() : _selectedMaNV,
+                    Name = txtTenNV.Text.Trim(), Gender = radNam.Checked ? "Nam" : "Nữ",
+                    BirthDate = dtpNgaySinh.Value.Date, Phone = txtSDT.Text.Trim(),
+                    Address = txtDiaChi.Text.Trim(), Role = Convert.ToString(cboChucVu.SelectedItem),
+                    Username = txtTenDN.Text.Trim(), Password = txtMatKhau.Text
+                }, _mode == FormMode.Adding);
+                Function.ThongBaoThanhCong("Đã lưu nhân viên " + id + ".");
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
                 ClearForm();
                 dgvNhanVien.ClearSelection();
                 SetFormMode(FormMode.Normal);
             }
-            catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
-        // Xử lý sự kiện btnXoa_Click của giao diện.
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (_selectedMaNV == null)
@@ -321,8 +249,7 @@ namespace QuanLyBanLaptop.DanhMuc
             if (confirm != DialogResult.Yes) return;
             try
             {
-                DataProcesser.ExecProcNonQuery("sp_XoaNhanVien", new[]
-                { new SqlParameter("@MaNV", _selectedMaNV) });
+                new EmployeeService().Delete(_selectedMaNV);
                 Function.ThongBaoThanhCong("Xóa nhân viên thành công!", "Thành công");
                 LoadDanhSachNhanVien(txtTimKiem.Text.Trim());
                 _selectedMaNV = null;
@@ -330,10 +257,8 @@ namespace QuanLyBanLaptop.DanhMuc
                 dgvNhanVien.ClearSelection();
                 SetFormMode(FormMode.Normal);
             }
-            catch (SqlException ex) { DataProcesser.ShowSqlError(ex); }
+            catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
-        // Xử lý sự kiện btnHuy_Click của giao diện.
         private void btnHuy_Click(object sender, EventArgs e)
         {
             _selectedMaNV = null;
@@ -347,8 +272,6 @@ namespace QuanLyBanLaptop.DanhMuc
         {
             NavigationManager.Navigate(NavigationMenu.TrangChu);
         }
-
-        // Xử lý sự kiện dgvNhanVien_CellClick của giao diện.
         private void dgvNhanVien_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
@@ -357,8 +280,6 @@ namespace QuanLyBanLaptop.DanhMuc
             FillFormFromGrid(row);
             SetFormMode(FormMode.Selected);
         }
-
-        // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.
         private void txtTimKiem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)

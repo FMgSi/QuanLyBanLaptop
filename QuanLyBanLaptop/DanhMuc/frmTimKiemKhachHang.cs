@@ -35,11 +35,11 @@ namespace QuanLyBanLaptop.DanhMuc
             try
             {
                 string sql = @"
-                    SELECT 
-                        MaKH, 
-                        TenKH, 
-                        ISNULL(Sdt, '') AS Sdt, 
-                        ISNULL(DiaChi, '') AS DiaChi, 
+                    SELECT
+                        MaKH,
+                        TenKH,
+                        ISNULL(Sdt, '') AS Sdt,
+                        ISNULL(DiaChi, '') AS DiaChi,
                         ISNULL(HangThanhVien, N'Đồng') AS HangThanhVien,
                         ISNULL(GioiTinh, N'Nam') AS GioiTinh
                     FROM dbo.KHACH_HANG
@@ -47,27 +47,6 @@ namespace QuanLyBanLaptop.DanhMuc
                     ORDER BY MaKH DESC";
 
                 _dtSource = Function.DocBang(sql);
-                if (_dtSource == null || _dtSource.Rows.Count == 0)
-                {
-                    // Dữ liệu mẫu dự phòng nếu DB chưa kết nối
-                    _dtSource = new DataTable();
-                    _dtSource.Columns.Add("MaKH", typeof(string));
-                    _dtSource.Columns.Add("TenKH", typeof(string));
-                    _dtSource.Columns.Add("Sdt", typeof(string));
-                    _dtSource.Columns.Add("DiaChi", typeof(string));
-                    _dtSource.Columns.Add("HangThanhVien", typeof(string));
-                    _dtSource.Columns.Add("GioiTinh", typeof(string));
-
-                    _dtSource.Rows.Add("KH001", "Trần Anh Tuấn", "0901234567", "Hà Nội", "Vàng", "Nam");
-                    _dtSource.Rows.Add("KH002", "Hoàng Minh Đức", "0912345678", "Hải Phòng", "Bạc", "Nam");
-                    _dtSource.Rows.Add("KH003", "Nguyễn Thảo My", "0923456789", "Đà Nẵng", "Đồng", "Nữ");
-                    _dtSource.Rows.Add("KH004", "Lê Quang Hải", "0934567890", "Hà Nội", "VIP", "Nam");
-                    _dtSource.Rows.Add("KH005", "Phạm Minh Đăng", "0945678901", "Bắc Ninh", "Vàng", "Nam");
-                    _dtSource.Rows.Add("KH006", "Đinh Công Trình", "0956789012", "Hà Nam", "Đồng", "Nam");
-                    _dtSource.Rows.Add("KH007", "Bùi Thị Mai", "0967890123", "Hưng Yên", "Bạc", "Nữ");
-                    _dtSource.Rows.Add("KH008", "Ngô Văn Long", "0978901234", "Vĩnh Phúc", "Đồng", "Nam");
-                }
-
                 _dv = new DataView(_dtSource);
                 dgvKhachHang.DataSource = _dv;
                 ConfigureGridColumns();
@@ -225,15 +204,7 @@ namespace QuanLyBanLaptop.DanhMuc
                 dlg.Controls.Add(lblHeader);
 
                 // Tự sinh mã khách hàng mới
-                string newMaKH = "KH001";
-                try
-                {
-                    newMaKH = Function.SinhMaTuDong("KHACH_HANG", "MaKH", "KH", 2);
-                }
-                catch
-                {
-                    newMaKH = $"KH{(_dtSource != null ? _dtSource.Rows.Count + 1 : 1):D3}";
-                }
+                string newMaKH = Function.SinhMaTuDong("KHACH_HANG", "MaKH", "KH", 2);
 
                 int y = 55;
                 var lblMa = new Label { Text = "Mã KH:", Location = new Point(25, y + 3), Size = new Size(90, 20), Font = new Font("Segoe UI", 9F, FontStyle.Bold) };
@@ -311,7 +282,7 @@ namespace QuanLyBanLaptop.DanhMuc
                             new SqlParameter("@Sdt", string.IsNullOrEmpty(sdt) ? (object)DBNull.Value : sdt),
                             new SqlParameter("@DiaChi", string.IsNullOrEmpty(diaChi) ? (object)DBNull.Value : diaChi));
                     }
-                    catch { }
+                    catch (Exception ex) { Function.ThongBaoLoi(ex.Message); return; }
 
                     // Thêm vào DataTable nguồn
                     if (_dtSource != null)

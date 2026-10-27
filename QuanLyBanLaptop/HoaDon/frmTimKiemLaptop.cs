@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
@@ -17,30 +17,24 @@ namespace QuanLyBanLaptop.HoaDon
         public decimal SelectedDonGia { get; private set; }
         public int SelectedBaoHanh { get; private set; }
         public int SelectedSoLuongTon { get; private set; }
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmTimKiemLaptop()
         {
             InitializeComponent();
         }
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmTimKiemLaptop_Load(object sender, EventArgs e)
         {
             LoadData();
             txtTimKiem.Focus();
         }
-
-        // Tải dữ liệu phục vụ LoadData.
         private void LoadData()
         {
             try
             {
                 string query = @"
-SELECT 
+SELECT
     l.MaLaptop,
     l.TenLaptop,
-    CASE 
+    CASE
         WHEN l.TenLaptop LIKE 'Acer%' THEN 'Acer'
         WHEN l.TenLaptop LIKE 'Asus%' THEN 'Asus'
         WHEN l.TenLaptop LIKE 'Dell%' THEN 'Dell'
@@ -55,8 +49,8 @@ SELECT
         WHEN n.TenNCC LIKE '%Apple%' THEN 'Apple'
         ELSE ISNULL(l.Loai, N'Khác')
     END AS Hang,
-    ISNULL(l.CPU, '') + 
-    CASE WHEN l.RAM IS NOT NULL AND l.RAM <> '' THEN ' / ' + l.RAM ELSE '' END + 
+    ISNULL(l.CPU, '') +
+    CASE WHEN l.RAM IS NOT NULL AND l.RAM <> '' THEN ' / ' + l.RAM ELSE '' END +
     CASE WHEN l.SSD IS NOT NULL AND l.SSD <> '' THEN ' / ' + l.SSD + (CASE WHEN l.SSD NOT LIKE '%SSD%' THEN ' SSD' ELSE '' END) ELSE '' END AS CauHinhChinh,
     l.DonGia,
     l.SoLuongTon,
@@ -85,8 +79,6 @@ ORDER BY l.TenLaptop";
                 Function.ThongBaoLoi("Lỗi tải danh sách laptop: " + ex.Message, "Lỗi");
             }
         }
-
-        // Thực hiện BindData theo trạng thái và dữ liệu hiện tại.
         private void BindData()
         {
             if (_dv == null) return;
@@ -113,8 +105,6 @@ ORDER BY l.TenLaptop";
             dgvLaptop.DataSource = _dv;
             lblHienThi.Text = $"Hiển thị: {_dv.Count} sản phẩm";
         }
-
-        // Thực hiện FilterData theo trạng thái và dữ liệu hiện tại.
         private void FilterData()
         {
             if (_dtSource == null || _dv == null) return;
@@ -134,8 +124,6 @@ ORDER BY l.TenLaptop";
 
             BindData();
         }
-
-        // Thực hiện ChonSanPhamHienTai theo trạng thái và dữ liệu hiện tại.
         private void ChonSanPhamHienTai()
         {
             if (dgvLaptop.CurrentRow != null && dgvLaptop.CurrentRow.Index >= 0)
@@ -161,14 +149,10 @@ ORDER BY l.TenLaptop";
                 Function.ThongBaoThanhCong("Vui lòng chọn một sản phẩm trong danh sách.", "Thông báo");
             }
         }
-
-        // Xử lý sự kiện btnTimKiem_Click của giao diện.
         private void btnTimKiem_Click(object sender, EventArgs e)
         {
             FilterData();
         }
-
-        // Xử lý sự kiện txtTimKiem_TextChanged của giao diện.
         private void txtTimKiem_TextChanged(object sender, EventArgs e)
         {
             if (txtTimKiem.Text != PlaceholderText)
@@ -176,8 +160,6 @@ ORDER BY l.TenLaptop";
                 FilterData();
             }
         }
-
-        // Xử lý sự kiện txtTimKiem_KeyDown của giao diện.
         private void txtTimKiem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -198,8 +180,6 @@ ORDER BY l.TenLaptop";
                 }
             }
         }
-
-        // Xử lý sự kiện txtTimKiem_Enter của giao diện.
         private void txtTimKiem_Enter(object sender, EventArgs e)
         {
             if (txtTimKiem.Text == PlaceholderText)
@@ -208,8 +188,6 @@ ORDER BY l.TenLaptop";
                 txtTimKiem.ForeColor = Color.FromArgb(15, 23, 42);
             }
         }
-
-        // Xử lý sự kiện txtTimKiem_Leave của giao diện.
         private void txtTimKiem_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTimKiem.Text))
@@ -218,8 +196,6 @@ ORDER BY l.TenLaptop";
                 txtTimKiem.ForeColor = Color.FromArgb(148, 163, 184);
             }
         }
-
-        // Xử lý sự kiện dgvLaptop_CellDoubleClick của giao diện.
         private void dgvLaptop_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -227,8 +203,6 @@ ORDER BY l.TenLaptop";
                 ChonSanPhamHienTai();
             }
         }
-
-        // Xử lý sự kiện dgvLaptop_KeyDown của giao diện.
         private void dgvLaptop_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -237,14 +211,10 @@ ORDER BY l.TenLaptop";
                 ChonSanPhamHienTai();
             }
         }
-
-        // Xử lý sự kiện btnChon_Click của giao diện.
         private void btnChon_Click(object sender, EventArgs e)
         {
             ChonSanPhamHienTai();
         }
-
-        // Xử lý sự kiện btnDong_Click của giao diện.
         private void btnDong_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;

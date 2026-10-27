@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 
 namespace QuanLyBanLaptop
@@ -19,9 +19,11 @@ namespace QuanLyBanLaptop
                 if (Classes.DataProcesser.ExecuteScalar(
                     "SELECT CASE WHEN OBJECT_ID('dbo.seq_AppInvoice','SO') IS NOT NULL THEN OBJECT_ID('dbo.HOP_DONG_TRA_GOP','U') END") == null)
                 {
-                    Classes.Function.ThongBaoCanhBao("Cần áp dụng migration DB 11, 12 và 13 trước khi chạy phiên bản này.");
+                    Classes.Function.ThongBaoCanhBao("Cần cài bộ SQL trong Database theo hướng dẫn README trước khi chạy.");
                     return;
                 }
+                using (var login = new frmDangNhap())
+                    if (login.ShowDialog() != DialogResult.OK) return;
                 Application.Run(new frmMain());
             }
             catch (Exception ex) { Classes.Function.ThongBaoLoi(ex.Message, "Không thể khởi động"); }

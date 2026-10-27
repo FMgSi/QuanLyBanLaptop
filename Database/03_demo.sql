@@ -1,20 +1,9 @@
-/* =====================================================================
-   QuanLyBanLaptop - 02_seed.sql  (chạy sau 01_schema.sql)
-   Danh mục nhập trực tiếp; giao dịch (nhập, bán, trả góp, bảo hành) gọi qua
-   stored procedure nên tồn kho, serial, tổng tiền, hạng thành viên luôn nhất quán.
-
-   Tài khoản mẫu: admin / admin123 ; binh_sale / 123456 ; cuong_kho / 123456
-   ===================================================================== */
-USE QuanLyBanLaptop_V2;
+-- DEMO tùy chọn, chỉ chạy một lần sau 01 và 02 trên DB chưa có dữ liệu nghiệp vụ.
+-- Tài khoản demo: admin/admin123; binh_sale/123456; cuong_kho/123456.
+SET XACT_ABORT ON;
+IF EXISTS(SELECT 1 FROM dbo.NHAN_VIEN) THROW 52001,N'Database đã có dữ liệu. Không nạp demo.',1;
+BEGIN TRANSACTION;
 GO
-SET NOCOUNT ON;
-
-/* ---------- Cấu hình ---------- */
-INSERT CAU_HINH (Khoa, GiaTri, MoTa) VALUES
-('NGUONG_BAC',  N'10000000', N'Tổng chi tiêu tối thiểu để lên hạng Bạc'),
-('NGUONG_VANG', N'30000000', N'Tổng chi tiêu tối thiểu để lên hạng Vàng'),
-('NGUONG_VIP',  N'50000000', N'Tổng chi tiêu tối thiểu để lên hạng VIP');
-
 /* ---------- Danh mục ---------- */
 INSERT NHA_CUNG_CAP (MaNCC, TenNCC, DiaChi, Sdt) VALUES
 ('NCC01', N'Công ty TNHH Máy Tính Asus Việt Nam',  N'Quận 1, TP. Hồ Chí Minh', '0281234567'),
@@ -44,9 +33,9 @@ INSERT LAPTOP (MaLaptop, TenLaptop, Loai, CPU, RAM, SSD, DonGiaNhap, DonGia, SoL
 ('LT010', N'Lenovo Legion 5',         N'Gaming',    N'Core i7 13700H', '16GB', '1TB',   26000000, 32500000, 0, 36, 'NCC05', N'LT010.jpg', N'Đỉnh cao đồ họa & game');
 
 INSERT NHAN_VIEN (MaNV, TenNV, SDT, ChucVu, TenDN, MatKhau) VALUES
-('NV001', N'Nguyễn Văn An',   '0912345678', N'Quản trị viên', 'admin',     ''),
-('NV002', N'Trần Thị Bình',   '0987654321', N'Nhân viên',     'binh_sale', ''),
-('NV003', N'Lê Hoàng Cường',  '0905556666', N'Nhân viên',     'cuong_kho', '');
+('NV001', N'Nguyễn Văn An',   '0912345678', N'Quản trị viên', 'admin',     'admin123'),
+('NV002', N'Trần Thị Bình',   '0987654321', N'Nhân viên',     'binh_sale', '123456'),
+('NV003', N'Lê Hoàng Cường',  '0905556666', N'Nhân viên',     'cuong_kho', '123456');
 EXEC dbo.sp_DatMatKhau 'NV001', N'admin123';
 EXEC dbo.sp_DatMatKhau 'NV002', N'123456';
 EXEC dbo.sp_DatMatKhau 'NV003', N'123456';
@@ -108,13 +97,21 @@ GO
 DECLARE @bh VARCHAR(10);
 
 -- BH001: máy LT001 của HD001, còn bảo hành -> đã trả khách
-EXEC dbo.sp_TiepNhanBaoHanh 'PN002-LT001-001', 'NV002', N'Bảo hành',
+EXEC dbo.sp_TiepNhanBaoHanh 'LT001-PN002-001', 'NV002', N'Bảo hành',
      N'Lỗi quạt tản nhiệt kêu to, vệ sinh và tra keo hãng', 0, '2026-10-18 09:30', @bh OUTPUT;
 EXEC dbo.sp_CapNhatBaoHanh @bh, N'Đã trả khách', '2026-10-20 15:00';
 
 -- BH002: máy LT002 của HD003, khách làm rơi vỡ -> sửa chữa tính phí, đang xử lý
-EXEC dbo.sp_TiepNhanBaoHanh 'PN001-LT002-001', 'NV002', N'Sửa chữa',
+EXEC dbo.sp_TiepNhanBaoHanh 'LT002-PN001-001', 'NV002', N'Sửa chữa',
      N'Khách làm rơi vỡ bản lề góc phải (từ chối BH, sửa dịch vụ)', 850000, '2026-10-21 14:00', @bh OUTPUT;
 GO
 
-PRINT N'Seed hoàn tất. Chạy 03_doi_soat.sql để kiểm tra, kết quả đúng là không có dòng nào.';
+PRINT N'Seed hoàn tất. Chạy 04_verify.sql để kiểm tra, kết quả đúng là không có dòng nào.';
+
+COMMIT;
+GO
+ALTER SEQUENCE dbo.seq_AppEmployee RESTART WITH 4;
+ALTER SEQUENCE dbo.seq_AppCustomer RESTART WITH 6;
+ALTER SEQUENCE dbo.seq_AppSupplier RESTART WITH 6;
+ALTER SEQUENCE dbo.seq_AppLaptop RESTART WITH 11;
+GO

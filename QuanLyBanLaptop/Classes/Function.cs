@@ -255,16 +255,7 @@ namespace QuanLyBanLaptop.Classes
                 case "NHAN_VIEN.MaNV": sequence = "seq_AppEmployee"; break;
                 default: throw new ArgumentException("Bảng sinh mã chưa được hỗ trợ.");
             }
-            long next = 1;
-            try
-            {
-                object val = DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo." + sequence);
-                if (val != null) next = Convert.ToInt64(val);
-            }
-            catch
-            {
-                next = 1;
-            }
+            long next = Convert.ToInt64(DataProcesser.ExecuteScalar("SELECT NEXT VALUE FOR dbo." + sequence));
             string id = tienTo + next.ToString("D" + doRong);
             if (id.Length > 10) throw new InvalidOperationException("Mã vượt giới hạn 10 ký tự.");
             return id;
@@ -381,8 +372,9 @@ namespace QuanLyBanLaptop.Classes
             dgv.AllowUserToAddRows = false;
             dgv.AllowUserToDeleteRows = false;
             dgv.AllowUserToResizeRows = false;
-            dgv.AllowUserToResizeColumns = false;
+            dgv.AllowUserToResizeColumns = true;
             dgv.AllowUserToOrderColumns = false;
+            dgv.ScrollBars = ScrollBars.Both;
             dgv.ReadOnly = true;
         }
 
@@ -496,7 +488,11 @@ namespace QuanLyBanLaptop.Classes
             if (dgv != null && dgv.Columns.Contains(tenCot))
             {
                 dgv.Columns[tenCot].HeaderText = tieuDe;
-                if (doRong > 0) dgv.Columns[tenCot].Width = doRong;
+                if (doRong > 0)
+                {
+                    dgv.Columns[tenCot].Width = doRong;
+                    dgv.Columns[tenCot].MinimumWidth = Math.Max(doRong, 60);
+                }
             }
         }
 
@@ -518,4 +514,3 @@ namespace QuanLyBanLaptop.Classes
         #endregion
     }
 }
-

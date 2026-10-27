@@ -12,52 +12,31 @@ namespace QuanLyBanLaptop.Services
         public decimal Interest { get; private set; }
         public decimal Monthly { get; private set; }
 
-        // Lãi suất trọn kỳ của các gói hiện tại (ưu tiên đọc từ CAU_HINH, dự phòng giá trị mặc định).
+        // Đọc lãi suất trọn kỳ; cấu hình thiếu/sai phải được xử lý trước khi giao dịch.
         public static decimal RateFor(int months)
         {
             if (months != 3 && months != 6 && months != 9 && months != 12)
                 throw new ArgumentException("Kỳ hạn không hợp lệ.");
 
-            try
-            {
-                string key = "LAI_SUAT_" + months + "_THANG";
-                object val = DataProcesser.ExecuteScalar("SELECT GiaTri FROM CAU_HINH WHERE Khoa = '" + key + "'");
-                if (val != null && decimal.TryParse(val.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal configuredRate))
-                {
-                    return configuredRate;
-                }
-            }
-            catch { }
-
-            switch (months)
-            {
-                case 3: return 2.4m;
-                case 6: return 4m;
-                case 9: return 6m;
-                case 12: return 8m;
-                default: throw new ArgumentException("Kỳ hạn không hợp lệ.");
-            }
+            decimal rate = new ConfigurationService().GetDecimal("LAI_SUAT_" + months + "_THANG");
+            if (rate < 0 || rate > 100) throw new InvalidOperationException("Lãi suất cấu hình không hợp lệ.");
+            return rate;
         }
 
-        // Tỷ lệ trả trước mặc định từ CAU_HINH (mặc định 30%)
-        public static decimal GetDefaultDownPaymentRatio()
+        public static decimal GetDefaultDownPaymentRatio(int? months = null)
         {
-            try
-            {
-                object val = DataProcesser.ExecuteScalar("SELECT GiaTri FROM CAU_HINH WHERE Khoa = 'TRA_TRUOC_TOI_THIEU'");
-                if (val != null && decimal.TryParse(val.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal pct) && pct > 0 && pct < 100)
-                {
-                    return pct / 100m;
-                }
-            }
-            catch { }
-            return 0.30m;
+            if (months.HasValue && months != 3 && months != 6 && months != 9 && months != 12)
+                throw new ArgumentException("Kỳ hạn không hợp lệ.");
+            string key = months.HasValue ? "TRA_TRUOC_" + months + "_THANG" : "TRA_TRUOC_TOI_THIEU";
+            decimal ratio = new ConfigurationService().GetDecimal(key) / 100m;
+            if (ratio < 0 || ratio >= 1) throw new InvalidOperationException("Tỷ lệ trả trước cấu hình không hợp lệ.");
+            return ratio;
         }
-
         // Làm tròn tiền đồng thống nhất với SQL ROUND; kỳ cuối nhận phần dư.
         public static InstallmentCalculator Calculate(decimal total, int months, decimal? rate = null, decimal? downRatio = null)
         {
-            decimal ratio = downRatio ?? GetDefaultDownPaymentRatio();
+            if (months <= 0) throw new ArgumentException("Kỳ hạn phải lớn hơn 0.");
+            decimal ratio = downRatio ?? GetDefaultDownPaymentRatio(months);
             if (total < 0 || ratio < 0 || ratio >= 1) throw new ArgumentException("Số tiền/tỷ lệ không hợp lệ.");
             decimal interestRate = rate ?? RateFor(months);
             if (months <= 0 || interestRate < 0) throw new ArgumentException("Kỳ hạn/lãi suất không hợp lệ.");

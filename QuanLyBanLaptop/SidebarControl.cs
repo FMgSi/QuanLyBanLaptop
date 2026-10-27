@@ -15,6 +15,7 @@ namespace QuanLyBanLaptop
         private const int EXPANDED_WIDTH = 230;
         private const int COLLAPSED_WIDTH = 64;
         private const int STEP_WIDTH = 25;
+        private readonly Button btnCauHinh = new Button();
 
         [Description("The currently selected menu item on the sidebar")]
         [DefaultValue(NavigationMenu.TrangChu)]
@@ -27,11 +28,19 @@ namespace QuanLyBanLaptop
                 UpdateMenuStyles();
             }
         }
-
-        // Thực hiện SidebarControl theo trạng thái và dữ liệu hiện tại.
         public SidebarControl()
         {
             InitializeComponent();
+            btnCauHinh.Name = "btnCauHinh";
+            btnCauHinh.Text = "   Cấu Hình";
+            btnCauHinh.Tag = NavigationMenu.CauHinh;
+            btnCauHinh.Dock = DockStyle.Top;
+            btnCauHinh.Height = btnThongKe.Height;
+            btnCauHinh.TextAlign = ContentAlignment.MiddleLeft;
+            btnCauHinh.Padding = btnThongKe.Padding;
+            pnlMenu.Controls.Add(btnCauHinh);
+            pnlMenu.Controls.SetChildIndex(btnCauHinh, 0);
+            pnlMenu.AutoScroll = true;
 
             DoubleBuffered = true;
             SetDoubleBuffered(pnlLogo);
@@ -39,9 +48,15 @@ namespace QuanLyBanLaptop
 
             ApplyThemeAndIcons();
             SetupEvents();
+            UserSession.Changed += RefreshPermissions;
+            Disposed += (sender, args) => UserSession.Changed -= RefreshPermissions;
+            RefreshPermissions(this, EventArgs.Empty);
         }
-
-        // Thực hiện SetDoubleBuffered theo trạng thái và dữ liệu hiện tại.
+        private void RefreshPermissions(object sender, EventArgs args)
+        {
+            btnNhanVien.Visible = btnThongKe.Visible = btnCauHinh.Visible = UserSession.IsAdmin;
+            btnNhanVien.Enabled = btnThongKe.Enabled = btnCauHinh.Enabled = UserSession.IsAdmin;
+        }
         private static void SetDoubleBuffered(Control control)
         {
             typeof(Control).InvokeMember(
@@ -49,8 +64,6 @@ namespace QuanLyBanLaptop
                 BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
                 null, control, new object[] { true });
         }
-
-        // Thực hiện ApplyThemeAndIcons theo trạng thái và dữ liệu hiện tại.
         private void ApplyThemeAndIcons()
         {
             BackColor = SidebarTheme.SidebarBack;
@@ -68,6 +81,10 @@ namespace QuanLyBanLaptop
             btnTheoDoiTraGop.Image = IconHelper.CreateInstallmentIcon(20);
             btnBaoHanhSuaChua.Image = IconHelper.CreateWrenchIcon(20);
             btnThongKe.Image = IconHelper.CreateChartIcon(20);
+            btnCauHinh.Image = IconHelper.CreateSettingsIcon(20);
+            btnCauHinh.Cursor = Cursors.Hand;
+            btnCauHinh.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnCauHinh.ImageAlign = ContentAlignment.MiddleLeft;
 
             // Button tag mapping
             btnTrangChu.Tag = NavigationMenu.TrangChu;
@@ -79,6 +96,7 @@ namespace QuanLyBanLaptop
             btnTheoDoiTraGop.Tag = NavigationMenu.TheoDoiTraGop;
             btnBaoHanhSuaChua.Tag = NavigationMenu.BaoHanhSuaChua;
             btnThongKe.Tag = NavigationMenu.ThongKe;
+            btnCauHinh.Tag = NavigationMenu.CauHinh;
 
             // Common button appearance
             foreach (Control c in pnlMenu.Controls)
@@ -128,8 +146,6 @@ namespace QuanLyBanLaptop
             RefreshOverdueBadge();
             UpdateMenuStyles();
         }
-
-        // Thực hiện RefreshOverdueBadge theo trạng thái và dữ liệu hiện tại.
         public void RefreshOverdueBadge()
         {
             try
@@ -160,8 +176,6 @@ namespace QuanLyBanLaptop
             tmrCollapse.Interval = 10;
             tmrCollapse.Tick += TmrCollapse_Tick;
         }
-
-        // Xử lý sự kiện MenuButton_Click của giao diện.
         private void MenuButton_Click(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -175,8 +189,6 @@ namespace QuanLyBanLaptop
                 NavigationManager.Navigate(parentForm, menu);
             }
         }
-
-        // Xử lý sự kiện MenuButton_MouseEnter của giao diện.
         private void MenuButton_MouseEnter(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -187,8 +199,6 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-
-        // Xử lý sự kiện MenuButton_MouseLeave của giao diện.
         private void MenuButton_MouseLeave(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.Tag is NavigationMenu menu)
@@ -203,8 +213,6 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-
-        // Thực hiện UpdateMenuStyles theo trạng thái và dữ liệu hiện tại.
         public void UpdateMenuStyles()
         {
             foreach (Control c in pnlMenu.Controls)
@@ -223,14 +231,10 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-
-        // Thực hiện ToggleSidebar theo trạng thái và dữ liệu hiện tại.
         public void ToggleSidebar()
         {
             tmrCollapse.Start();
         }
-
-        // Xử lý sự kiện TmrCollapse_Tick của giao diện.
         private void TmrCollapse_Tick(object sender, EventArgs e)
         {
             if (_isCollapsed)
@@ -260,8 +264,6 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-
-        // Thực hiện SetButtonTextsVisible theo trạng thái và dữ liệu hiện tại.
         private void SetButtonTextsVisible(bool visible)
         {
             btnTrangChu.Text = visible ? "   Trang Chủ" : "";
@@ -273,6 +275,7 @@ namespace QuanLyBanLaptop
             btnTheoDoiTraGop.Text = visible ? "   Theo Dõi Trả Góp" : "";
             btnBaoHanhSuaChua.Text = visible ? "   Sửa Chữa Bảo Hành" : "";
             btnThongKe.Text = visible ? "   Thống Kê" : "";
+            btnCauHinh.Text = visible ? "   Cấu Hình" : "";
 
             int paddingLeft = visible ? 16 : 18;
             foreach (Control c in pnlMenu.Controls)

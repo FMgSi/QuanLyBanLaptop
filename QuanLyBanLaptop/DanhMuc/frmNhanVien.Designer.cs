@@ -282,10 +282,11 @@ namespace QuanLyBanLaptop.DanhMuc
             // dgvNhanVien
             this.dgvNhanVien.AllowUserToAddRows = false; this.dgvNhanVien.AllowUserToDeleteRows = false;
             this.dgvNhanVien.AllowUserToResizeRows = false;
-            this.dgvNhanVien.AllowUserToResizeColumns = false;
+            this.dgvNhanVien.AllowUserToResizeColumns = true;
             this.dgvNhanVien.AllowUserToOrderColumns = false;
             this.dgvNhanVien.AutoGenerateColumns = false;
-            this.dgvNhanVien.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvNhanVien.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.None;
+            this.dgvNhanVien.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvNhanVien.BackgroundColor = System.Drawing.Color.White; this.dgvNhanVien.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvNhanVien.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(239,246,255);
             this.dgvNhanVien.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
@@ -296,7 +297,7 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNhanVien.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(219,234,254);
             this.dgvNhanVien.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(30,64,175);
             this.dgvNhanVien.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-                this.colMaNV, this.colTenNV, this.colGioiTinh, this.colNgaySinh, this.colSDT, this.colDiaChi, this.colChucVu, this.colTenDN, this.colTrangThai, this.colMatKhau });
+                this.colMaNV, this.colTenNV, this.colGioiTinh, this.colNgaySinh, this.colSDT, this.colDiaChi, this.colChucVu, this.colTenDN, this.colMatKhau, this.colTrangThai });
             this.dgvNhanVien.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvNhanVien.GridColor = System.Drawing.Color.FromArgb(229,231,235);
             this.dgvNhanVien.Location = new System.Drawing.Point(14, 284);
@@ -309,16 +310,16 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNhanVien.TabIndex = 2;
             this.dgvNhanVien.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvNhanVien_CellClick);
 
-            this.colMaNV.DataPropertyName = "MaNV"; this.colMaNV.HeaderText = "Mã NV"; this.colMaNV.Name = "MaNV"; this.colMaNV.ReadOnly = true; this.colMaNV.Width = 90;
-            this.colTenNV.DataPropertyName = "TenNV"; this.colTenNV.HeaderText = "Họ tên"; this.colTenNV.Name = "TenNV"; this.colTenNV.ReadOnly = true; this.colTenNV.Width = 180;
-            this.colGioiTinh.DataPropertyName = "GioiTinh"; this.colGioiTinh.HeaderText = "Giới tính"; this.colGioiTinh.Name = "GioiTinh"; this.colGioiTinh.ReadOnly = true; this.colGioiTinh.Width = 80;
-            this.colNgaySinh.DataPropertyName = "NgaySinh"; this.colNgaySinh.HeaderText = "Ngày sinh"; this.colNgaySinh.Name = "NgaySinh"; this.colNgaySinh.ReadOnly = true; this.colNgaySinh.Width = 100;
-            this.colSDT.DataPropertyName = "SDT"; this.colSDT.HeaderText = "SĐT"; this.colSDT.Name = "SDT"; this.colSDT.ReadOnly = true; this.colSDT.Width = 110;
-            this.colDiaChi.DataPropertyName = "DiaChi"; this.colDiaChi.HeaderText = "Địa chỉ"; this.colDiaChi.Name = "DiaChi"; this.colDiaChi.ReadOnly = true; this.colDiaChi.Width = 200;
-            this.colChucVu.DataPropertyName = "ChucVu"; this.colChucVu.HeaderText = "Chức vụ"; this.colChucVu.Name = "ChucVu"; this.colChucVu.ReadOnly = true; this.colChucVu.Width = 110;
-            this.colTenDN.DataPropertyName = "TenDN"; this.colTenDN.HeaderText = "Tên đăng nhập"; this.colTenDN.Name = "TenDN"; this.colTenDN.ReadOnly = true; this.colTenDN.Width = 120;
-            this.colTrangThai.DataPropertyName = "TrangThai"; this.colTrangThai.HeaderText = "Trạng thái"; this.colTrangThai.Name = "TrangThai"; this.colTrangThai.ReadOnly = true; this.colTrangThai.Width = 100;
-            this.colMatKhau.DataPropertyName = "MatKhau"; this.colMatKhau.HeaderText = "Mật khẩu"; this.colMatKhau.Name = "MatKhau"; this.colMatKhau.ReadOnly = true; this.colMatKhau.Visible = false;
+            this.colMaNV.DataPropertyName = "MaNV"; this.colMaNV.HeaderText = "Mã NV"; this.colMaNV.Name = "MaNV"; this.colMaNV.ReadOnly = true; this.colMaNV.Width = 95; this.colMaNV.MinimumWidth = 90;
+            this.colTenNV.DataPropertyName = "TenNV"; this.colTenNV.HeaderText = "Họ tên"; this.colTenNV.Name = "TenNV"; this.colTenNV.ReadOnly = true; this.colTenNV.Width = 180; this.colTenNV.MinimumWidth = 160;
+            this.colGioiTinh.DataPropertyName = "GioiTinh"; this.colGioiTinh.HeaderText = "Giới tính"; this.colGioiTinh.Name = "GioiTinh"; this.colGioiTinh.ReadOnly = true; this.colGioiTinh.Width = 85; this.colGioiTinh.MinimumWidth = 80;
+            this.colNgaySinh.DataPropertyName = "NgaySinh"; this.colNgaySinh.HeaderText = "Ngày sinh"; this.colNgaySinh.Name = "NgaySinh"; this.colNgaySinh.ReadOnly = true; this.colNgaySinh.Width = 110; this.colNgaySinh.MinimumWidth = 100;
+            this.colSDT.DataPropertyName = "SDT"; this.colSDT.HeaderText = "SĐT"; this.colSDT.Name = "SDT"; this.colSDT.ReadOnly = true; this.colSDT.Width = 120; this.colSDT.MinimumWidth = 110;
+            this.colDiaChi.DataPropertyName = "DiaChi"; this.colDiaChi.HeaderText = "Địa chỉ"; this.colDiaChi.Name = "DiaChi"; this.colDiaChi.ReadOnly = true; this.colDiaChi.Width = 220; this.colDiaChi.MinimumWidth = 180;
+            this.colChucVu.DataPropertyName = "ChucVu"; this.colChucVu.HeaderText = "Chức vụ"; this.colChucVu.Name = "ChucVu"; this.colChucVu.ReadOnly = true; this.colChucVu.Width = 120; this.colChucVu.MinimumWidth = 110;
+            this.colTenDN.DataPropertyName = "TenDN"; this.colTenDN.HeaderText = "Tên đăng nhập"; this.colTenDN.Name = "TenDN"; this.colTenDN.ReadOnly = true; this.colTenDN.Width = 130; this.colTenDN.MinimumWidth = 115;
+            this.colMatKhau.DataPropertyName = "MatKhau"; this.colMatKhau.HeaderText = "Mật khẩu"; this.colMatKhau.Name = "MatKhau"; this.colMatKhau.ReadOnly = true; this.colMatKhau.Width = 120; this.colMatKhau.MinimumWidth = 100; this.colMatKhau.Visible = true;
+            this.colTrangThai.DataPropertyName = "TrangThai"; this.colTrangThai.HeaderText = "Trạng thái"; this.colTrangThai.Name = "TrangThai"; this.colTrangThai.ReadOnly = true; this.colTrangThai.Width = 125; this.colTrangThai.MinimumWidth = 110;
 
             // frmNhanVien
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);

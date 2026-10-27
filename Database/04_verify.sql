@@ -1,8 +1,8 @@
 /* =====================================================================
-   QuanLyBanLaptop - 03_doi_soat.sql
+   QuanLyBanLaptop - 04_verify.sql
    Đối soát dữ liệu dẫn xuất. Kết quả ĐÚNG là không có dòng nào.
    ===================================================================== */
-USE QuanLyBanLaptop_V2;
+
 GO
 
 SELECT N'Tồn kho lệch số serial trong kho' AS Loai, MaLaptop AS Khoa,
@@ -13,7 +13,7 @@ UNION ALL
 SELECT N'Tổng tiền hóa đơn lệch chi tiết', hd.MaHD,
        N'TongTien=' + CAST(hd.TongTien AS NVARCHAR(30))
 FROM HOA_DON hd
-WHERE hd.TongTien <> ISNULL((SELECT SUM(SoLuong * DonGia) FROM CHI_TIET_HD WHERE MaHD = hd.MaHD), 0)
+WHERE hd.TongTien <> ISNULL((SELECT SUM(ThanhTien) FROM CHI_TIET_HD WHERE MaHD = hd.MaHD), 0)
 
 UNION ALL
 SELECT N'Tổng tiền phiếu nhập lệch chi tiết', pn.MaPN,
@@ -41,11 +41,14 @@ WHERE hd.PhuongThucThanhToan = N'Trả góp'
   AND (SELECT COUNT(*) FROM LICH_TRA_GOP WHERE MaHD = hd.MaHD) <> hd.ChuKyTraGop
 
 UNION ALL
-SELECT N'Tổng các kỳ trả góp lệch tổng hóa đơn', hd.MaHD,
+SELECT N'Tổng lịch lệch dư nợ và lãi hợp đồng', hd.MaHD,
        N'TongTien=' + CAST(hd.TongTien AS NVARCHAR(30))
 FROM HOA_DON hd
 WHERE hd.PhuongThucThanhToan = N'Trả góp'
-  AND hd.TongTien <> (SELECT SUM(SoTienPhaiTra) FROM LICH_TRA_GOP WHERE MaHD = hd.MaHD)
+  AND EXISTS (SELECT 1 FROM HOP_DONG_TRA_GOP c WHERE c.MaHD=hd.MaHD AND
+    hd.TongTien-ROUND(hd.TongTien*c.TyLeTraTruoc,0)
+    +ROUND((hd.TongTien-ROUND(hd.TongTien*c.TyLeTraTruoc,0))*c.LaiSuat/100,0)
+    <> (SELECT SUM(SoTienPhaiTra) FROM LICH_TRA_GOP WHERE MaHD=hd.MaHD))
 
 UNION ALL
 SELECT N'Tình trạng hóa đơn không khớp lịch trả góp', hd.MaHD, hd.TinhTrang

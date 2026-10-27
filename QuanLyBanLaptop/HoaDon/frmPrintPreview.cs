@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -27,8 +27,6 @@ namespace QuanLyBanLaptop.HoaDon
             _phieuThu = phieuThu ?? new PhieuThuPrintData();
             _printDoc.PrintPage += InPhieuThu;
         }
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         private void frmPrintPreview_Load(object sender, EventArgs e)
         {
             // Chiều cao tự co giãn theo số lượng sản phẩm

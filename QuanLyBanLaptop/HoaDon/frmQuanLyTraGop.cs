@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -56,12 +56,12 @@ namespace QuanLyBanLaptop.HoaDon
         private void SetupGrids()
         {
             // Cấu hình dgvHopDong (Master)
-            dgvHopDong.AllowUserToResizeColumns = false;
+            dgvHopDong.AllowUserToResizeColumns = true;
             dgvHopDong.AllowUserToResizeRows = false;
             dgvHopDong.AllowUserToOrderColumns = false;
             dgvHopDong.Columns.Clear();
             dgvHopDong.AutoGenerateColumns = false;
-            dgvHopDong.ScrollBars = ScrollBars.Vertical;
+            dgvHopDong.ScrollBars = ScrollBars.Both;
 
             dgvHopDong.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -148,12 +148,12 @@ namespace QuanLyBanLaptop.HoaDon
             dgvHopDong.CellPainting += DgvHopDong_CellPainting;
 
             // Cấu hình dgvLichTraGop (Detail)
-            dgvLichTraGop.AllowUserToResizeColumns = false;
+            dgvLichTraGop.AllowUserToResizeColumns = true;
             dgvLichTraGop.AllowUserToResizeRows = false;
             dgvLichTraGop.AllowUserToOrderColumns = false;
             dgvLichTraGop.Columns.Clear();
             dgvLichTraGop.AutoGenerateColumns = false;
-            dgvLichTraGop.ScrollBars = ScrollBars.Vertical;
+            dgvLichTraGop.ScrollBars = ScrollBars.Both;
 
             dgvLichTraGop.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -778,15 +778,7 @@ ORDER BY hd.MaHD DESC";
             LoadData();
         }
 
-        // Xử lý mở form cấu hình lãi suất & tham số trả góp
-        private void btnCauHinh_Click(object sender, EventArgs e)
-        {
-            using (var frm = new QuanLyBanLaptop.DanhMuc.frmCauHinhTraGop())
-            {
-                frm.ShowDialog(this);
-                LoadData();
-            }
-        }
+
 
         // ═══════════════════════════════════════════════════════════════════
         // THU TIỀN KỲ TRẢ GÓP ĐANG CHỌN

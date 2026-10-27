@@ -31,8 +31,6 @@ namespace QuanLyBanLaptop.HoaDon
         private static readonly Color ColorRed      = Color.FromArgb(239, 68, 68);   // Đỏ (Xóa, Hủy)
         private static readonly Color ColorIndigo   = Color.FromArgb(99, 102, 241);  // Tím xanh (In hóa đơn)
         private static readonly Color ColorGray     = Color.FromArgb(100, 116, 139); // Xám (Đóng)
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmBanHang()
         {
             InitializeComponent();
@@ -51,8 +49,6 @@ namespace QuanLyBanLaptop.HoaDon
         {
             ButtonTheme.Apply(btn);
         }
-
-        // Thực hiện SetFormMode theo trạng thái và dữ liệu hiện tại.
         private void SetFormMode(FormMode mode)
         {
             _mode = mode;
@@ -145,7 +141,7 @@ namespace QuanLyBanLaptop.HoaDon
                     txtHangKhach.Text = hang;
 
                     decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(hang);
-                    txtGiamGia.Text = phanTramGiam.ToString("0");
+                    txtGiamGia.Text = phanTramGiam.ToString("0.##");
                     TinhThanhTien();
                     CapNhatGiamGiaChoGioHang(phanTramGiam);
 
@@ -174,8 +170,6 @@ namespace QuanLyBanLaptop.HoaDon
                 System.Diagnostics.Debug.WriteLine("Lỗi tra cứu SĐT khách: " + ex.Message);
             }
         }
-
-        // Thực hiện ClearForm theo trạng thái và dữ liệu hiện tại.
         private void ClearForm()
         {
             txtMaHD.Clear();
@@ -418,42 +412,8 @@ namespace QuanLyBanLaptop.HoaDon
         // ─── Yêu cầu 1: Lấy mã NV & tên NV từ phiên đăng nhập ─────────────
         private void LoadThongTinNhanVien()
         {
-            try
-            {
-                string maNV = Function.CurrentMaNV;
-                string tenNV = Function.CurrentTenNV;
-
-                if (string.IsNullOrEmpty(maNV))
-                {
-                    DataTable dtNV = DataProcesser.ExecuteReader(
-                        "SELECT TOP 1 MaNV, TenNV FROM NHAN_VIEN WHERE DaNghi = 0 ORDER BY MaNV");
-                    if (dtNV != null && dtNV.Rows.Count > 0)
-                    {
-                        maNV = dtNV.Rows[0]["MaNV"].ToString();
-                        tenNV = dtNV.Rows[0]["TenNV"].ToString();
-                    }
-                    else
-                    {
-                        maNV = "NV001";
-                        tenNV = "Quản trị viên";
-                    }
-                }
-                else if (string.IsNullOrEmpty(tenNV))
-                {
-                    object foundTen = DataProcesser.ExecuteScalar(
-                        "SELECT TenNV FROM NHAN_VIEN WHERE MaNV = @MaNV",
-                        new[] { new SqlParameter("@MaNV", maNV) });
-                    if (foundTen != null && foundTen != DBNull.Value)
-                        tenNV = foundTen.ToString();
-                }
-
-                txtMaNV.Text = maNV;
-                txtTenNV.Text = tenNV;
-            }
-            catch (Exception ex)
-            {
-                Function.ThongBaoCanhBao("Lỗi nạp thông tin nhân viên: " + ex.Message, "Lỗi");
-            }
+            txtMaNV.Text = UserSession.MaNV;
+            txtTenNV.Text = UserSession.TenNV;
         }
 
         // ─── Tải danh sách khách hàng lên ComboBox (chỉ cho phép kéo chọn) ─
@@ -535,7 +495,7 @@ namespace QuanLyBanLaptop.HoaDon
 
                 txtSoLuong.Text = "1";
                 decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(txtHangKhach.Text);
-                txtGiamGia.Text = phanTramGiam.ToString("0");
+                txtGiamGia.Text = phanTramGiam.ToString("0.##");
                 TinhThanhTien();
             }
             else
@@ -561,7 +521,7 @@ namespace QuanLyBanLaptop.HoaDon
                     txtBaoHanh.Text   = frm.SelectedBaoHanh > 0 ? frm.SelectedBaoHanh.ToString() : "12";
                     txtSoLuong.Text   = "1";
                     decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(txtHangKhach.Text);
-                    txtGiamGia.Text   = phanTramGiam.ToString("0");
+                    txtGiamGia.Text   = phanTramGiam.ToString("0.##");
                     TinhThanhTien();
 
                     txtSoLuong.Focus();
@@ -682,13 +642,7 @@ namespace QuanLyBanLaptop.HoaDon
         // Lấy phần trăm giảm giá tự động theo hạng thành viên khách hàng: - Vàng / VIP: 15% - Bạc: 5% - Đồng / Chưa có hạng: 0%
         private decimal LayPhanTramGiamGiaTheoHang(string hang)
         {
-            if (string.IsNullOrWhiteSpace(hang)) return 0;
-            string h = hang.Trim().ToLowerInvariant();
-            if (h.Contains("vàng") || h.Contains("vang") || h.Contains("vip") || h.Contains("gold"))
-                return 15;
-            if (h.Contains("bạc") || h.Contains("bac") || h.Contains("silver"))
-                return 5;
-            return 0; // Đồng hoặc các hạng khác
+            return new Services.ConfigurationService().DiscountFor(hang);
         }
 
         // Cập nhật lại phần trăm giảm giá cho toàn bộ giỏ hàng theo hạng khách
@@ -722,7 +676,7 @@ namespace QuanLyBanLaptop.HoaDon
 
                 // Tự động gán giảm giá theo hạng khách hàng: Vàng: 15%, Bạc: 5%, Đồng: 0%
                 decimal phanTramGiam = LayPhanTramGiamGiaTheoHang(hang);
-                txtGiamGia.Text = phanTramGiam.ToString("0");
+                txtGiamGia.Text = phanTramGiam.ToString("0.##");
                 TinhThanhTien();
 
                 // Nếu đang tạo mới hoặc chỉnh sửa hóa đơn, cập nhật giảm giá cho các mặt hàng đã có trong giỏ
@@ -885,8 +839,6 @@ namespace QuanLyBanLaptop.HoaDon
                 }
             }
         }
-
-        // Thực hiện XemTruocHoaDonHienTai theo trạng thái và dữ liệu hiện tại.
         private void XemTruocHoaDonHienTai()
         {
             string maHD = txtMaHD.Text.Trim();
@@ -1371,8 +1323,6 @@ namespace QuanLyBanLaptop.HoaDon
                 }
             }
         }
-
-        // Xử lý sự kiện lblBaoHanh_Click của giao diện.
         private void lblBaoHanh_Click(object sender, EventArgs e)
         {
 

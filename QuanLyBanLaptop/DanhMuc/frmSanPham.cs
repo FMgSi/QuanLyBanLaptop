@@ -23,8 +23,6 @@ namespace QuanLyBanLaptop.DanhMuc
         private ActiveTab _currentTab = ActiveTab.TatCaMay;
         private readonly Color _colorNavy = Color.FromArgb(27, 42, 74);
         private readonly Color _colorWhite = Color.White;
-
-        // Khởi tạo giao diện và đăng ký sự kiện cho form.
         public frmSanPham()
         {
             InitializeComponent();
@@ -44,8 +42,6 @@ namespace QuanLyBanLaptop.DanhMuc
             SetupNCCEvents();
             SetFormMode(FormMode.Normal);
         }
-
-        // Xử lý sự kiện FrmSanPham_Load của giao diện.
         private void FrmSanPham_Load(object sender, EventArgs e)
         {
 
@@ -70,8 +66,6 @@ namespace QuanLyBanLaptop.DanhMuc
 
             SwitchTab(ActiveTab.TatCaMay);
         }
-
-        // Thực hiện OnVisibleChanged theo trạng thái và dữ liệu hiện tại.
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -97,8 +91,6 @@ namespace QuanLyBanLaptop.DanhMuc
             btnTabLoaiMay.Click += (s, e) => SwitchTab(ActiveTab.LoaiMay);
             btnTabNhaCungCap.Click += (s, e) => SwitchTab(ActiveTab.NhaCungCap);
         }
-
-        // Thực hiện SwitchTab theo trạng thái và dữ liệu hiện tại.
         private void SwitchTab(ActiveTab tab)
         {
             _currentTab = tab;
@@ -249,8 +241,6 @@ namespace QuanLyBanLaptop.DanhMuc
                     break;
             }
         }
-
-        // Xử lý sự kiện TxtChiNhapSoNguyen_KeyPress của giao diện.
         private void TxtChiNhapSoNguyen_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Các TextBox Số Lượng, Đơn giá Nhập, Đơn giá bán chỉ cho phép người dùng nhập số nguyên
@@ -259,8 +249,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 e.Handled = true;
             }
         }
-
-        // Tải dữ liệu phục vụ LoadComboboxesLaptop.
         private void LoadComboboxesLaptop()
         {
             // Đổ danh sách loại máy vào form chỉnh sửa
@@ -284,16 +272,14 @@ namespace QuanLyBanLaptop.DanhMuc
             if (cboSSD.Items.Count > 0 && cboSSD.SelectedIndex < 0)
                 cboSSD.SelectedIndex = 1; // 512GB
         }
-
-        // Tải dữ liệu phục vụ LoadDataLaptop.
         private void LoadDataLaptop()
         {
             string sql = @"
-                SELECT l.MaLaptop, l.TenLaptop, ISNULL(l.Loai, N'Khác') AS Loai, 
-                       n.TenNCC, l.CPU, l.RAM, l.SSD, 
+                SELECT l.MaLaptop, l.TenLaptop, ISNULL(l.Loai, N'Khác') AS Loai,
+                       n.TenNCC, l.CPU, l.RAM, l.SSD,
                        ISNULL(l.DonGiaNhap, 0) AS DonGiaNhap,
-                       l.DonGia, 
-                       l.SoLuongTon, 
+                       l.DonGia,
+                       l.SoLuongTon,
                        l.ThoiGianBaoHanh, l.MaNCC, l.NgungKinhDoanh,
                        ISNULL(l.Anh, N'') AS Anh,
                        ISNULL(l.GhiChu, N'') AS GhiChu,
@@ -309,12 +295,12 @@ namespace QuanLyBanLaptop.DanhMuc
             if (!string.IsNullOrEmpty(keyword))
             {
                 sql += @" AND (
-                    l.MaLaptop LIKE @kw 
-                    OR l.TenLaptop LIKE @kw 
-                    OR l.Loai LIKE @kw 
-                    OR l.CPU LIKE @kw 
-                    OR l.RAM LIKE @kw 
-                    OR l.SSD LIKE @kw 
+                    l.MaLaptop LIKE @kw
+                    OR l.TenLaptop LIKE @kw
+                    OR l.Loai LIKE @kw
+                    OR l.CPU LIKE @kw
+                    OR l.RAM LIKE @kw
+                    OR l.SSD LIKE @kw
                     OR n.TenNCC LIKE @kw
                     OR (CASE WHEN l.NgungKinhDoanh = 1 THEN N'Ngừng KD' ELSE N'Hoạt động' END) LIKE @kw
                 )";
@@ -327,8 +313,6 @@ namespace QuanLyBanLaptop.DanhMuc
             dgvLaptop.DataSource = dt;
             dgvLaptop.ClearSelection();
         }
-
-        // Xử lý sự kiện DgvLaptop_CellFormatting của giao diện.
         private void DgvLaptop_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex < 0 || e.Value == null) return;
@@ -367,8 +351,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 }
             }
         }
-
-        // Thực hiện GetCellString theo trạng thái và dữ liệu hiện tại.
         private string GetCellString(DataGridViewRow row, string colName)
         {
             if (row == null) return "";
@@ -412,8 +394,6 @@ namespace QuanLyBanLaptop.DanhMuc
             if (int.TryParse(bhStr, out int baoHanh))
                 numBaoHanh.Value = Math.Min(numBaoHanh.Maximum, Math.Max(numBaoHanh.Minimum, baoHanh));
         }
-
-        // Xử lý sự kiện DgvLaptop_CellClick của giao diện.
         private void DgvLaptop_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvLaptop.Rows.Count) return;
@@ -496,8 +476,6 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
-        // Xử lý sự kiện BtnXoa_Click của giao diện.
         private void BtnXoa_Click(object sender, EventArgs e)
         {
             string ma = txtMaLaptop.Text.Trim();
@@ -659,8 +637,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 LoadDataLoaiMay();
             };
         }
-
-        // Tải dữ liệu phục vụ LoadDataLoaiMay.
         private void LoadDataLoaiMay()
         {
             string sql = @"
@@ -673,8 +649,6 @@ namespace QuanLyBanLaptop.DanhMuc
             DataTable dt = DataProcesser.ReadData(sql);
             dgvLoaiMay.DataSource = dt;
         }
-
-        // Xử lý sự kiện DgvLoaiMay_CellClick của giao diện.
         private void DgvLoaiMay_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvLoaiMay.Rows.Count) return;
@@ -791,8 +765,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 LoadDataNCC();
             };
         }
-
-        // Tải dữ liệu phục vụ LoadDataNCC.
         private void LoadDataNCC()
         {
             string sql = @"
@@ -807,8 +779,6 @@ namespace QuanLyBanLaptop.DanhMuc
 
             txtMaNCC.Text = Function.SinhMaTuDong("NHA_CUNG_CAP", "MaNCC", "NCC", 2);
         }
-
-        // Xử lý sự kiện DgvNCC_CellClick của giao diện.
         private void DgvNCC_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvNCC.Rows.Count) return;

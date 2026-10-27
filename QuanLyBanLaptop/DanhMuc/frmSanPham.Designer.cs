@@ -221,8 +221,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvLaptop.AllowUserToAddRows = false;
             this.dgvLaptop.AllowUserToDeleteRows = false;
             this.dgvLaptop.AllowUserToResizeRows = false;
-            this.dgvLaptop.AllowUserToResizeColumns = false;
+            this.dgvLaptop.AllowUserToResizeColumns = true;
             this.dgvLaptop.AllowUserToOrderColumns = false;
+            this.dgvLaptop.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvLaptop.BackgroundColor = System.Drawing.Color.White;
             this.dgvLaptop.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvLaptop.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -915,8 +916,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvLoaiMay.AllowUserToAddRows = false;
             this.dgvLoaiMay.AllowUserToDeleteRows = false;
             this.dgvLoaiMay.AllowUserToResizeRows = false;
-            this.dgvLoaiMay.AllowUserToResizeColumns = false;
+            this.dgvLoaiMay.AllowUserToResizeColumns = true;
             this.dgvLoaiMay.AllowUserToOrderColumns = false;
+            this.dgvLoaiMay.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvLoaiMay.BackgroundColor = System.Drawing.Color.White;
             this.dgvLoaiMay.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvLoaiMay.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
@@ -1168,8 +1170,9 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvNCC.AllowUserToAddRows = false;
             this.dgvNCC.AllowUserToDeleteRows = false;
             this.dgvNCC.AllowUserToResizeRows = false;
-            this.dgvNCC.AllowUserToResizeColumns = false;
+            this.dgvNCC.AllowUserToResizeColumns = true;
             this.dgvNCC.AllowUserToOrderColumns = false;
+            this.dgvNCC.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvNCC.BackgroundColor = System.Drawing.Color.White;
             this.dgvNCC.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvNCC.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;

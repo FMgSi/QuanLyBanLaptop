@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Collections.Generic;
 using QuanLyBanLaptop.Classes;
 
 namespace QuanLyBanLaptop.Services
@@ -20,19 +21,46 @@ namespace QuanLyBanLaptop.Services
     // Ghi hóa đơn, tồn kho và serial trong một transaction.
     public sealed class SaleService
     {
+        private readonly Func<IDatabaseSession> openSession;
+        public SaleService() : this(() => new DbHelpers()) { }
+        public SaleService(Func<IDatabaseSession> openSession)
+        {
+            this.openSession = openSession ?? throw new ArgumentNullException(nameof(openSession));
+        }
         // Kiểm tra dữ liệu đầu vào trước khi mở transaction.
-        public void Save(SaleRequest sale)
+        private static List<DataRow> Validate(SaleRequest sale, bool validatePayment = true)
         {
             if (sale == null || sale.Items == null) throw new ArgumentException("Thiếu giỏ hàng.");
-            var rows = sale.Items.AsEnumerable().Where(r => r.RowState != DataRowState.Deleted)
+            var rows = sale.Items.Copy().AsEnumerable().Where(r => r.RowState != DataRowState.Deleted)
                 .OrderBy(r => Convert.ToString(r["MaLaptop"]), StringComparer.Ordinal).ToList();
             if (rows.Count == 0) throw new ArgumentException("Hóa đơn phải có ít nhất một sản phẩm.");
-            if (rows.Select(r => Convert.ToString(r["MaLaptop"])).Distinct().Count() != rows.Count)
+            if (string.IsNullOrWhiteSpace(sale.InvoiceId) || string.IsNullOrWhiteSpace(sale.CustomerId) || string.IsNullOrWhiteSpace(sale.EmployeeId))
+                throw new ArgumentException("Thiếu mã hóa đơn, khách hàng hoặc nhân viên.");
+            if (rows.Select(r => Convert.ToString(r["MaLaptop"]).Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Count() != rows.Count)
                 throw new ArgumentException("Sản phẩm bị trùng trong giỏ hàng.");
+            if (validatePayment && !new[] { "Tiền mặt", "Chuyển khoản", "Trả góp" }.Contains(sale.PaymentMethod))
+                throw new ArgumentException("Phương thức thanh toán không hợp lệ.");
             if (sale.PaymentMethod == "Trả góp" && !new[] { 3, 6, 9, 12 }.Contains(sale.Months))
                 throw new ArgumentException("Kỳ hạn trả góp không hợp lệ.");
+            if (sale.PaymentMethod != "Trả góp" && sale.Months != 0)
+                throw new ArgumentException("Thanh toán ngay không có kỳ hạn trả góp.");
+            foreach (var row in rows)
+            {
+                if (string.IsNullOrWhiteSpace(Convert.ToString(row["MaLaptop"])) ||
+                    Convert.ToInt32(row["SoLuong"]) <= 0 || Convert.ToDecimal(row["DonGia"]) <= 0 ||
+                    Convert.ToDecimal(row["GiamGia"]) < 0 || Convert.ToDecimal(row["GiamGia"]) > 100)
+                    throw new ArgumentException("Mã hàng, số lượng, giá bán hoặc giảm giá không hợp lệ.");
+            }
+            return rows;
+        }
 
-            using (var db = new DbHelpers())
+        public void Save(SaleRequest sale)
+        {
+            var rows = Validate(sale);
+            // Giá vốn/bảo hành lịch sử chỉ được lấy từ DB khi sửa hóa đơn.
+            foreach (string column in new[] { "OriginalCost", "OriginalWarranty" })
+                if (rows[0].Table.Columns.Contains(column)) rows[0].Table.Columns.Remove(column);
+            using (var db = openSession())
             {
                 db.BatDauGiaoDich();
                 if (Convert.ToInt32(db.LayMotGiaTri("SELECT COUNT(*) FROM NHAN_VIEN WHERE MaNV=@0 AND DaNghi=0", sale.EmployeeId)) != 1)
@@ -47,17 +75,21 @@ namespace QuanLyBanLaptop.Services
                 foreach (var row in rows) SaveLine(db, sale, row);
                 if (sale.PaymentMethod == "Trả góp")
                 {
-                    db.CapNhat("INSERT HOP_DONG_TRA_GOP(MaHD,TyLeTraTruoc,LaiSuat) VALUES(@0,@1,@2)",
-                        sale.InvoiceId, InstallmentCalculator.GetDefaultDownPaymentRatio(), InstallmentCalculator.RateFor(sale.Months));
+                    // Chốt cấu hình hiện tại cùng transaction; procedure cũ cũng dùng điều khoản đã chốt này.
+                    db.CapNhat(@"INSERT HOP_DONG_TRA_GOP(MaHD,TyLeTraTruoc,LaiSuat)
+                        SELECT @0,COALESCE(
+                            (SELECT CONVERT(decimal(9,4),GiaTri) FROM CAU_HINH WHERE Khoa=@1),
+                            (SELECT CONVERT(decimal(9,4),GiaTri) FROM CAU_HINH WHERE Khoa='TRA_TRUOC_TOI_THIEU'))/100,
+                            (SELECT CONVERT(decimal(5,2),GiaTri) FROM CAU_HINH WHERE Khoa=@2)",
+                        sale.InvoiceId, "TRA_TRUOC_" + sale.Months + "_THANG", "LAI_SUAT_" + sale.Months + "_THANG");
                     db.CapNhat("EXEC dbo.sp_TaoLichTraGop @MaHD=@0", sale.InvoiceId);
                 }
-                db.CapNhat("EXEC dbo.sp_CapNhatHangThanhVien @MaKH=@0", sale.CustomerId);
                 db.XacNhan();
             }
         }
 
         // Khóa hóa đơn và chặn sửa lịch sử đã có trả góp hoặc bảo hành.
-        private string LockEditable(DbHelpers db, string id)
+        private string LockEditable(IDatabaseSession db, string id)
         {
             var invoice = db.DocBang("SELECT MaKH,PhuongThucThanhToan FROM HOA_DON WITH(UPDLOCK,HOLDLOCK) WHERE MaHD=@0", id);
             if (invoice.Rows.Count != 1) throw new InvalidOperationException("Không tìm thấy hóa đơn.");
@@ -70,7 +102,7 @@ namespace QuanLyBanLaptop.Services
         }
 
         // Hoàn serial trước khi xóa chi tiết để giữ toàn vẹn khóa ngoại.
-        private void ReleaseLines(DbHelpers db, string id, string productId = null)
+        private void ReleaseLines(IDatabaseSession db, string id, string productId = null)
         {
             db.CapNhat(@"UPDATE LAPTOP_SERIAL SET TrangThai=N'Trong kho',MaHD=NULL,NgayHetBH=NULL
                 WHERE MaHD=@0 AND (@1 IS NULL OR MaLaptop=@1)", id, productId);
@@ -80,16 +112,15 @@ namespace QuanLyBanLaptop.Services
         // Cập nhật hóa đơn tiền mặt/chuyển khoản bằng cùng logic bán từng sản phẩm.
         public void Update(SaleRequest sale)
         {
-            var rows = sale.Items.AsEnumerable().Where(r => r.RowState != DataRowState.Deleted)
-                .OrderBy(r => Convert.ToString(r["MaLaptop"]), StringComparer.Ordinal).ToList();
-            if (rows.Count == 0) throw new ArgumentException("Hóa đơn phải có sản phẩm.");
-            using (var db = new DbHelpers())
+            var rows = Validate(sale, false);
+            using (var db = openSession())
             {
                 db.BatDauGiaoDich();
                 LockEditable(db, sale.InvoiceId);
                 var originals = db.DocBang("SELECT MaLaptop,GiaVon,ThoiGianBaoHanh FROM CHI_TIET_HD WHERE MaHD=@0", sale.InvoiceId);
-                if (!sale.Items.Columns.Contains("OriginalCost")) sale.Items.Columns.Add("OriginalCost", typeof(decimal));
-                if (!sale.Items.Columns.Contains("OriginalWarranty")) sale.Items.Columns.Add("OriginalWarranty", typeof(int));
+                var items = rows[0].Table;
+                if (!items.Columns.Contains("OriginalCost")) items.Columns.Add("OriginalCost", typeof(decimal));
+                if (!items.Columns.Contains("OriginalWarranty")) items.Columns.Add("OriginalWarranty", typeof(int));
                 foreach (var row in rows)
                 {
                     var old = originals.AsEnumerable().FirstOrDefault(r => Convert.ToString(r["MaLaptop"]) == Convert.ToString(row["MaLaptop"]));
@@ -107,7 +138,7 @@ namespace QuanLyBanLaptop.Services
         // Xóa hóa đơn không có công nợ/bảo hành và hoàn serial trong cùng giao dịch.
         public void Delete(string id)
         {
-            using (var db = new DbHelpers())
+            using (var db = openSession())
             {
                 db.BatDauGiaoDich();
                 LockEditable(db, id);
@@ -120,7 +151,7 @@ namespace QuanLyBanLaptop.Services
         // Trả một dòng hàng, giữ ít nhất một dòng trên hóa đơn.
         public void RemoveLine(string id, string productId)
         {
-            using (var db = new DbHelpers())
+            using (var db = openSession())
             {
                 db.BatDauGiaoDich();
                 LockEditable(db, id);
@@ -132,7 +163,7 @@ namespace QuanLyBanLaptop.Services
         }
 
         // Khóa hàng theo thứ tự mã; chỉ ghi thành công khi đủ cả tồn kho và serial.
-        private void SaveLine(DbHelpers db, SaleRequest sale, DataRow row)
+        private void SaveLine(IDatabaseSession db, SaleRequest sale, DataRow row)
         {
             string id = Convert.ToString(row["MaLaptop"]);
             int quantity = Convert.ToInt32(row["SoLuong"]);
@@ -151,13 +182,13 @@ namespace QuanLyBanLaptop.Services
             db.CapNhat(@"INSERT CHI_TIET_HD(MaHD,MaLaptop,SoLuong,DonGia,GiaVon,ThoiGianBaoHanh,GiamGia)
                 VALUES(@0,@1,@2,@3,@6,@4,@5)",
                 sale.InvoiceId, id, quantity, price, warranty, discount, cost);
-            int changed = Convert.ToInt32(db.LayMotGiaTri(@";WITH selected AS (
-                    SELECT TOP (@0) * FROM LAPTOP_SERIAL WITH(UPDLOCK,HOLDLOCK)
-                    WHERE MaLaptop=@1 AND TrangThai=N'Trong kho' ORDER BY SerialNo)
-                UPDATE selected SET TrangThai=N'Đã bán',MaHD=@2,NgayHetBH=DATEADD(MONTH,@3,@4); SELECT @@ROWCOUNT",
-                quantity, id, sale.InvoiceId, warranty, sale.Date.Date));
-            if (changed != quantity) throw new InvalidOperationException("Serial không khớp tồn kho của " + id + ". Hãy đối soát.");
-            db.CapNhat("UPDATE LAPTOP SET SoLuongTon=SoLuongTon-@0 WHERE MaLaptop=@1", quantity, id);
+            // Trigger trg_CTHD_Them cấp serial; SoLuongTon được tính từ serial.
+            // Chỉ đối soát ở đây, không cấp thêm một lô serial lần thứ hai.
+            int assigned = Convert.ToInt32(db.LayMotGiaTri(
+                "SELECT COUNT(*) FROM LAPTOP_SERIAL WHERE MaHD=@0 AND MaLaptop=@1",
+                sale.InvoiceId, id));
+            if (assigned != quantity)
+                throw new InvalidOperationException("Serial không khớp số lượng bán của " + id + ". Hãy đối soát.");
         }
     }
 }

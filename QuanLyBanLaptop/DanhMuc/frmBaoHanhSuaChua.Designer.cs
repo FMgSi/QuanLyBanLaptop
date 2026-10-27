@@ -128,9 +128,10 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvBaoHanh.AllowUserToAddRows = false;
             this.dgvBaoHanh.AllowUserToDeleteRows = false;
             this.dgvBaoHanh.AllowUserToOrderColumns = false;
-            this.dgvBaoHanh.AllowUserToResizeColumns = false;
+            this.dgvBaoHanh.AllowUserToResizeColumns = true;
             this.dgvBaoHanh.AllowUserToResizeRows = false;
             this.dgvBaoHanh.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvBaoHanh.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvBaoHanh.BackgroundColor = System.Drawing.Color.White;
             this.dgvBaoHanh.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvBaoHanh.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;

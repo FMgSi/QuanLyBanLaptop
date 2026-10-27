@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.Thongke
+﻿namespace QuanLyBanLaptop.Thongke
 {
     partial class frmThongKe
     {
@@ -138,7 +138,8 @@ namespace QuanLyBanLaptop.Thongke
             // 
             this.dgvThongKe.AllowUserToAddRows = false;
             this.dgvThongKe.AllowUserToDeleteRows = false;
-            this.dgvThongKe.AllowUserToResizeColumns = false;
+            this.dgvThongKe.AllowUserToResizeColumns = true;
+            this.dgvThongKe.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvThongKe.AllowUserToResizeRows = false;
             this.dgvThongKe.AllowUserToOrderColumns = false;
             this.dgvThongKe.BackgroundColor = System.Drawing.Color.White;

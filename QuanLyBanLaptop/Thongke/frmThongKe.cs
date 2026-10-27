@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -16,6 +16,7 @@ namespace QuanLyBanLaptop.Thongke
 {
     public partial class frmThongKe : QuanLyBanLaptop.Classes.AppForm
     {
+        protected override bool RequiresAdmin => true;
         private DataTable duLieuBaoCao;
         private string tieuDeBaoCaoHienTai = "BÁO CÁO DOANH THU & LỢI NHUẬN";
         private int dongDangIn = 0;
@@ -61,7 +62,8 @@ namespace QuanLyBanLaptop.Thongke
         {
             dgvThongKe.AllowUserToAddRows = false;
             dgvThongKe.AllowUserToDeleteRows = false;
-            dgvThongKe.AllowUserToResizeColumns = false;
+            dgvThongKe.AllowUserToResizeColumns = true;
+            dgvThongKe.ScrollBars = ScrollBars.Both;
             dgvThongKe.AllowUserToResizeRows = false;
             dgvThongKe.AllowUserToOrderColumns = false;
             dgvThongKe.ReadOnly = true;
@@ -113,8 +115,8 @@ namespace QuanLyBanLaptop.Thongke
             }
 
             int mode = cboLoaiThongKe.SelectedIndex;
-            string sql;
-            SqlParameter[] pars;
+
+
 
             try
             {
@@ -123,79 +125,27 @@ namespace QuanLyBanLaptop.Thongke
                     tieuDeBaoCaoHienTai = "BÁO CÁO DOANH THU THEO NGÀY";
                     lblGridTitle.Text = "BẢNG SỐ LIỆU DOANH THU THEO NGÀY";
                     lblChartTitle.Text = "BIỂU ĐỒ DOANH THU && LỢI NHUẬN THEO NGÀY";
-                    sql = "SELECT Ngay, SoHoaDon, SoMayBan, DoanhThu, GiaVon, LoiNhuan FROM dbo.fn_BaoCaoDoanhThu(@Tu, @Den) ORDER BY Ngay ASC";
-                    pars = new[]
-                    {
-                        new SqlParameter("@Tu", SqlDbType.Date) { Value = tuNgay },
-                        new SqlParameter("@Den", SqlDbType.Date) { Value = denNgay }
-                    };
                 }
                 else if (mode == 1) // Theo tháng
                 {
                     tieuDeBaoCaoHienTai = "BÁO CÁO DOANH THU THEO THÁNG";
                     lblGridTitle.Text = "BẢNG SỐ LIỆU DOANH THU THEO THÁNG";
                     lblChartTitle.Text = "BIỂU ĐỒ DOANH THU && LỢI NHUẬN THEO THÁNG";
-                    sql = @"SELECT CAST(Thang AS varchar(2)) + '/' + CAST(Nam AS varchar(4)) AS ThangNam, 
-                                   SoHoaDon, SoMayBan, DoanhThu, GiaVon, LoiNhuan 
-                            FROM dbo.vw_DoanhThuThang 
-                            WHERE (Nam * 100 + Thang) BETWEEN (@TuYear * 100 + @TuMonth) AND (@DenYear * 100 + @DenMonth) 
-                            ORDER BY Nam ASC, Thang ASC";
-                    pars = new[]
-                    {
-                        new SqlParameter("@TuYear", SqlDbType.Int) { Value = tuNgay.Year },
-                        new SqlParameter("@TuMonth", SqlDbType.Int) { Value = tuNgay.Month },
-                        new SqlParameter("@DenYear", SqlDbType.Int) { Value = denNgay.Year },
-                        new SqlParameter("@DenMonth", SqlDbType.Int) { Value = denNgay.Month }
-                    };
                 }
                 else if (mode == 2) // Theo sản phẩm
                 {
                     tieuDeBaoCaoHienTai = "BÁO CÁO DOANH THU THEO SẢN PHẨM LAPTOP";
                     lblGridTitle.Text = "BẢNG XẾP HẠNG DOANH THU THEO SẢN PHẨM";
                     lblChartTitle.Text = "BIỂU ĐỒ DOANH THU THEO DÒNG LAPTOP";
-                    sql = @"SELECT l.MaLaptop, l.TenLaptop, l.Loai, 
-                                   SUM(ct.SoLuong) AS SoMayBan, 
-                                   COUNT(DISTINCT hd.MaHD) AS SoHoaDon, 
-                                   SUM(ct.SoLuong * ct.DonGia) AS DoanhThu, 
-                                   SUM(ct.SoLuong * ct.GiaVon) AS GiaVon, 
-                                   SUM(ct.SoLuong * (ct.DonGia - ct.GiaVon)) AS LoiNhuan 
-                            FROM CHI_TIET_HD ct 
-                            JOIN HOA_DON hd ON hd.MaHD = ct.MaHD 
-                            JOIN LAPTOP l ON l.MaLaptop = ct.MaLaptop 
-                            WHERE hd.NgayLap >= @Tu AND hd.NgayLap < DATEADD(DAY, 1, @Den) 
-                            GROUP BY l.MaLaptop, l.TenLaptop, l.Loai 
-                            ORDER BY DoanhThu DESC";
-                    pars = new[]
-                    {
-                        new SqlParameter("@Tu", SqlDbType.Date) { Value = tuNgay },
-                        new SqlParameter("@Den", SqlDbType.Date) { Value = denNgay }
-                    };
                 }
                 else // Theo nhân viên
                 {
                     tieuDeBaoCaoHienTai = "HIỆU SUẤT DOANH THU THEO NHÂN VIÊN";
                     lblGridTitle.Text = "BẢNG HIỆU SUẤT DOANH THU THEO NHÂN VIÊN";
                     lblChartTitle.Text = "BIỂU ĐỒ DOANH THU THEO NHÂN VIÊN";
-                    sql = @"SELECT nv.MaNV, nv.TenNV, nv.ChucVu, 
-                                   COUNT(DISTINCT hd.MaHD) AS SoHoaDon, 
-                                   SUM(ct.SoLuong) AS SoMayBan, 
-                                   SUM(ct.SoLuong * ct.DonGia) AS DoanhThu, 
-                                   SUM(ct.SoLuong * ct.GiaVon) AS GiaVon, 
-                                   SUM(ct.SoLuong * (ct.DonGia - ct.GiaVon)) AS LoiNhuan 
-                            FROM HOA_DON hd 
-                            JOIN CHI_TIET_HD ct ON ct.MaHD = hd.MaHD 
-                            JOIN NHAN_VIEN nv ON nv.MaNV = hd.MaNV 
-                            WHERE hd.NgayLap >= @Tu AND hd.NgayLap < DATEADD(DAY, 1, @Den) 
-                            GROUP BY nv.MaNV, nv.TenNV, nv.ChucVu 
-                            ORDER BY DoanhThu DESC";
-                    pars = new[]
-                    {
-                        new SqlParameter("@Tu", SqlDbType.Date) { Value = tuNgay },
-                        new SqlParameter("@Den", SqlDbType.Date) { Value = denNgay }
-                    };
                 }
 
-                duLieuBaoCao = DataProcesser.ExecuteReader(sql, pars);
+                duLieuBaoCao = new QuanLyBanLaptop.Services.ReportService().GetRevenue((QuanLyBanLaptop.Services.RevenueGrouping)mode, tuNgay, denNgay);
                 HienThiDuLieuLuoi(mode);
                 CapNhatTheKPI();
                 CapNhatBieuDo(mode);
@@ -219,19 +169,19 @@ namespace QuanLyBanLaptop.Thongke
 
             if (dgvThongKe.Columns.Count > 0)
             {
-                SetHeader("Ngay", "Thời gian / Ngày");
-                SetHeader("ThangNam", "Tháng / Năm");
-                SetHeader("SoHoaDon", "Số hóa đơn");
-                SetHeader("SoMayBan", "Số máy bán ra");
-                SetHeader("DoanhThu", "Tổng doanh thu");
-                SetHeader("GiaVon", "Tổng tiền nhập");
-                SetHeader("LoiNhuan", "Lợi nhuận ước tính");
-                SetHeader("MaLaptop", "Mã Laptop");
-                SetHeader("TenLaptop", "Tên Laptop");
-                SetHeader("Loai", "Phân loại");
-                SetHeader("MaNV", "Mã NV");
-                SetHeader("TenNV", "Họ tên NV");
-                SetHeader("ChucVu", "Chức vụ");
+                SetHeader("Ngay", "Thời gian / Ngày", 130);
+                SetHeader("ThangNam", "Tháng / Năm", 120);
+                SetHeader("SoHoaDon", "Số hóa đơn", 100);
+                SetHeader("SoMayBan", "Số máy bán ra", 110);
+                SetHeader("DoanhThu", "Tổng doanh thu", 140);
+                SetHeader("GiaVon", "Tổng tiền nhập", 140);
+                SetHeader("LoiNhuan", "Lợi nhuận ước tính", 140);
+                SetHeader("MaLaptop", "Mã Laptop", 100);
+                SetHeader("TenLaptop", "Tên Laptop", 180);
+                SetHeader("Loai", "Phân loại", 110);
+                SetHeader("MaNV", "Mã NV", 90);
+                SetHeader("TenNV", "Họ tên NV", 160);
+                SetHeader("ChucVu", "Chức vụ", 110);
 
                 FormatColumnCurrency("DoanhThu");
                 FormatColumnCurrency("GiaVon");
@@ -260,10 +210,13 @@ namespace QuanLyBanLaptop.Thongke
             }
         }
 
-        private void SetHeader(string colName, string header)
+        private void SetHeader(string colName, string header, int minWidth = 100)
         {
             if (dgvThongKe.Columns.Contains(colName))
+            {
                 dgvThongKe.Columns[colName].HeaderText = header;
+                dgvThongKe.Columns[colName].MinimumWidth = minWidth;
+            }
         }
 
         private void CapNhatTheKPI()
@@ -475,7 +428,7 @@ namespace QuanLyBanLaptop.Thongke
                 g.DrawString(tieuDeBaoCaoHienTai, fontTieuDe, brushText, bounds.Left, y);
                 y += 28;
 
-                string timeInfo = string.Format("Từ ngày: {0:dd/MM/yyyy}  Đến ngày: {1:dd/MM/yyyy}  |  Người lập: {2}", 
+                string timeInfo = string.Format("Từ ngày: {0:dd/MM/yyyy}  Đến ngày: {1:dd/MM/yyyy}  |  Người lập: {2}",
                     dtpTuNgay.Value, dtpDenNgay.Value, string.IsNullOrEmpty(UserSession.TenNV) ? "Quản trị viên" : UserSession.TenNV);
                 g.DrawString(timeInfo, fontSub, brushText, bounds.Left, y);
                 y += 22;

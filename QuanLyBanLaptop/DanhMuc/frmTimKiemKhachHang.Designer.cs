@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.DanhMuc
+﻿namespace QuanLyBanLaptop.DanhMuc
 {
     partial class frmTimKiemKhachHang
     {
@@ -128,7 +128,8 @@ namespace QuanLyBanLaptop.DanhMuc
             this.dgvKhachHang.AllowUserToAddRows = false;
             this.dgvKhachHang.AllowUserToDeleteRows = false;
             this.dgvKhachHang.AllowUserToOrderColumns = false;
-            this.dgvKhachHang.AllowUserToResizeColumns = false;
+            this.dgvKhachHang.AllowUserToResizeColumns = true;
+            this.dgvKhachHang.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvKhachHang.AllowUserToResizeRows = false;
             this.dgvKhachHang.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvKhachHang.BackgroundColor = System.Drawing.Color.White;

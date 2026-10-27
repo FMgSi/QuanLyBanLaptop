@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.HoaDon
+﻿namespace QuanLyBanLaptop.HoaDon
 {
     partial class frmQuanLyTraGop
     {
@@ -44,7 +44,6 @@ namespace QuanLyBanLaptop.HoaDon
             this.btnThuTienTop = new System.Windows.Forms.Button();
             this.lblDetailTitle = new System.Windows.Forms.Label();
             this.pnlFilter = new System.Windows.Forms.Panel();
-            this.btnCauHinh = new System.Windows.Forms.Button();
             this.btnLamMoi = new System.Windows.Forms.Button();
             this.btnTimKiem = new System.Windows.Forms.Button();
             this.cboTrangThai = new System.Windows.Forms.ComboBox();
@@ -159,7 +158,8 @@ namespace QuanLyBanLaptop.HoaDon
             this.dgvHopDong.AllowUserToAddRows = false;
             this.dgvHopDong.AllowUserToDeleteRows = false;
             this.dgvHopDong.AllowUserToResizeRows = false;
-            this.dgvHopDong.AllowUserToResizeColumns = false;
+            this.dgvHopDong.AllowUserToResizeColumns = true;
+            this.dgvHopDong.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvHopDong.AllowUserToOrderColumns = false;
             this.dgvHopDong.BackgroundColor = System.Drawing.Color.White;
             this.dgvHopDong.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -248,7 +248,8 @@ namespace QuanLyBanLaptop.HoaDon
             this.dgvLichTraGop.AllowUserToAddRows = false;
             this.dgvLichTraGop.AllowUserToDeleteRows = false;
             this.dgvLichTraGop.AllowUserToResizeRows = false;
-            this.dgvLichTraGop.AllowUserToResizeColumns = false;
+            this.dgvLichTraGop.AllowUserToResizeColumns = true;
+            this.dgvLichTraGop.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.dgvLichTraGop.AllowUserToOrderColumns = false;
             this.dgvLichTraGop.BackgroundColor = System.Drawing.Color.White;
             this.dgvLichTraGop.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -442,7 +443,6 @@ namespace QuanLyBanLaptop.HoaDon
             // pnlFilter
             // 
             this.pnlFilter.BackColor = System.Drawing.Color.White;
-            this.pnlFilter.Controls.Add(this.btnCauHinh);
             this.pnlFilter.Controls.Add(this.btnLamMoi);
             this.pnlFilter.Controls.Add(this.btnTimKiem);
             this.pnlFilter.Controls.Add(this.cboTrangThai);
@@ -455,23 +455,6 @@ namespace QuanLyBanLaptop.HoaDon
             this.pnlFilter.Name = "pnlFilter";
             this.pnlFilter.Size = new System.Drawing.Size(1554, 58);
             this.pnlFilter.TabIndex = 2;
-            // 
-            // btnCauHinh
-            // 
-            this.btnCauHinh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCauHinh.BackColor = System.Drawing.Color.White;
-            this.btnCauHinh.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCauHinh.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(206)))), ((int)(((byte)(212)))), ((int)(((byte)(218)))));
-            this.btnCauHinh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCauHinh.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnCauHinh.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(37)))), ((int)(((byte)(41)))));
-            this.btnCauHinh.Location = new System.Drawing.Point(1215, 20);
-            this.btnCauHinh.Name = "btnCauHinh";
-            this.btnCauHinh.Size = new System.Drawing.Size(135, 28);
-            this.btnCauHinh.TabIndex = 7;
-            this.btnCauHinh.Text = "⚙ Cấu hình lãi suất";
-            this.btnCauHinh.UseVisualStyleBackColor = false;
-            this.btnCauHinh.Click += new System.EventHandler(this.btnCauHinh_Click);
             // 
             // btnLamMoi
             // 
@@ -910,7 +893,6 @@ namespace QuanLyBanLaptop.HoaDon
         private System.Windows.Forms.ComboBox cboTrangThai;
         private System.Windows.Forms.Button btnTimKiem;
         private System.Windows.Forms.Button btnLamMoi;
-        private System.Windows.Forms.Button btnCauHinh;
         private System.Windows.Forms.Panel pnlContent;
         private System.Windows.Forms.SplitContainer pnlSplit;
         private System.Windows.Forms.Panel pnlMaster;

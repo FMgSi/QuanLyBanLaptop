@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -6,8 +6,8 @@ using System.Windows.Forms;
 
 namespace QuanLyBanLaptop.Classes
 {
-    // API tương thích cho form cũ; quản lý transaction kế thừa từ DbHelpers.
-    public class DataProcesser : DbHelpers
+    // Cổng truy cập dữ liệu không trạng thái; giao dịch dùng IDatabaseSession.
+    public static class DataProcesser
     {
         private static string connectionString;
 
@@ -44,7 +44,7 @@ namespace QuanLyBanLaptop.Classes
             Func<SqlCommand, T> action)
         {
             using (var connection = GetOpenConnection())
-            using (var command = CreateCommand(connection, null, sql, parameters, type))
+            using (var command = DbHelpers.CreateCommand(connection, null, sql, parameters, type))
                 return action(command);
         }
 
@@ -82,15 +82,15 @@ namespace QuanLyBanLaptop.Classes
         // Đọc bảng với tham số SQL có tên.
         public static DataTable ReadData(string sql, params SqlParameter[] p) => ExecuteReader(sql, p);
         // Đọc bảng với tham số vị trí.
-        public static DataTable ReadData(string sql, params object[] p) => ExecuteReader(sql, Parameters(p));
+        public static DataTable ReadData(string sql, params object[] p) => ExecuteReader(sql, DbHelpers.Parameters(p));
         // Cập nhật với tham số SQL có tên.
         public static int ChangeData(string sql, params SqlParameter[] p) => ExecuteNonQuery(sql, p);
         // Cập nhật với tham số vị trí.
-        public static int ChangeData(string sql, params object[] p) => ExecuteNonQuery(sql, Parameters(p));
+        public static int ChangeData(string sql, params object[] p) => ExecuteNonQuery(sql, DbHelpers.Parameters(p));
         // Đọc giá trị với tham số SQL có tên.
         public static object ExecuteScalar(string sql, params SqlParameter[] p) => ExecuteScalar(sql, p, CommandType.Text);
         // Đọc giá trị với tham số vị trí.
-        public static object ExecuteScalar(string sql, params object[] p) => ExecuteScalar(sql, Parameters(p), CommandType.Text);
+        public static object ExecuteScalar(string sql, params object[] p) => ExecuteScalar(sql, DbHelpers.Parameters(p), CommandType.Text);
         // Gọi stored procedure trả bảng.
         public static DataTable ExecProc(string name, SqlParameter[] p = null) => ExecuteReader(name, p, CommandType.StoredProcedure);
         // Gọi stored procedure ghi dữ liệu.

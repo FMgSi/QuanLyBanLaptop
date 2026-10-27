@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Models;
 
@@ -10,10 +10,11 @@ namespace QuanLyBanLaptop.Services
         // Kiểm tra một lần cho cả thêm và sửa sản phẩm.
         public void Save(Product product, bool isNew)
         {
+            if (product == null) throw new ArgumentNullException(nameof(product));
             if (string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.SupplierId))
                 throw new ArgumentException("Vui lòng nhập tên sản phẩm và chọn nhà cung cấp.");
             if (product.OpeningQuantity < 0 || product.OpeningQuantity > 10000 ||
-                product.PurchasePrice < 0 || product.SalePrice <= product.PurchasePrice)
+                product.PurchasePrice < 0 || product.SalePrice <= product.PurchasePrice || product.WarrantyMonths < 0)
                 throw new ArgumentException("Số lượng phải từ 0 đến 10.000; giá bán phải lớn hơn giá nhập không âm.");
             using (var db = new DbHelpers())
             {

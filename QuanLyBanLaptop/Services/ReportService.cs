@@ -1,11 +1,9 @@
-using System;
+﻿using System;
 using System.Data;
 using QuanLyBanLaptop.Classes;
-
 namespace QuanLyBanLaptop.Services
 {
     public enum RevenueGrouping { Day, Month, Product, Employee }
-
     public sealed class ReportService
     {
         public DataTable GetRevenue(RevenueGrouping grouping, DateTime from, DateTime to)
@@ -29,7 +27,6 @@ namespace QuanLyBanLaptop.Services
                     group = columns; order = "DoanhThu DESC"; break;
                 default: throw new ArgumentOutOfRangeException(nameof(grouping));
             }
-            // Các phần cấu trúc chỉ lấy từ enum; ngày luôn truyền bằng tham số.
             return DataProcesser.ReadData("SELECT " + columns + @",
                 COUNT(DISTINCT h.MaHD) AS SoHoaDon,SUM(c.SoLuong) AS SoMayBan,
                 SUM(c.ThanhTien) AS DoanhThu,SUM(c.SoLuong*c.GiaVon) AS GiaVon,

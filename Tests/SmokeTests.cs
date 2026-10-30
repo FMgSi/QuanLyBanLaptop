@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Services;
-
 public static class SmokeTests
 {
     private static int checks;
@@ -14,13 +13,11 @@ public static class SmokeTests
         if (!condition) throw new Exception(message);
         checks++;
     }
-
     private static void ClickButton(Button btn)
     {
         var m = typeof(Button).GetMethod("OnClick", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         m.Invoke(btn, new object[] { EventArgs.Empty });
     }
-
     [STAThread]
     public static void Main()
     {
@@ -50,7 +47,6 @@ public static class SmokeTests
         try { new SaleService().Save(new SaleRequest { Items = new DataTable() }); }
         catch (ArgumentException) { rejected = true; }
         Check(rejected, "Empty cart rejected without opening database");
-
         using (var form = new Form())
         using (var panel = new Panel())
         using (var enabled = new Button { Text = "Them", Size = new Size(85, 27) })
@@ -74,22 +70,18 @@ public static class SmokeTests
             Check(homeBtn.BackColor == SidebarTheme.SidebarActive, "Active sidebar menu has royal blue background");
             Check(homeBtn.BackColor != Color.White, "Sidebar button must not be turned white by ButtonTheme");
             Check(homeBtn.ForeColor == Color.White, "Sidebar button text is white");
-
             UserSession.ChucVu = "Quản trị viên";
             Check(sb.Controls.Find("btnNhanVien", true).First().Visible, "Admin sees btnNhanVien");
             Check(sb.Controls.Find("btnThongKe", true).First().Visible, "Admin sees btnThongKe");
             Check(sb.Controls.Find("btnCauHinh", true).First().Visible, "Admin sees btnCauHinh");
-
             UserSession.ChucVu = "Nhân viên";
             Check(!sb.Controls.Find("btnNhanVien", true).First().Visible, "Non-admin hides btnNhanVien");
             Check(!sb.Controls.Find("btnThongKe", true).First().Visible, "Non-admin hides btnThongKe");
             Check(!sb.Controls.Find("btnCauHinh", true).First().Visible, "Non-admin hides btnCauHinh");
             UserSession.ChucVu = "Quản trị viên";
         }
-
         var forms = typeof(AppForm).Assembly.GetTypes().Where(t => t.Name.StartsWith("frm") && typeof(Form).IsAssignableFrom(t));
         Check(forms.All(t => typeof(AppForm).IsAssignableFrom(t)), "All forms must inherit shared theme");
-
         using (var qlTraGop = new QuanLyBanLaptop.HoaDon.frmQuanLyTraGop())
         {
             var fieldBtn = typeof(QuanLyBanLaptop.HoaDon.frmQuanLyTraGop).GetField("btnCauHinh", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -102,13 +94,11 @@ public static class SmokeTests
             Check(dgvLich != null && dgvLich.AllowUserToResizeColumns && !dgvLich.AllowUserToOrderColumns, "dgvLichTraGop must allow column resizing and not allow column reordering");
             Check(qlTraGop.FormBorderStyle == FormBorderStyle.FixedSingle && !qlTraGop.MaximizeBox, "frmQuanLyTraGop must have fixed single border without maximize box");
         }
-
         using (var main = new QuanLyBanLaptop.frmMain())
         {
             Check(main.FormBorderStyle == FormBorderStyle.FixedSingle, "frmMain must have fixed single border");
             Check(main.WindowState == FormWindowState.Maximized, "frmMain must automatically open maximized / full screen");
         }
-
         using (var thongKe = new QuanLyBanLaptop.Thongke.frmThongKe())
         {
             var chart = thongKe.Controls.Find("chartDoanhthu", true).FirstOrDefault() as System.Windows.Forms.DataVisualization.Charting.Chart;
@@ -121,7 +111,6 @@ public static class SmokeTests
             var btnExcel = thongKe.Controls.Find("btnXuatExcel", true).FirstOrDefault() as Button;
             Check(btnExcel != null, "btnXuatExcel must exist in frmThongKe");
         }
-
         using (var cauHinh = new QuanLyBanLaptop.DanhMuc.frmCauHinhTraGop())
         {
             Check(cauHinh.Controls.Find("sidebarControl1", true).Length > 0, "frmCauHinhTraGop must contain sidebarControl1");
@@ -129,7 +118,6 @@ public static class SmokeTests
             var dgvConfig = cauHinh.Controls.Find("dgvCauHinh", true).FirstOrDefault() as DataGridView;
             Check(dgvConfig != null && dgvConfig.AllowUserToResizeColumns && !dgvConfig.AllowUserToResizeRows && !dgvConfig.AllowUserToOrderColumns, "dgvCauHinh must allow column resizing and prevent row resize/order");
         }
-
         using (var baoHanh = new QuanLyBanLaptop.DanhMuc.frmBaoHanhSuaChua())
         {
             Check(typeof(AppForm).IsAssignableFrom(typeof(QuanLyBanLaptop.DanhMuc.frmBaoHanhSuaChua)), "frmBaoHanhSuaChua must inherit AppForm");
@@ -166,14 +154,32 @@ public static class SmokeTests
                 "Switching from draft to all restores read-only mode");
             Check(((TextBox)baoHanh.Controls.Find("txtLoiDichVu",true).First()).ReadOnly,
                 "Ticket details are read-only in all tab");
-
             var btnInP = baoHanh.Controls.Find("btnInPhieu", true).FirstOrDefault();
             Check(btnInP != null, "btnInPhieu must exist in frmBaoHanhSuaChua");
             Check(btnInP.Visible == false, "btnInPhieu must be hidden in frmBaoHanhSuaChua");
             Check(baoHanh.Controls.Find("btnXuatExcel", true).FirstOrDefault() != null, "btnXuatExcel must exist in frmBaoHanhSuaChua");
             Check(baoHanh.Controls.Find("btnChonSanPham", true).FirstOrDefault() != null, "btnChonSanPham must exist in frmBaoHanhSuaChua");
         }
-
+        using (var salesPicker = new QuanLyBanLaptop.HoaDon.frmTimKiemLaptop())
+        using (var repairPicker = new QuanLyBanLaptop.HoaDon.frmTimKiemLaptop(true))
+        {
+            Check(salesPicker.Controls.Find("btnMayNgoaiDanhMuc", true).Length == 0,
+                "Sales picker does not permit external devices");
+            Check(repairPicker.Controls.Find("btnMayNgoaiDanhMuc", true).Length == 1,
+                "Repair picker permits external devices");
+            repairPicker.Show();
+            Application.DoEvents();
+            var search = (TextBox)repairPicker.Controls.Find("txtTimKiem", true).First();
+            search.Text = "Acer";
+            var grid = (DataGridView)repairPicker.Controls.Find("dgvLaptop", true).First();
+            Check(grid.Rows.Count > 0, "Repair picker searches the laptop catalogue");
+            decimal expectedPrice = Convert.ToDecimal(((DataRowView)grid.CurrentRow.DataBoundItem)["DonGia"]);
+            grid.Columns["colGiaBan"].DefaultCellStyle.Format = "N2";
+            ClickButton((Button)repairPicker.Controls.Find("btnChon", true).First());
+            Check(repairPicker.SelectedDonGia == expectedPrice, "Picker returns numeric price regardless of display format");
+            Check(repairPicker.DialogResult == DialogResult.OK && repairPicker.SelectedTenLaptop.Contains("Acer"),
+                "Repair picker returns selected model");
+        }
         using (var kh = new QuanLyBanLaptop.DanhMuc.frmKhachHang())
         {
             var btnThem = kh.Controls.Find("btnThem", true).FirstOrDefault() as Button;
@@ -193,7 +199,6 @@ public static class SmokeTests
             ClickButton(btnHuy);
             Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmKhachHang restored to initial state after Huy click");
         }
-
         using (var nv = new QuanLyBanLaptop.DanhMuc.frmNhanVien())
         {
             var btnThem = nv.Controls.Find("btnThem", true).FirstOrDefault() as Button;
@@ -213,7 +218,6 @@ public static class SmokeTests
             ClickButton(btnHuy);
             Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmNhanVien restored to initial state after Huy click");
         }
-
         using (var sp = new QuanLyBanLaptop.DanhMuc.frmSanPham())
         {
             var btnThem = sp.Controls.Find("btnThem", true).FirstOrDefault() as Button;
@@ -233,7 +237,6 @@ public static class SmokeTests
             ClickButton(btnHuy);
             Check(btnThem.Enabled && !btnLuu.Enabled && !btnHuy.Enabled, "frmSanPham restored to initial state after Huy click");
         }
-
         Check(InstallmentCalculator.RateFor(3) > 0, "RateFor must return valid positive interest rate");
         using (var exportGrid = new DataGridView { AllowUserToAddRows = false })
         {
@@ -252,7 +255,6 @@ public static class SmokeTests
                 "Excel fallback preserves Vietnamese, leading zeros and escapes markup");
         }
         Check(InstallmentCalculator.GetDefaultDownPaymentRatio() > 0, "GetDefaultDownPaymentRatio must return valid positive down payment ratio");
-
         Console.WriteLine("PASS: " + checks + " checks (calculations, validation, recursive theme, sidebar blue theme, all forms, fixed grids/splitters, chart & config form, warranty form, button state machines).");
         }
         catch (Exception ex)

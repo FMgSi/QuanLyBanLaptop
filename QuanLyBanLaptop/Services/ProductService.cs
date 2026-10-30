@@ -1,13 +1,10 @@
-using System;
+﻿using System;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Models;
-
 namespace QuanLyBanLaptop.Services
 {
-    // Lưu sản phẩm và tạo phiếu nhập cho số lượng ban đầu.
     public sealed class ProductService
     {
-        // Kiểm tra một lần cho cả thêm và sửa sản phẩm.
         public void Save(Product product, bool isNew)
         {
             if (product == null) throw new ArgumentNullException(nameof(product));

@@ -29,15 +29,12 @@ try {
     $connection.Open()
     [void](Invoke-Batch "IF DB_ID(N'$Database') IS NULL CREATE DATABASE [$Database];")
     $connection.ChangeDatabase($Database)
-    # Stop in PowerShell before executing any installation batch on an existing schema.
     [void](Invoke-Batch "IF EXISTS(SELECT 1 FROM sys.objects WHERE is_ms_shipped=0) THROW 52000,N'Database is not empty. Installation stopped; existing data is unchanged.',1;")
     [void](Invoke-Batch 'BEGIN TRANSACTION;')
     try {
         Invoke-Script '01_structure.sql'
         Invoke-Script '02_operations.sql'
         [void](Invoke-Batch 'COMMIT;')
-        # Release schema locks before demo queries compile/execute in parallel.
-        # The demo script owns its own transaction; a failure rolls back its data.
         if ($Demo) { Invoke-Script '03_demo.sql' }
     }
     catch {

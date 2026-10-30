@@ -1,8 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Compile Include="Classes\ButtonTheme.cs" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -15,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <CodePage>65001</CodePage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,11 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
-    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,60 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\DataProcesser.cs" />
-    <Compile Include="Classes\DbHelpers.cs" />
-    <Compile Include="Classes\GridExcelExporter.cs" />
-    <Compile Include="Classes\IDatabaseSession.cs" />
-    <Compile Include="Services\*.cs" />
+    <Compile Include="Classes\*.cs" />
     <Compile Include="Models\*.cs" />
-    <Compile Include="Classes\Function.cs" />
-    <Compile Include="Classes\SidebarTheme.cs" />
-    <Compile Include="Classes\NavigationMenu.cs" />
-    <Compile Include="Classes\IconHelper.cs" />
-    <Compile Include="Classes\NavigationManager.cs" />
-    <Compile Include="Classes\UserSession.cs" />
-    <Compile Include="SidebarControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SidebarControl.Designer.cs">
-      <DependentUpon>SidebarControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmKhachHang.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmKhachHang.Designer.cs">
-      <DependentUpon>frmKhachHang.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmBaoHanhSuaChua.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmBaoHanhSuaChua.Designer.cs">
-      <DependentUpon>frmBaoHanhSuaChua.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmTimKiemKhachHang.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmTimKiemKhachHang.Designer.cs">
-      <DependentUpon>frmTimKiemKhachHang.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmCauHinhTraGop.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmCauHinhTraGop.Designer.cs">
-      <DependentUpon>frmCauHinhTraGop.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmNhanVien.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmNhanVien.Designer.cs">
-      <DependentUpon>frmNhanVien.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DanhMuc\frmSanPham.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DanhMuc\frmSanPham.Designer.cs">
-      <DependentUpon>frmSanPham.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Services\*.cs" />
+    <Compile Include="DanhMuc\*.cs" />
+    <Compile Include="HoaDon\*.cs" />
+    <Compile Include="Thongke\*.cs" />
     <Compile Include="frmDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,123 +73,17 @@
     <Compile Include="frmTrangChu.Designer.cs">
       <DependentUpon>frmTrangChu.cs</DependentUpon>
     </Compile>
-    <Compile Include="HoaDon\frmBanHang.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmBanHang.Designer.cs">
-      <DependentUpon>frmBanHang.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\frmThanhToan.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmThanhToan.Designer.cs">
-      <DependentUpon>frmThanhToan.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\HoaDonPrintData.cs" />
-    <Compile Include="HoaDon\PhieuThuPrintData.cs" />
-    <Compile Include="HoaDon\frmPrintPreview.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmPrintPreview.Designer.cs">
-      <DependentUpon>frmPrintPreview.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\frmThuTienTraGop.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmThuTienTraGop.Designer.cs">
-      <DependentUpon>frmThuTienTraGop.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\frmQuanLyTraGop.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmQuanLyTraGop.Designer.cs">
-      <DependentUpon>frmQuanLyTraGop.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\frmNhapHang.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmNhapHang.Designer.cs">
-      <DependentUpon>frmNhapHang.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HoaDon\frmTimKiemLaptop.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HoaDon\frmTimKiemLaptop.Designer.cs">
-      <DependentUpon>frmTimKiemLaptop.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Thongke\frmThongKe.cs">
-      <SubType>Form</SubType>
+    <Compile Include="SidebarControl.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Thongke\frmThongKe.Designer.cs">
-      <DependentUpon>frmThongKe.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="DanhMuc\frmCauHinhTraGop.resx">
-      <DependentUpon>frmCauHinhTraGop.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DanhMuc\frmKhachHang.resx">
-      <DependentUpon>frmKhachHang.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DanhMuc\frmBaoHanhSuaChua.resx">
-      <DependentUpon>frmBaoHanhSuaChua.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DanhMuc\frmSanPham.resx">
-      <DependentUpon>frmSanPham.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmDangNhap.resx">
-      <DependentUpon>frmDangNhap.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmBanHang.resx">
-      <DependentUpon>frmBanHang.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmNhapHang.resx">
-      <DependentUpon>frmNhapHang.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmQuanLyTraGop.resx">
-      <DependentUpon>frmQuanLyTraGop.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmThanhToan.resx">
-      <DependentUpon>frmThanhToan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="HoaDon\frmThuTienTraGop.resx">
-      <DependentUpon>frmThuTienTraGop.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    <Compile Include="SidebarControl.Designer.cs">
+      <DependentUpon>SidebarControl.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Resources\logo.png" />
-    <None Include="Resources\text_utc.png" />
-    <None Include="Resources\burger-menu.png" />
-    <None Include="Resources\icon_trangchu.png" />
-    <None Include="Resources\icon_laptop.png" />
-    <None Include="Resources\icon_banhang.png" />
-    <None Include="Resources\icon_nhaphang.png" />
-    <None Include="Resources\icon_nhanvien.png" />
-    <None Include="Resources\icon_thongke.png" />
-    <Content Include="Resources\vietqr_user.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Debug\Images\Button\" />
-    <Folder Include="bin\Debug\Images\Laptop\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

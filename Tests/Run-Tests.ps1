@@ -1,15 +1,18 @@
-﻿param([string]$Server = '.\SQLEXPRESS')
+param([string]$Server = '.\SQLEXPRESS')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
 $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
 if (-not $msbuild) { throw 'Install Visual Studio with .NET desktop development and .NET Framework 4.7.2 targeting pack.' }
-& $msbuild "$root/QuanLyBanLaptop/QuanLyBanLaptop.csproj" -t:Build -p:Configuration=Debug -p:UseSharedCompilation=false -verbosity:minimal
+& $msbuild "$root\QuanLyBanLaptop\QuanLyBanLaptop.csproj" -t:Build -p:Configuration=Debug -p:UseSharedCompilation=false -verbosity:minimal
 if ($LASTEXITCODE) { throw 'Build failed.' }
-$bin = Join-Path $root 'QuanLyBanLaptop/bin/Debug'
-$csc = Join-Path (Split-Path $msbuild) 'Roslyn/csc.exe'
-foreach ($test in @('BusinessTests','SmokeTests')) {
-    & $csc /nologo /target:exe "/out:$bin/$test.exe" "/reference:$bin/QuanLyBanLaptop.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Data.dll /reference:System.Data.DataSetExtensions.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll /reference:System.Windows.Forms.DataVisualization.dll "$PSScriptRoot/$test.cs"
+$bin = Join-Path $root 'QuanLyBanLaptop\bin\Debug'
+$csc = Join-Path (Split-Path $msbuild) 'Roslyn\csc.exe'
+$testBin = Join-Path $env:TEMP 'QuanLyBanLaptop_Tests'
+New-Item -ItemType Directory -Force -Path $testBin | Out-Null
+Copy-Item "$bin\*" -Destination $testBin -Force
+foreach ($test in @('BusinessTests','SmokeTests','PermissionTests','GridScrollTests')) {
+    & $csc /nologo /target:exe "/out:$testBin\$test.exe" "/reference:$testBin\QuanLyBanLaptop.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Data.dll /reference:System.Data.DataSetExtensions.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll /reference:System.Windows.Forms.DataVisualization.dll "$PSScriptRoot\$test.cs"
     if ($LASTEXITCODE) { throw "Compile $test failed." }
 }
 Add-Type -AssemblyName System.Data
@@ -32,8 +35,8 @@ try {
     }
     $builder['Initial Catalog']=$name
     $env:LAPTOP_TEST_CONNECTION=$builder.ConnectionString
-    foreach ($test in @('BusinessTests','SmokeTests')) {
-        & "$bin/$test.exe"
+    foreach ($test in @('BusinessTests','SmokeTests','PermissionTests','GridScrollTests')) {
+        & "$testBin\$test.exe"
         if ($LASTEXITCODE) { throw "$test failed." }
     }
     $command=$cn.CreateCommand()
@@ -50,8 +53,8 @@ finally {
     $builder['Initial Catalog']='master'
     $cleanup=New-Object System.Data.SqlClient.SqlConnection $builder.ConnectionString
     $cleanup.Open()
-    # Only the randomly named database created by this invocation is removed.
     $command=$cleanup.CreateCommand(); $command.CommandText="ALTER DATABASE [$name] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$name]"
     [void]$command.ExecuteNonQuery(); $cleanup.Dispose()
     Remove-Item Env:LAPTOP_TEST_CONNECTION -ErrorAction SilentlyContinue
+    Remove-Item $testBin -Recurse -Force -ErrorAction SilentlyContinue
 }

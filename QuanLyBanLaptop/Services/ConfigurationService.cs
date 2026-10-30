@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Globalization;
 using System.Collections.Generic;
 using QuanLyBanLaptop.Classes;
-
 namespace QuanLyBanLaptop.Services
 {
     public sealed class ConfigurationService
@@ -12,7 +11,6 @@ namespace QuanLyBanLaptop.Services
         {
             { "GIAM_GIA_DONG", 0 }, { "GIAM_GIA_BAC", 5 }, { "GIAM_GIA_VANG", 15 }, { "GIAM_GIA_VIP", 15 }
         };
-
         public DataTable GetAll()
         {
             UserSession.RequireAdmin();
@@ -25,11 +23,9 @@ namespace QuanLyBanLaptop.Services
                     table.Rows.Add(item.Key, item.Value.ToString(CultureInfo.InvariantCulture), DBNull.Value);
             return table;
         }
-
         public decimal GetDecimal(string key)
         {
             var value = DataProcesser.ExecuteScalar("SELECT GiaTri FROM CAU_HINH WHERE Khoa=@0", key);
-            // Tương thích DB cũ: chỉ tham số mới có mặc định, không tự ghi khi đọc.
             if (value == null && Discounts.ContainsKey(key)) return Discounts[key];
             if (value == null && IsTermDownPayment(key)) return GetDecimal("TRA_TRUOC_TOI_THIEU");
             decimal number;
@@ -38,11 +34,9 @@ namespace QuanLyBanLaptop.Services
                 throw new InvalidOperationException("Thiếu hoặc sai cấu hình: " + key);
             return number;
         }
-
         private static bool IsTermDownPayment(string key) =>
             key == "TRA_TRUOC_3_THANG" || key == "TRA_TRUOC_6_THANG" ||
             key == "TRA_TRUOC_9_THANG" || key == "TRA_TRUOC_12_THANG";
-
         public decimal DiscountFor(string membership)
         {
             string key;
@@ -57,7 +51,6 @@ namespace QuanLyBanLaptop.Services
             if (discount < 0 || discount > 100) throw new InvalidOperationException("Cấu hình giảm giá phải từ 0 đến 100%.");
             return discount;
         }
-
         public void Save(string key, decimal value)
         {
             if (!UserSession.IsAdmin) throw new InvalidOperationException("Chỉ quản trị viên được sửa cấu hình.");

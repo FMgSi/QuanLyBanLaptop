@@ -1,6 +1,5 @@
 ﻿namespace QuanLyBanLaptop.Models
 {
-    // Dữ liệu sản phẩm dùng chung cho thêm mới và cập nhật.
     public sealed class Product
     {
         public string Id { get; set; }

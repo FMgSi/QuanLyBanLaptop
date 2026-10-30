@@ -1,32 +1,24 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
-
 namespace QuanLyBanLaptop
 {
     public partial class SidebarControl : UserControl
     {
         private NavigationMenu _selectedMenu = NavigationMenu.TrangChu;
-        private bool _isCollapsed = false;
-        private int _overdueCount = 0;
-        private const int EXPANDED_WIDTH = 230;
-        private const int COLLAPSED_WIDTH = 64;
-        private const int STEP_WIDTH = 25;
+        private bool _isCollapsed;
+        private int _overdueCount;
+        private const int EXPANDED_WIDTH = 230, COLLAPSED_WIDTH = 64, STEP_WIDTH = 25;
         private readonly Button btnCauHinh = new Button();
-
         [Description("The currently selected menu item on the sidebar")]
         [DefaultValue(NavigationMenu.TrangChu)]
         public NavigationMenu SelectedMenu
         {
             get => _selectedMenu;
-            set
-            {
-                _selectedMenu = value;
-                UpdateMenuStyles();
-            }
+            set { _selectedMenu = value; UpdateMenuStyles(); }
         }
         public SidebarControl()
         {
@@ -41,36 +33,23 @@ namespace QuanLyBanLaptop
             pnlMenu.Controls.Add(btnCauHinh);
             pnlMenu.Controls.SetChildIndex(btnCauHinh, 0);
             pnlMenu.AutoScroll = true;
-
             DoubleBuffered = true;
             SetDoubleBuffered(pnlLogo);
             SetDoubleBuffered(pnlMenu);
-
             ApplyThemeAndIcons();
             SetupEvents();
             UserSession.Changed += RefreshPermissions;
-            Disposed += (sender, args) => UserSession.Changed -= RefreshPermissions;
+            Disposed += (s, e) => UserSession.Changed -= RefreshPermissions;
             RefreshPermissions(this, EventArgs.Empty);
         }
-        private void RefreshPermissions(object sender, EventArgs args)
-        {
-            btnNhanVien.Visible = btnThongKe.Visible = btnCauHinh.Visible = UserSession.IsAdmin;
+        private void RefreshPermissions(object sender, EventArgs args) =>
+            btnNhanVien.Visible = btnThongKe.Visible = btnCauHinh.Visible =
             btnNhanVien.Enabled = btnThongKe.Enabled = btnCauHinh.Enabled = UserSession.IsAdmin;
-        }
-        private static void SetDoubleBuffered(Control control)
-        {
-            typeof(Control).InvokeMember(
-                "DoubleBuffered",
-                BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
-                null, control, new object[] { true });
-        }
+        private static void SetDoubleBuffered(Control c) =>
+            typeof(Control).InvokeMember("DoubleBuffered", BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic, null, c, new object[] { true });
         private void ApplyThemeAndIcons()
         {
-            BackColor = SidebarTheme.SidebarBack;
-            pnlLogo.BackColor = SidebarTheme.SidebarBack;
-            pnlMenu.BackColor = SidebarTheme.SidebarBack;
-
-            // Load vector-drawn crisp icons
+            BackColor = pnlLogo.BackColor = pnlMenu.BackColor = SidebarTheme.SidebarBack;
             picLogo.Image = IconHelper.CreateLaptopLogo(48);
             btnTrangChu.Image = IconHelper.CreateHomeIcon(20);
             btnQuanLyLaptop.Image = IconHelper.CreateLaptopIcon(20);
@@ -85,8 +64,6 @@ namespace QuanLyBanLaptop
             btnCauHinh.Cursor = Cursors.Hand;
             btnCauHinh.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCauHinh.ImageAlign = ContentAlignment.MiddleLeft;
-
-            // Button tag mapping
             btnTrangChu.Tag = NavigationMenu.TrangChu;
             btnQuanLyLaptop.Tag = NavigationMenu.QuanLyLaptop;
             btnBanHang.Tag = NavigationMenu.BanHang;
@@ -97,52 +74,21 @@ namespace QuanLyBanLaptop
             btnBaoHanhSuaChua.Tag = NavigationMenu.BaoHanhSuaChua;
             btnThongKe.Tag = NavigationMenu.ThongKe;
             btnCauHinh.Tag = NavigationMenu.CauHinh;
-
-            // Common button appearance
-            foreach (Control c in pnlMenu.Controls)
-            {
-                if (c is Button btn)
-                {
-                    btn.UseVisualStyleBackColor = false;
-                    btn.FlatStyle = FlatStyle.Flat;
-                    btn.FlatAppearance.BorderSize = 0;
-                    btn.ForeColor = SidebarTheme.TextWhite;
-                    btn.Font = SidebarTheme.MenuFont;
-                    btn.BackColor = SidebarTheme.SidebarBack;
-                    btn.FlatAppearance.MouseDownBackColor = SidebarTheme.SidebarActive;
-                    btn.FlatAppearance.MouseOverBackColor = SidebarTheme.SidebarHover;
-                }
-            }
-
-            var tip = new ToolTip();
-            tip.SetToolTip(picLogo, "Bấm để thu gọn / mở rộng menu");
-
-            // Vẽ badge đỏ cảnh báo kỳ quá hạn trên nút Theo Dõi Trả Góp
+            new ToolTip().SetToolTip(picLogo, "Bấm để thu gọn / mở rộng menu");
             btnTheoDoiTraGop.Paint += (s, e) =>
             {
-                if (_overdueCount > 0 && !_isCollapsed)
+                if (_overdueCount <= 0 || _isCollapsed) return;
+                string txt = _overdueCount > 99 ? "99+" : _overdueCount.ToString();
+                int sz = 20, bx = btnTheoDoiTraGop.Width - sz - 16, by = (btnTheoDoiTraGop.Height - sz) / 2;
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                using (var br = new SolidBrush(Color.FromArgb(239, 68, 68))) e.Graphics.FillEllipse(br, bx, by, sz, sz);
+                using (var f = new Font("Segoe UI", 8.2f, FontStyle.Bold))
+                using (var tb = new SolidBrush(Color.White))
                 {
-                    string badgeText = _overdueCount > 99 ? "99+" : _overdueCount.ToString();
-                    int badgeSize = 20;
-                    int badgeX = btnTheoDoiTraGop.Width - badgeSize - 16;
-                    int badgeY = (btnTheoDoiTraGop.Height - badgeSize) / 2;
-
-                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                    using (var brush = new SolidBrush(Color.FromArgb(239, 68, 68))) // Red
-                    {
-                        e.Graphics.FillEllipse(brush, badgeX, badgeY, badgeSize, badgeSize);
-                    }
-                    using (var font = new Font("Segoe UI", 8.2f, FontStyle.Bold))
-                    using (var textBrush = new SolidBrush(Color.White))
-                    {
-                        var sz = e.Graphics.MeasureString(badgeText, font);
-                        e.Graphics.DrawString(badgeText, font, textBrush,
-                            badgeX + (badgeSize - sz.Width) / 2f + 0.5f,
-                            badgeY + (badgeSize - sz.Height) / 2f + 0.5f);
-                    }
+                    var m = e.Graphics.MeasureString(txt, f);
+                    e.Graphics.DrawString(txt, f, tb, bx + (sz - m.Width) / 2f + 0.5f, by + (sz - m.Height) / 2f + 0.5f);
                 }
             };
-
             RefreshOverdueBadge();
             UpdateMenuStyles();
         }
@@ -150,96 +96,52 @@ namespace QuanLyBanLaptop
         {
             try
             {
-                object countObj = DataProcesser.ExecuteScalarSilent(
-                    "SELECT COUNT(DISTINCT MaHD) FROM LICH_TRA_GOP WHERE NgayTra IS NULL AND NgayDenHan < CAST(GETDATE() AS DATE)");
-                _overdueCount = (countObj != null && countObj != DBNull.Value) ? Convert.ToInt32(countObj) : 0;
+                object v = DataProcesser.ExecuteScalarSilent("SELECT COUNT(DISTINCT MaHD) FROM LICH_TRA_GOP WHERE NgayTra IS NULL AND NgayDenHan < CAST(GETDATE() AS DATE)");
+                _overdueCount = (v != null && v != DBNull.Value) ? Convert.ToInt32(v) : 0;
                 btnTheoDoiTraGop.Invalidate();
             }
             catch { }
         }
-
-        // Khởi tạo cấu hình và liên kết cho SetupEvents.
         private void SetupEvents()
         {
             picLogo.Click += (s, e) => ToggleSidebar();
-
             foreach (Control c in pnlMenu.Controls)
-            {
                 if (c is Button btn)
                 {
-                    btn.Click += MenuButton_Click;
-                    btn.MouseEnter += MenuButton_MouseEnter;
-                    btn.MouseLeave += MenuButton_MouseLeave;
+                    btn.Click += (s, e) =>
+                    {
+                        if (!(s is Button b) || !(b.Tag is NavigationMenu m) || m == _selectedMenu) return;
+                        _selectedMenu = m;
+                        UpdateMenuStyles();
+                        NavigationManager.Navigate(FindForm(), m);
+                    };
+                    btn.MouseEnter += (s, e) => { if (s is Button b && b.Tag is NavigationMenu m && m != _selectedMenu) b.BackColor = SidebarTheme.SidebarHover; };
+                    btn.MouseLeave += (s, e) => { if (s is Button b && b.Tag is NavigationMenu m) b.BackColor = m == _selectedMenu ? SidebarTheme.SidebarActive : SidebarTheme.SidebarBack; };
                 }
-            }
-
             tmrCollapse.Interval = 10;
             tmrCollapse.Tick += TmrCollapse_Tick;
-        }
-        private void MenuButton_Click(object sender, EventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is NavigationMenu menu)
-            {
-                if (menu == _selectedMenu) return;
-
-                _selectedMenu = menu;
-                UpdateMenuStyles();
-
-                Form parentForm = FindForm();
-                NavigationManager.Navigate(parentForm, menu);
-            }
-        }
-        private void MenuButton_MouseEnter(object sender, EventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is NavigationMenu menu)
-            {
-                if (menu != _selectedMenu)
-                {
-                    btn.BackColor = SidebarTheme.SidebarHover;
-                }
-            }
-        }
-        private void MenuButton_MouseLeave(object sender, EventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is NavigationMenu menu)
-            {
-                if (menu != _selectedMenu)
-                {
-                    btn.BackColor = SidebarTheme.SidebarBack;
-                }
-                else
-                {
-                    btn.BackColor = SidebarTheme.SidebarActive;
-                }
-            }
         }
         public void UpdateMenuStyles()
         {
             foreach (Control c in pnlMenu.Controls)
-            {
                 if (c is Button btn && btn.Tag is NavigationMenu menu)
                 {
-                    bool isSelected = (menu == _selectedMenu);
+                    bool sel = menu == _selectedMenu;
                     btn.UseVisualStyleBackColor = false;
                     btn.FlatStyle = FlatStyle.Flat;
                     btn.FlatAppearance.BorderSize = 0;
-                    btn.BackColor = isSelected ? SidebarTheme.SidebarActive : SidebarTheme.SidebarBack;
+                    btn.BackColor = sel ? SidebarTheme.SidebarActive : SidebarTheme.SidebarBack;
                     btn.ForeColor = SidebarTheme.TextWhite;
-                    btn.Font = isSelected ? SidebarTheme.MenuActiveFont : SidebarTheme.MenuFont;
+                    btn.Font = sel ? SidebarTheme.MenuActiveFont : SidebarTheme.MenuFont;
                     btn.FlatAppearance.MouseDownBackColor = SidebarTheme.SidebarActive;
                     btn.FlatAppearance.MouseOverBackColor = SidebarTheme.SidebarHover;
                 }
-            }
         }
-        public void ToggleSidebar()
-        {
-            tmrCollapse.Start();
-        }
+        public void ToggleSidebar() => tmrCollapse.Start();
         private void TmrCollapse_Tick(object sender, EventArgs e)
         {
             if (_isCollapsed)
             {
-                // Expanding
                 Width += STEP_WIDTH;
                 if (Width >= EXPANDED_WIDTH)
                 {
@@ -252,7 +154,6 @@ namespace QuanLyBanLaptop
             }
             else
             {
-                // Collapsing
                 SetButtonTextsVisible(false);
                 Width -= STEP_WIDTH;
                 if (Width <= COLLAPSED_WIDTH)
@@ -264,27 +165,21 @@ namespace QuanLyBanLaptop
                 }
             }
         }
-        private void SetButtonTextsVisible(bool visible)
+        private void SetButtonTextsVisible(bool v)
         {
-            btnTrangChu.Text = visible ? "   Trang Chủ" : "";
-            btnQuanLyLaptop.Text = visible ? "   Quản Lý Laptop" : "";
-            btnBanHang.Text = visible ? "   Bán Hàng" : "";
-            btnNhapHang.Text = visible ? "   Nhập Hàng" : "";
-            btnNhanVien.Text = visible ? "   Nhân Viên" : "";
-            btnKhachHang.Text = visible ? "   Khách Hàng" : "";
-            btnTheoDoiTraGop.Text = visible ? "   Theo Dõi Trả Góp" : "";
-            btnBaoHanhSuaChua.Text = visible ? "   Sửa Chữa Bảo Hành" : "";
-            btnThongKe.Text = visible ? "   Thống Kê" : "";
-            btnCauHinh.Text = visible ? "   Cấu Hình" : "";
-
-            int paddingLeft = visible ? 16 : 18;
+            btnTrangChu.Text = v ? "   Trang Chủ" : "";
+            btnQuanLyLaptop.Text = v ? "   Quản Lý Laptop" : "";
+            btnBanHang.Text = v ? "   Bán Hàng" : "";
+            btnNhapHang.Text = v ? "   Nhập Hàng" : "";
+            btnNhanVien.Text = v ? "   Nhân Viên" : "";
+            btnKhachHang.Text = v ? "   Khách Hàng" : "";
+            btnTheoDoiTraGop.Text = v ? "   Theo Dõi Trả Góp" : "";
+            btnBaoHanhSuaChua.Text = v ? "   Sửa Chữa Bảo Hành" : "";
+            btnThongKe.Text = v ? "   Thống Kê" : "";
+            btnCauHinh.Text = v ? "   Cấu Hình" : "";
+            int p = v ? 16 : 18;
             foreach (Control c in pnlMenu.Controls)
-            {
-                if (c is Button b)
-                {
-                    b.Padding = new Padding(paddingLeft, 0, 0, 0);
-                }
-            }
+                if (c is Button b) b.Padding = new Padding(p, 0, 0, 0);
         }
     }
 }

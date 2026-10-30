@@ -1,25 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Services;
-
 namespace QuanLyBanLaptop.DanhMuc
 {
-    public partial class frmBaoHanhSuaChua : QuanLyBanLaptop.Classes.AppForm
+    public partial class frmBaoHanhSuaChua : AppForm
     {
-        // ── 1. ĐỐI TƯỢNG DỮ LIỆU ──────────────────────────────────────────
         public class TicketItem
         {
             public string Id { get; set; }
-            public string Type { get; set; } // "repair" (Sửa chữa) hoặc "warranty" (Bảo hành)
+            public string Type { get; set; }
             public string EmpId { get; set; }
             public string EmpName { get; set; }
             public string CustId { get; set; }
@@ -27,7 +22,6 @@ namespace QuanLyBanLaptop.DanhMuc
             public string Device { get; set; }
             public string Problem { get; set; }
         }
-
         public class RepairServiceItem
         {
             public string Id { get; set; }
@@ -37,7 +31,6 @@ namespace QuanLyBanLaptop.DanhMuc
             public string Time { get; set; }
             public string Warranty { get; set; }
         }
-
         public class WarrantyServiceItem
         {
             public string Id { get; set; }
@@ -46,96 +39,78 @@ namespace QuanLyBanLaptop.DanhMuc
             public string Fee { get; set; }
             public string Time { get; set; }
         }
-
-        // ── 2. KHO DỮ LIỆU ĐÚNG CHUẨN MẪU HTML ─────────────────────────────
         private readonly WarrantyService warrantyService = new WarrantyService();
         private string selectedSerial;
         private List<TicketItem> allTickets = new List<TicketItem>();
         private List<RepairServiceItem> repairServicesCatalog = new List<RepairServiceItem>();
         private List<WarrantyServiceItem> warrantyServicesCatalog = new List<WarrantyServiceItem>();
-
-        private string currentTab = "all"; // 'all' | 'repair' | 'warranty'
-        private string selectedTicketId = null;
-        private string selectedServiceId = null;
-
+        private string currentTab = "all", selectedTicketId, selectedServiceId;
+        private enum ActionState { Normal, Adding, Selected, Editing }
+        private ActionState currentActionState = ActionState.Normal;
         public frmBaoHanhSuaChua()
         {
             InitializeComponent();
             dgvBaoHanh.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvBaoHanh.ColumnHeadersDefaultCellStyle.BackColor;
             dgvBaoHanh.ColumnHeadersDefaultCellStyle.SelectionForeColor = dgvBaoHanh.ColumnHeadersDefaultCellStyle.ForeColor;
+            dgvBaoHanh.SelectionChanged += (s, e) => UpdateExcelButtonState();
             NavigationManager.RegisterForm(NavigationMenu.BaoHanhSuaChua, this);
             sidebarControl1.SelectedMenu = NavigationMenu.BaoHanhSuaChua;
-
             InitCatalogData();
             LoadTickets();
-
             SwitchTab("all");
             UpdateUserInfoDisplay();
             txtMaPhieu.Text = SinhMaPhieuMoi();
             pnlHeaderTop.Visible = !NavigationManager.IsHosted;
             SetActionState(ActionState.Normal);
         }
-
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
-            if (Visible)
-            {
-                sidebarControl1.SelectedMenu = NavigationMenu.BaoHanhSuaChua;
-                UpdateUserInfoDisplay();
-                LoadTickets();
-                RenderGrid();
-                if (string.IsNullOrWhiteSpace(txtMaPhieu.Text))
-                {
-                    txtMaPhieu.Text = SinhMaPhieuMoi();
-                }
-                pnlHeaderTop.Visible = !NavigationManager.IsHosted;
-                SetActionState(ActionState.Normal);
-            }
+            if (!Visible) return;
+            sidebarControl1.SelectedMenu = NavigationMenu.BaoHanhSuaChua;
+            UpdateUserInfoDisplay();
+            LoadTickets();
+            RenderGrid();
+            if (string.IsNullOrWhiteSpace(txtMaPhieu.Text)) txtMaPhieu.Text = SinhMaPhieuMoi();
+            pnlHeaderTop.Visible = !NavigationManager.IsHosted;
+            SetActionState(ActionState.Normal);
         }
-
-        // Hiển thị tên người dùng đăng nhập và tự động gán vào form
         private void UpdateUserInfoDisplay()
         {
-            string name = UserSession.TenNV ?? "";
-            string id = UserSession.MaNV ?? "";
+            string name = UserSession.TenNV ?? "", id = UserSession.MaNV ?? "";
             string role = !string.IsNullOrEmpty(UserSession.ChucVu) ? UserSession.ChucVu : "Quản trị viên";
             lblHeaderUserInfo.Text = $"👤 {name} ({id}) - {role}";
-
-            // Tự động điền Mã NV và Tên NV từ phiên đăng nhập
             txtMaNV.Text = id;
             txtTenNV.Text = name;
         }
-
-        // ── SINH MÃ PHIẾU TỰ ĐỘNG THEO QUY TẮC MP_ddMMyyyy_xx ──────────────
-        private string SinhMaPhieuMoi()
-        {
-            return "(Tự động)";
-        }
-
-        // Sự kiện bấm nút [🔍 Khách hàng] mở bảng chọn khách hàng (giống nút Hàng bên frmHoaDon)
+        private string SinhMaPhieuMoi() => "(Tự động)";
         private void btnChonKhachHang_Click(object sender, EventArgs e)
         {
             using (var frm = new frmTimKiemKhachHang())
             {
-                if (frm.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(frm.SelectedMaKH))
-                {
-                    selectedSerial = null;
-                    txtTenMay.Clear();
-                    txtMaKH.Text = frm.SelectedMaKH;
-                    txtTenKH.Text = frm.SelectedTenKH;
-                    lblFooterNote.Text = $"Đã chọn khách hàng: {frm.SelectedTenKH} ({frm.SelectedMaKH})";
-                    txtTenMay.Focus();
-                }
+                if (frm.ShowDialog(this) != DialogResult.OK || string.IsNullOrEmpty(frm.SelectedMaKH)) return;
+                selectedSerial = null;
+                txtTenMay.Clear();
+                txtMaKH.Text = frm.SelectedMaKH;
+                txtTenKH.Text = frm.SelectedTenKH;
+                lblFooterNote.Text = $"Đã chọn khách hàng: {frm.SelectedTenKH} ({frm.SelectedMaKH})";
+                txtTenMay.Focus();
             }
         }
-
-        // Sự kiện bấm nút [🔍 Sản phẩm] mở bảng tìm kiếm sản phẩm (giống nút Hàng bên frmHoaDon)
         private void btnChonSanPham_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtMaKH.Text))
+            if (string.IsNullOrWhiteSpace(txtMaKH.Text)) { Function.ThongBaoCanhBao("Hãy chọn khách hàng trước khi chọn serial máy."); return; }
+            if (currentTab == "repair")
             {
-                Function.ThongBaoCanhBao("Hãy chọn khách hàng trước khi chọn serial máy.");
+                using (var picker = new HoaDon.frmTimKiemLaptop(true))
+                {
+                    if (picker.ShowDialog(this) == DialogResult.OK)
+                    {
+                        selectedSerial = null;
+                        txtTenMay.Text = picker.SelectedTenLaptop;
+                        lblFooterNote.Text = "Máy sửa chữa: " + picker.SelectedTenLaptop + " (không yêu cầu mua tại cửa hàng).";
+                    }
+                }
                 return;
             }
             try
@@ -150,13 +125,8 @@ namespace QuanLyBanLaptop.DanhMuc
                         : "Khách hàng không có máy đã mua có thể tiếp nhận sửa chữa.");
                     return;
                 }
-                using (var dialog = new Form { Text = "Chọn serial máy của khách hàng", Width = 750,
-                    Height = 400, StartPosition = FormStartPosition.CenterParent })
-                using (var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true,
-                    AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                    AllowUserToAddRows = false, MultiSelect = false,
-                    SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                    DataSource = devices })
+                using (var dialog = new Form { Text = "Chọn serial máy của khách hàng", Width = 750, Height = 400, StartPosition = FormStartPosition.CenterParent })
+                using (var grid = new DataGridView { Dock = DockStyle.Fill, ReadOnly = true, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill, AllowUserToAddRows = false, MultiSelect = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, DataSource = devices })
                 using (var choose = new Button { Text = "Chọn máy", Dock = DockStyle.Bottom, Height = 36 })
                 {
                     choose.Click += (buttonSender, args) =>
@@ -178,8 +148,6 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
-        // Khởi tạo danh mục dịch vụ sửa chữa và bảo hành mẫu
         private void InitCatalogData()
         {
             repairServicesCatalog = new List<RepairServiceItem>
@@ -193,7 +161,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 new RepairServiceItem { Id = "DV-SC07", Name = "Nâng cấp ổ cứng SSD NVMe PCIe 512GB", Symptom = "Máy khởi động rất chậm, ổ HDD cũ bị Bad Sector", Price = "890.000 đ", Time = "30 phút", Warranty = "36 tháng" },
                 new RepairServiceItem { Id = "DV-SC08", Name = "Đóng lại / Thay thế Chipset VGA đồ họa rời", Symptom = "Rác hình, màn hình xanh BSOD khi bật game", Price = "1.250.000 đ", Time = "2 - 3 ngày", Warranty = "3 tháng" }
             };
-
             warrantyServicesCatalog = new List<WarrantyServiceItem>
             {
                 new WarrantyServiceItem { Id = "DV-BH01", Name = "Bảo hành đổi mới Pin linh kiện chính hãng", Condition = "Pin chai vượt mức 30% trong thời hạn bảo hành hãng", Fee = "0 đ (Bảo hành)", Time = "1 - 2 ngày" },
@@ -204,8 +171,6 @@ namespace QuanLyBanLaptop.DanhMuc
                 new WarrantyServiceItem { Id = "DV-BH06", Name = "Bảo hành sạc Adapter theo máy", Condition = "Không sạc vào điện, tiếp xúc chập chờn nguyên tem", Fee = "0 đ (Bảo hành)", Time = "Đổi mới ngay" }
             };
         }
-
-        // Tải dữ liệu từ CSDL hoặc nạp danh sách chuẩn từ HTML
         private void LoadTickets()
         {
             allTickets.Clear();
@@ -223,35 +188,23 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi("Không tải được phiếu bảo hành: " + ex.Message); }
         }
-
-        // ── 3. CHUYỂN TAB (TẤT CẢ - DỊCH VỤ SỬA CHỮA - QUẢN LÝ BẢO HÀNH) ─────
         private void SwitchTab(string tab)
         {
             currentTab = tab;
             pnlFormContainer.Visible = tab != "all";
             HandleClearForm();
             SetActionState(ActionState.Normal);
-            selectedTicketId = null;
-            selectedServiceId = null;
+            selectedTicketId = selectedServiceId = null;
             lblCurrentSelected.Text = "Đang chọn: Chưa chọn";
-
-            Color activeBg = Color.FromArgb(17, 35, 64);      // #112340
-            Color inactiveBg = Color.White;
-            Color activeFg = Color.White;
-            Color inactiveFg = Color.FromArgb(51, 65, 85);
-
-            btnTabAll.BackColor = (tab == "all") ? activeBg : inactiveBg;
-            btnTabAll.ForeColor = (tab == "all") ? activeFg : inactiveFg;
-            btnTabAll.Font = new Font("Segoe UI", 9F, (tab == "all") ? FontStyle.Bold : FontStyle.Regular);
-
-            btnTabRepair.BackColor = (tab == "repair") ? activeBg : inactiveBg;
-            btnTabRepair.ForeColor = (tab == "repair") ? activeFg : inactiveFg;
-            btnTabRepair.Font = new Font("Segoe UI", 9F, (tab == "repair") ? FontStyle.Bold : FontStyle.Regular);
-
-            btnTabWarranty.BackColor = (tab == "warranty") ? activeBg : inactiveBg;
-            btnTabWarranty.ForeColor = (tab == "warranty") ? activeFg : inactiveFg;
-            btnTabWarranty.Font = new Font("Segoe UI", 9F, (tab == "warranty") ? FontStyle.Bold : FontStyle.Regular);
-
+            Color activeBg = Color.FromArgb(17, 35, 64), inactiveBg = Color.White;
+            Color activeFg = Color.White, inactiveFg = Color.FromArgb(51, 65, 85);
+            foreach (var (btn, key) in new[] { (btnTabAll, "all"), (btnTabRepair, "repair"), (btnTabWarranty, "warranty") })
+            {
+                bool active = tab == key;
+                btn.BackColor = active ? activeBg : inactiveBg;
+                btn.ForeColor = active ? activeFg : inactiveFg;
+                btn.Font = new Font("Segoe UI", 9F, active ? FontStyle.Bold : FontStyle.Regular);
+            }
             if (tab == "all")
             {
                 lblFormHeader.Text = "TỔNG HỢP THÔNG TIN PHIẾU TIẾP NHẬN";
@@ -273,80 +226,48 @@ namespace QuanLyBanLaptop.DanhMuc
                 lblTableHint.Text = "Bấm trực tiếp hạng mục bảo hành để nạp nhanh vào mục Lỗi / Dịch vụ";
                 lblFooterNote.Text = "Bấm vào bất kỳ hạng mục nào để chọn vào phiếu tiếp nhận";
             }
-
             RenderGrid();
         }
-
         private void btnTabAll_Click(object sender, EventArgs e) => SwitchTab("all");
         private void btnTabRepair_Click(object sender, EventArgs e) => SwitchTab("repair");
         private void btnTabWarranty_Click(object sender, EventArgs e) => SwitchTab("warranty");
-
-        // ── 4. RENDER BẢNG DỮ LIỆU ĐA NĂNG THEO TAB ─────────────────────────
         private void RenderGrid()
         {
             dgvBaoHanh.Columns.Clear();
             dgvBaoHanh.AutoGenerateColumns = false;
             dgvBaoHanh.AllowUserToResizeColumns = true;
             dgvBaoHanh.ScrollBars = ScrollBars.Both;
-
             if (currentTab == "all")
             {
-                // Tab Tất cả: Danh sách tất cả các phiếu
                 lblRecordCount.Text = $"Tổng số: {allTickets.Count} phiếu";
-
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã phiếu", Width = 95, MinimumWidth = 85 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "TypeDisplay", HeaderText = "Phân loại", Width = 110, MinimumWidth = 95 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "EmpId", HeaderText = "Mã NV", Width = 85, MinimumWidth = 80 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "EmpName", HeaderText = "Tên nhân viên", Width = 150, MinimumWidth = 130 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CustId", HeaderText = "Mã KH", Width = 85, MinimumWidth = 80 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "CustName", HeaderText = "Tên khách hàng", Width = 150, MinimumWidth = 130 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Device", HeaderText = "Tên máy", Width = 170, MinimumWidth = 140 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Problem", HeaderText = "Lỗi / Dịch vụ tiếp nhận", Width = 250, MinimumWidth = 200, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
-
-                var viewList = allTickets.Select(t => new
-                {
-                    t.Id,
-                    TypeDisplay = (t.Type == "repair" ? "Sửa chữa" : "Bảo hành"),
-                    t.EmpId,
-                    t.EmpName,
-                    t.CustId,
-                    t.CustName,
-                    t.Device,
-                    t.Problem
-                }).ToList();
-
-                dgvBaoHanh.DataSource = viewList;
-
-                // Tô màu phân loại
+                dgvBaoHanh.Columns.AddRange(
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã phiếu", Width = 95, MinimumWidth = 85 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "TypeDisplay", HeaderText = "Phân loại", Width = 110, MinimumWidth = 95 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "EmpId", HeaderText = "Mã NV", Width = 85, MinimumWidth = 80 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "EmpName", HeaderText = "Tên nhân viên", Width = 150, MinimumWidth = 130 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "CustId", HeaderText = "Mã KH", Width = 85, MinimumWidth = 80 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "CustName", HeaderText = "Tên khách hàng", Width = 150, MinimumWidth = 130 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Device", HeaderText = "Tên máy", Width = 170, MinimumWidth = 140 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Problem", HeaderText = "Lỗi / Dịch vụ tiếp nhận", Width = 250, MinimumWidth = 200, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
+                dgvBaoHanh.DataSource = allTickets.Select(t => new { t.Id, TypeDisplay = t.Type == "repair" ? "Sửa chữa" : "Bảo hành", t.EmpId, t.EmpName, t.CustId, t.CustName, t.Device, t.Problem }).ToList();
                 for (int i = 0; i < dgvBaoHanh.Rows.Count; i++)
                 {
                     string pl = dgvBaoHanh.Rows[i].Cells[1].Value?.ToString() ?? "";
-                    if (pl == "Sửa chữa")
-                    {
-                        dgvBaoHanh.Rows[i].Cells[1].Style.ForeColor = Color.FromArgb(29, 78, 216);
-                        dgvBaoHanh.Rows[i].Cells[1].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-                    }
-                    else
-                    {
-                        dgvBaoHanh.Rows[i].Cells[1].Style.ForeColor = Color.FromArgb(126, 34, 206);
-                        dgvBaoHanh.Rows[i].Cells[1].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-                    }
+                    dgvBaoHanh.Rows[i].Cells[1].Style.ForeColor = pl == "Sửa chữa" ? Color.FromArgb(29, 78, 216) : Color.FromArgb(126, 34, 206);
+                    dgvBaoHanh.Rows[i].Cells[1].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
                 }
             }
             else if (currentTab == "repair")
             {
-                // Tab Dịch vụ Sửa chữa: Bảng danh mục các gói sửa máy
                 lblRecordCount.Text = $"Tổng số: {repairServicesCatalog.Count} dịch vụ có sẵn";
-
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã DV", Width = 95, MinimumWidth = 85 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Tên dịch vụ sửa máy", Width = 280, MinimumWidth = 180 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Symptom", HeaderText = "Triệu chứng lỗi thường gặp", Width = 260, MinimumWidth = 180, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Price", HeaderText = "Giá tham khảo", Width = 140, MinimumWidth = 120 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Time", HeaderText = "Thời gian", Width = 130, MinimumWidth = 110 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Warranty", HeaderText = "Bảo hành", Width = 120, MinimumWidth = 100 });
-
+                dgvBaoHanh.Columns.AddRange(
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã DV", Width = 95, MinimumWidth = 85 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Tên dịch vụ sửa máy", Width = 280, MinimumWidth = 180 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Symptom", HeaderText = "Triệu chứng lỗi thường gặp", Width = 260, MinimumWidth = 180, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Price", HeaderText = "Giá tham khảo", Width = 140, MinimumWidth = 120 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Time", HeaderText = "Thời gian", Width = 130, MinimumWidth = 110 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Warranty", HeaderText = "Bảo hành", Width = 120, MinimumWidth = 100 });
                 dgvBaoHanh.DataSource = repairServicesCatalog.ToList();
-
                 for (int i = 0; i < dgvBaoHanh.Rows.Count; i++)
                 {
                     dgvBaoHanh.Rows[i].Cells[0].Style.ForeColor = Color.FromArgb(17, 35, 64);
@@ -357,17 +278,14 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             else if (currentTab == "warranty")
             {
-                // Tab Quản lý Bảo hành: Bảng các hạng mục bảo hành hãng
                 lblRecordCount.Text = $"Tổng số: {warrantyServicesCatalog.Count} hạng mục bảo hành";
-
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã BH", Width = 95, MinimumWidth = 85 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Hạng mục bảo hành", Width = 300, MinimumWidth = 200 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Condition", HeaderText = "Điều kiện tiếp nhận bảo hành", Width = 280, MinimumWidth = 200, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Fee", HeaderText = "Chi phí", Width = 150, MinimumWidth = 120 });
-                dgvBaoHanh.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "Time", HeaderText = "Thời gian xử lý", Width = 150, MinimumWidth = 120 });
-
+                dgvBaoHanh.Columns.AddRange(
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Id", HeaderText = "Mã BH", Width = 95, MinimumWidth = 85 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Name", HeaderText = "Hạng mục bảo hành", Width = 300, MinimumWidth = 200 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Condition", HeaderText = "Điều kiện tiếp nhận bảo hành", Width = 280, MinimumWidth = 200, AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Fee", HeaderText = "Chi phí", Width = 150, MinimumWidth = 120 },
+                    new DataGridViewTextBoxColumn { DataPropertyName = "Time", HeaderText = "Thời gian xử lý", Width = 150, MinimumWidth = 120 });
                 dgvBaoHanh.DataSource = warrantyServicesCatalog.ToList();
-
                 for (int i = 0; i < dgvBaoHanh.Rows.Count; i++)
                 {
                     dgvBaoHanh.Rows[i].Cells[0].Style.ForeColor = Color.FromArgb(126, 34, 206);
@@ -376,14 +294,13 @@ namespace QuanLyBanLaptop.DanhMuc
                     dgvBaoHanh.Rows[i].Cells[3].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
                 }
             }
-
-            // Khôi phục chọn dòng trực quan theo Tab giống như HTML
+            string targetId = currentTab == "all" ? selectedTicketId : selectedServiceId;
             bool hasSelection = false;
-            if (!string.IsNullOrEmpty(selectedTicketId) && currentTab == "all")
+            if (!string.IsNullOrEmpty(targetId))
             {
                 for (int i = 0; i < dgvBaoHanh.Rows.Count; i++)
                 {
-                    if (dgvBaoHanh.Rows[i].Cells[0].Value?.ToString() == selectedTicketId)
+                    if (dgvBaoHanh.Rows[i].Cells[0].Value?.ToString() == targetId)
                     {
                         dgvBaoHanh.Rows[i].Selected = true;
                         try { dgvBaoHanh.FirstDisplayedScrollingRowIndex = i; } catch { }
@@ -392,76 +309,22 @@ namespace QuanLyBanLaptop.DanhMuc
                     }
                 }
             }
-            else if (!string.IsNullOrEmpty(selectedServiceId) && (currentTab == "repair" || currentTab == "warranty"))
-            {
-                for (int i = 0; i < dgvBaoHanh.Rows.Count; i++)
-                {
-                    if (dgvBaoHanh.Rows[i].Cells[0].Value?.ToString() == selectedServiceId)
-                    {
-                        dgvBaoHanh.Rows[i].Selected = true;
-                        try { dgvBaoHanh.FirstDisplayedScrollingRowIndex = i; } catch { }
-                        hasSelection = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!hasSelection)
-            {
-                dgvBaoHanh.ClearSelection();
-            }
+            if (!hasSelection) dgvBaoHanh.ClearSelection();
+            UpdateExcelButtonState();
         }
-
-        // ── 5. XỬ LÝ SỰ KIỆN CLICK CHỌN DÒNG TRÊN BẢNG ───────────────────────
         private void dgvBaoHanh_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvBaoHanh.Rows.Count) return;
-
-            if (currentTab == "all")
-            {
-                string id = dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString();
-                SelectTicketRow(id);
-            }
-            else if (currentTab == "repair")
-            {
-                string id = dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString();
-                SelectServiceRow(id, "repair");
-            }
-            else if (currentTab == "warranty")
-            {
-                string id = dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString();
-                SelectServiceRow(id, "warranty");
-            }
+            string id = dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString();
+            if (currentTab == "all") SelectTicketRow(id);
+            else SelectServiceRow(id, currentTab);
         }
-
         private void dgvBaoHanh_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex >= dgvBaoHanh.Rows.Count) return;
-
-            if (dgvBaoHanh.Columns[e.ColumnIndex] is DataGridViewButtonColumn)
-            {
-                string id = dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString();
-                if (currentTab == "repair")
-                {
-                    SelectServiceRow(id, "repair");
-                }
-                else if (currentTab == "warranty")
-                {
-                    SelectServiceRow(id, "warranty");
-                }
-            }
+            if (dgvBaoHanh.Columns[e.ColumnIndex] is DataGridViewButtonColumn && (currentTab == "repair" || currentTab == "warranty"))
+                SelectServiceRow(dgvBaoHanh.Rows[e.RowIndex].Cells[0].Value?.ToString(), currentTab);
         }
-
-        private enum ActionState
-        {
-            Normal,   // 1. Ban đầu: Chỉ Thêm và Thoát bấm được
-            Adding,   // 2. Bấm Thêm: Chỉ Hủy và Lưu bấm được
-            Selected, // 3. Bấm dòng Grid: Chỉ Hủy, Sửa, Xóa bấm được
-            Editing   // 4. Bấm Sửa: Chỉ Hủy và Lưu bấm được
-        }
-        private ActionState currentActionState = ActionState.Normal;
-
-        // Quản lý trạng thái và giao diện các nút thao tác theo chuẩn
         private void SetActionState(ActionState state)
         {
             bool viewOnly = currentTab == "all";
@@ -469,154 +332,97 @@ namespace QuanLyBanLaptop.DanhMuc
             currentActionState = state;
             bool editing = state == ActionState.Adding || state == ActionState.Editing;
             bool selected = state == ActionState.Selected;
-            foreach (var button in new[] { btnThem, btnSua, btnXoa, btnLuu, btnHuy })
-                button.Visible = !viewOnly;
+            foreach (var button in new[] { btnThem, btnSua, btnXoa, btnLuu, btnHuy }) button.Visible = !viewOnly;
             ButtonTheme.SetButtonState(btnThem, !viewOnly && state == ActionState.Normal);
             ButtonTheme.SetButtonState(btnSua, selected);
-            ButtonTheme.SetButtonState(btnXoa, selected && UserSession.IsAdmin, Color.FromArgb(185,28,28));
-            ButtonTheme.SetButtonState(btnLuu, editing, Color.FromArgb(21,128,61));
+            ButtonTheme.SetButtonState(btnXoa, selected && UserSession.IsAdmin, Color.FromArgb(185, 28, 28));
+            ButtonTheme.SetButtonState(btnLuu, editing, Color.FromArgb(21, 128, 61));
             ButtonTheme.SetButtonState(btnHuy, state != ActionState.Normal);
             ButtonTheme.SetButtonState(btnThoat, true);
-            ButtonTheme.SetButtonState(btnXuatExcel, true, Color.FromArgb(21,128,61));
-            txtTenKH.ReadOnly = txtTenMay.ReadOnly = true;
-            txtMaPhieu.ReadOnly = txtMaNV.ReadOnly = txtTenNV.ReadOnly = txtMaKH.ReadOnly = true;
+            UpdateExcelButtonState();
+            txtTenKH.ReadOnly = txtTenMay.ReadOnly = txtMaPhieu.ReadOnly = txtMaNV.ReadOnly = txtTenNV.ReadOnly = txtMaKH.ReadOnly = true;
             txtLoiDichVu.ReadOnly = !editing;
             btnChonKhachHang.Enabled = btnChonSanPham.Enabled = state == ActionState.Adding;
         }
-
-        // Chọn một phiếu từ Tab Tất cả nạp lên đúng 7 trường
+        private void UpdateExcelButtonState()
+        {
+            bool hasRow = dgvBaoHanh.SelectedRows.Count == 1 || (dgvBaoHanh.CurrentRow != null && dgvBaoHanh.CurrentRow.Index >= 0 && dgvBaoHanh.CurrentRow.Selected);
+            ButtonTheme.SetButtonState(btnXuatExcel, hasRow, Color.FromArgb(21, 128, 61));
+        }
         private void SelectTicketRow(string id)
         {
             var item = allTickets.FirstOrDefault(x => x.Id == id);
-            if (item != null)
-            {
-                selectedTicketId = item.Id;
-                selectedServiceId = null;
-                lblCurrentSelected.Text = $"Đang chọn: Phiếu {item.Id}";
-                lblFooterNote.Text = $"Đã nạp thông tin phiếu [{item.Id}]. Bấm 'Sửa' để cập nhật hoặc 'Hủy' để bỏ chọn.";
-
-                txtMaPhieu.Text = item.Id;
-                txtMaNV.Text = item.EmpId;
-                txtTenNV.Text = item.EmpName;
-                txtMaKH.Text = item.CustId;
-                txtTenKH.Text = item.CustName;
-                txtTenMay.Text = item.Device;
-                txtLoiDichVu.Text = item.Problem;
-
-                SetActionState(ActionState.Selected);
-            }
+            if (item == null) return;
+            selectedTicketId = item.Id;
+            selectedServiceId = null;
+            lblCurrentSelected.Text = $"Đang chọn: Phiếu {item.Id}";
+            lblFooterNote.Text = $"Đã nạp thông tin phiếu [{item.Id}]. Bấm 'Sửa' để cập nhật hoặc 'Hủy' để bỏ chọn.";
+            txtMaPhieu.Text = item.Id;
+            txtMaNV.Text = item.EmpId;
+            txtTenNV.Text = item.EmpName;
+            txtMaKH.Text = item.CustId;
+            txtTenKH.Text = item.CustName;
+            txtTenMay.Text = item.Device;
+            txtLoiDichVu.Text = item.Problem;
+            SetActionState(ActionState.Selected);
         }
-
-        // Chọn dịch vụ từ Tab Sửa chữa hoặc Bảo hành nạp vào form
         private void SelectServiceRow(string id, string type)
         {
             selectedServiceId = id;
             selectedTicketId = null;
             lblCurrentSelected.Text = $"Đang chọn: Dịch vụ {id}";
-
-            // Điền thông tin nhân viên đăng nhập nếu chưa có
-            if (string.IsNullOrWhiteSpace(txtMaNV.Text))
-            {
-                txtMaNV.Text = UserSession.MaNV ?? "";
-                txtTenNV.Text = UserSession.TenNV ?? "";
-            }
-
-            // Giữ hoặc tự sinh mã phiếu theo quy tắc MP_ddMMyyyy_xx
-            if (string.IsNullOrWhiteSpace(txtMaPhieu.Text) || !txtMaPhieu.Text.StartsWith("MP_"))
-            {
-                txtMaPhieu.Text = SinhMaPhieuMoi();
-            }
-
+            if (string.IsNullOrWhiteSpace(txtMaNV.Text)) { txtMaNV.Text = UserSession.MaNV ?? ""; txtTenNV.Text = UserSession.TenNV ?? ""; }
+            if (string.IsNullOrWhiteSpace(txtMaPhieu.Text) || !txtMaPhieu.Text.StartsWith("MP_")) txtMaPhieu.Text = SinhMaPhieuMoi();
             if (type == "repair")
             {
                 var s = repairServicesCatalog.FirstOrDefault(x => x.Id == id);
-                if (s != null)
-                {
-                    txtLoiDichVu.Text = $"{s.Name} - [Lỗi: {s.Symptom}]";
-                    lblFooterNote.Text = $"Đã chọn: {s.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!";
-                }
+                if (s != null) { txtLoiDichVu.Text = $"{s.Name} - [Lỗi: {s.Symptom}]"; lblFooterNote.Text = $"Đã chọn: {s.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!"; }
             }
             else
             {
                 var w = warrantyServicesCatalog.FirstOrDefault(x => x.Id == id);
-                if (w != null)
-                {
-                    txtLoiDichVu.Text = $"{w.Name} - [ĐK: {w.Condition}]";
-                    lblFooterNote.Text = $"Đã chọn: {w.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!";
-                }
+                if (w != null) { txtLoiDichVu.Text = $"{w.Name} - [ĐK: {w.Condition}]"; lblFooterNote.Text = $"Đã chọn: {w.Name}. Bấm [🔍 Khách hàng] để chọn khách rồi bấm 'Lưu'!"; }
             }
-
             SetActionState(ActionState.Adding);
             if (string.IsNullOrEmpty(txtMaKH.Text)) btnChonKhachHang.Focus();
             else if (string.IsNullOrEmpty(txtTenMay.Text)) btnChonSanPham.Focus();
             else txtLoiDichVu.Focus();
         }
-
-        // ── 6. THAO TÁC NÚT (THÊM, SỬA, XÓA, LƯU, HỦY, THOÁT) ────────────────
         private void btnThem_Click(object sender, EventArgs e)
         {
             if (currentTab == "all") return;
-            selectedSerial = null;
+            selectedSerial = selectedTicketId = selectedServiceId = null;
             SetActionState(ActionState.Adding);
-
-            selectedTicketId = null;
-            selectedServiceId = null;
             lblCurrentSelected.Text = "Đang chọn: Thêm mới";
             lblFooterNote.Text = "Đang thêm mới phiếu. Nhập thông tin rồi bấm 'Lưu' hoặc 'Hủy' để quay lại.";
-
-            // Sinh mã phiếu mới
             txtMaPhieu.Text = SinhMaPhieuMoi();
-
-            // Giữ mã và tên nhân viên đăng nhập
             txtMaNV.Text = UserSession.MaNV ?? "";
             txtTenNV.Text = UserSession.TenNV ?? "";
-
-            txtMaKH.Text = "";
-            txtTenKH.Text = "";
-            txtTenMay.Text = "";
-            txtLoiDichVu.Text = "";
-
+            txtMaKH.Text = txtTenKH.Text = txtTenMay.Text = txtLoiDichVu.Text = "";
             dgvBaoHanh.ClearSelection();
+            UpdateExcelButtonState();
             btnChonKhachHang.Focus();
         }
-
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (currentTab == "all") return;
-            if (string.IsNullOrEmpty(selectedTicketId))
-            {
-                Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong bảng để chỉnh sửa!");
-                return;
-            }
-
+            if (string.IsNullOrEmpty(selectedTicketId)) { Function.ThongBaoCanhBao("Vui lòng chọn 1 phiếu trong bảng để chỉnh sửa!"); return; }
             SetActionState(ActionState.Editing);
             lblFooterNote.Text = $"Đang chỉnh sửa phiếu [{selectedTicketId}]. Sửa xong bấm 'Lưu' hoặc 'Hủy' để quay lại.";
             txtLoiDichVu.Focus();
         }
-
         private void btnLuu_Click(object sender, EventArgs e)
         {
             if (currentTab == "all") return;
-            if (currentActionState == ActionState.Adding)
-            {
-                ThucHienLuuThem();
-            }
-            else if (currentActionState == ActionState.Editing)
-            {
-                ThucHienLuuSua();
-            }
-            else
-            {
-                Function.ThongBaoCanhBao("Vui lòng bấm 'Thêm' hoặc 'Sửa' trước khi Lưu!");
-            }
+            if (currentActionState == ActionState.Adding) ThucHienLuuThem();
+            else if (currentActionState == ActionState.Editing) ThucHienLuuSua();
+            else Function.ThongBaoCanhBao("Vui lòng bấm 'Thêm' hoặc 'Sửa' trước khi Lưu!");
         }
-
         private void ThucHienLuuThem()
         {
             try
             {
-                string id = warrantyService.Create(txtMaKH.Text.Trim(), selectedSerial,
-                    currentTab == "warranty" ? "Bảo hành" : "Sửa chữa", txtLoiDichVu.Text.Trim());
+                string id = warrantyService.Create(txtMaKH.Text.Trim(), selectedSerial, currentTab == "warranty" ? "Bảo hành" : "Sửa chữa", txtLoiDichVu.Text.Trim(), currentTab == "repair" ? txtTenMay.Text.Trim() : null);
                 LoadTickets();
                 SwitchTab("all");
                 HandleClearForm();
@@ -625,7 +431,6 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
         private void ThucHienLuuSua()
         {
             try
@@ -639,11 +444,9 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (currentTab == "all") return;
-            if (string.IsNullOrEmpty(selectedTicketId)) return;
+            if (currentTab == "all" || string.IsNullOrEmpty(selectedTicketId)) return;
             if (Function.XacNhan("Xóa phiếu nhập sai " + selectedTicketId + "?") != DialogResult.Yes) return;
             try
             {
@@ -656,77 +459,36 @@ namespace QuanLyBanLaptop.DanhMuc
             }
             catch (Exception ex) { Function.ThongBaoLoi(ex.Message); }
         }
-
-        private void btnHuy_Click(object sender, EventArgs e)
-        {
-            HandleClearForm();
-            SetActionState(ActionState.Normal);
-        }
-
+        private void btnHuy_Click(object sender, EventArgs e) { HandleClearForm(); SetActionState(ActionState.Normal); }
         private void HandleClearForm()
         {
-            selectedSerial = null;
-            selectedTicketId = null;
-            selectedServiceId = null;
+            selectedSerial = selectedTicketId = selectedServiceId = null;
             lblCurrentSelected.Text = "Đang chọn: Chưa chọn";
-
-            // Tự động sinh mã phiếu mới theo quy tắc MP_ddMMyyyy_xx
             txtMaPhieu.Text = SinhMaPhieuMoi();
-
-            // Luôn giữ mã và tên nhân viên đăng nhập
             txtMaNV.Text = UserSession.MaNV ?? "";
             txtTenNV.Text = UserSession.TenNV ?? "";
-
-            txtMaKH.Text = "";
-            txtTenKH.Text = "";
-            txtTenMay.Text = "";
-            txtLoiDichVu.Text = "";
-
-            if (currentTab == "all")
-                lblFooterNote.Text = "Bấm vào một dòng trong bảng để chọn nhanh";
-            else if (currentTab == "repair")
-                lblFooterNote.Text = "Bấm vào bất kỳ dịch vụ nào để chọn vào phiếu tiếp nhận";
-            else
-                lblFooterNote.Text = "Bấm vào bất kỳ hạng mục nào để chọn vào phiếu tiếp nhận";
-
+            txtMaKH.Text = txtTenKH.Text = txtTenMay.Text = txtLoiDichVu.Text = "";
+            lblFooterNote.Text = currentTab == "all" ? "Bấm vào một dòng trong bảng để chọn nhanh"
+                : currentTab == "repair" ? "Bấm vào bất kỳ dịch vụ nào để chọn vào phiếu tiếp nhận"
+                : "Bấm vào bất kỳ hạng mục nào để chọn vào phiếu tiếp nhận";
             dgvBaoHanh.ClearSelection();
+            UpdateExcelButtonState();
         }
-
-        // In phiếu tiếp nhận chuẩn A4
         private void btnInPhieu_Click(object sender, EventArgs e)
         {
-            string ticketId = txtMaPhieu.Text.Trim();
-            if (string.IsNullOrEmpty(ticketId) && !string.IsNullOrEmpty(selectedTicketId))
-            {
-                ticketId = selectedTicketId;
-            }
-
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                Function.ThongBaoCanhBao("Vui lòng chọn hoặc nhập thông tin phiếu cần in!");
-                return;
-            }
-
+            string ticketId = !string.IsNullOrEmpty(txtMaPhieu.Text.Trim()) ? txtMaPhieu.Text.Trim() : selectedTicketId;
+            if (string.IsNullOrEmpty(ticketId)) { Function.ThongBaoCanhBao("Vui lòng chọn hoặc nhập thông tin phiếu cần in!"); return; }
             using (var printDoc = new PrintDocument())
-            using (var previewDialog = new PrintPreviewDialog())
+            using (var previewDialog = new PrintPreviewDialog { Document = printDoc, Width = 900, Height = 700, StartPosition = FormStartPosition.CenterScreen, Text = $"Xem trước phiếu tiếp nhận [{ticketId}]" })
             {
                 printDoc.PrintPage += PrintDoc_PrintPage;
-                previewDialog.Document = printDoc;
-                previewDialog.Width = 900;
-                previewDialog.Height = 700;
-                previewDialog.StartPosition = FormStartPosition.CenterScreen;
-                previewDialog.Text = $"Xem trước phiếu tiếp nhận [{ticketId}]";
                 previewDialog.ShowDialog(this);
             }
         }
-
         private void PrintDoc_PrintPage(object sender, PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
-            int x = 60;
-            int y = 50;
-            int w = e.MarginBounds.Width + 40;
-
+            int x = 60, y = 50, w = e.MarginBounds.Width + 40;
             using (var titleFont = new Font("Segoe UI", 16, FontStyle.Bold))
             using (var headerFont = new Font("Segoe UI", 11, FontStyle.Bold))
             using (var normalFont = new Font("Segoe UI", 9.5f, FontStyle.Regular))
@@ -740,96 +502,64 @@ namespace QuanLyBanLaptop.DanhMuc
                 g.DrawString("CỬA HÀNG LAPTOP STORE", headerFont, blueBrush, x, y);
                 g.DrawString("Số 123 Đường Công Nghệ, Q. Cầu Giấy, TP. Hà Nội", italicFont, darkBrush, x, y + 22);
                 g.DrawString("Hotline: 1900 6868 - Website: laptopstore.com.vn", italicFont, darkBrush, x, y + 38);
-
-                string maPhieu = txtMaPhieu.Text.Trim();
-                string ngayIn = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-                g.DrawString($"Số phiếu: {maPhieu}", boldFont, blueBrush, x + w - 210, y);
-                g.DrawString($"Ngày lập: {ngayIn}", italicFont, darkBrush, x + w - 210, y + 22);
-
+                g.DrawString($"Số phiếu: {txtMaPhieu.Text.Trim()}", boldFont, blueBrush, x + w - 210, y);
+                g.DrawString($"Ngày lập: {DateTime.Now:dd/MM/yyyy HH:mm}", italicFont, darkBrush, x + w - 210, y + 22);
                 y += 65;
                 g.DrawLine(pen, x, y, x + w, y);
                 y += 20;
-
                 string title = "PHIẾU TIẾP NHẬN SỬA CHỮA & BẢO HÀNH LAPTOP";
                 SizeF titleSize = g.MeasureString(title, titleFont);
                 g.DrawString(title, titleFont, blueBrush, x + (w - titleSize.Width) / 2, y);
-
                 y += 40;
-
-                // Khung thông tin
                 g.DrawRectangle(lightPen, x, y, w, 220);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(248, 250, 252)), x, y, w, 28);
                 g.DrawString("THÔNG TIN TIẾP NHẬN THIẾT BỊ", boldFont, blueBrush, x + 10, y + 6);
-
-                int ly = y + 38;
-                int col1 = x + 15;
-                int col2 = x + 380;
-
+                int ly = y + 38, col1 = x + 15, col2 = x + 380;
                 g.DrawString($"Mã phiếu: {txtMaPhieu.Text}", boldFont, darkBrush, col1, ly);
                 g.DrawString($"Nhân viên tiếp nhận: {txtTenNV.Text} ({txtMaNV.Text})", normalFont, darkBrush, col2, ly);
-
                 ly += 26;
                 g.DrawString($"Khách hàng: {txtTenKH.Text} ({txtMaKH.Text})", boldFont, darkBrush, col1, ly);
                 g.DrawString($"Thiết bị laptop: {txtTenMay.Text}", boldFont, blueBrush, col2, ly);
-
                 ly += 28;
-                g.DrawString($"Lỗi / Dịch vụ tiếp nhận:", boldFont, darkBrush, col1, ly);
+                g.DrawString("Lỗi / Dịch vụ tiếp nhận:", boldFont, darkBrush, col1, ly);
                 ly += 20;
                 g.DrawString(txtLoiDichVu.Text, normalFont, darkBrush, new RectangleF(col1, ly, w - 30, 48));
-
                 y += 240;
-
                 g.DrawString("QUY ĐỊNH TIẾP NHẬN:", boldFont, darkBrush, x, y);
                 y += 20;
                 g.DrawString("1. Quý khách vui lòng mang phiếu này khi đến nhận lại máy.", italicFont, darkBrush, x, y);
                 y += 18;
                 g.DrawString("2. Cửa hàng không chịu trách nhiệm về dữ liệu cá nhân chưa được sao lưu.", italicFont, darkBrush, x, y);
-
                 y += 45;
-                int signCol1 = x + 60;
-                int signCol2 = x + w - 240;
-
+                int signCol1 = x + 60, signCol2 = x + w - 240;
                 g.DrawString("KHÁCH HÀNG", boldFont, darkBrush, signCol1, y);
                 g.DrawString("(Ký, ghi rõ họ tên)", italicFont, darkBrush, signCol1 - 10, y + 18);
                 g.DrawString(txtTenKH.Text, boldFont, darkBrush, signCol1, y + 80);
-
                 g.DrawString("NHÂN VIÊN TIẾP NHẬN", boldFont, darkBrush, signCol2, y);
                 g.DrawString("(Ký và đóng dấu)", italicFont, darkBrush, signCol2 - 5, y + 18);
                 g.DrawString(txtTenNV.Text, boldFont, darkBrush, signCol2, y + 80);
             }
         }
-
         private void btnXuatExcel_Click(object sender, EventArgs e)
         {
-            GridExcelExporter.Export(this, dgvBaoHanh, lblTableTitle.Text,
-                "SuaChuaBaoHanh_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls");
+            var row = dgvBaoHanh.CurrentRow != null && dgvBaoHanh.CurrentRow.Index >= 0 && dgvBaoHanh.CurrentRow.Selected
+                ? dgvBaoHanh.CurrentRow
+                : (dgvBaoHanh.SelectedRows.Count > 0 ? dgvBaoHanh.SelectedRows[0] : null);
+            if (row == null) { Function.ThongBaoCanhBao("Vui lòng chọn 1 hàng trong bảng để xuất Excel."); return; }
+            string id = Convert.ToString(row.Cells[0].Value ?? "Phieu").Trim();
+            GridExcelExporter.ExportRow(this, row, lblTableTitle.Text, "SuaChuaBaoHanh_" + id + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xls");
         }
         private void btnThoat_Click(object sender, EventArgs e)
         {
-            if (NavigationManager.IsHosted)
-            {
-                NavigationManager.Navigate(NavigationMenu.TrangChu);
-            }
-            else
-            {
-                this.Close();
-            }
+            if (NavigationManager.IsHosted) NavigationManager.Navigate(NavigationMenu.TrangChu);
+            else Close();
         }
-
         private void btnDangXuat_Click(object sender, EventArgs e)
         {
-            if (Function.XacNhan("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?", "Xác nhận đăng xuất") == DialogResult.Yes)
-            {
-                Function.ClearCurrentUser();
-                if (NavigationManager.IsHosted)
-                {
-                    NavigationManager.Navigate(NavigationMenu.TrangChu);
-                }
-                else
-                {
-                    this.Close();
-                }
-            }
+            if (Function.XacNhan("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?", "Xác nhận đăng xuất") != DialogResult.Yes) return;
+            Function.ClearCurrentUser();
+            if (NavigationManager.IsHosted) NavigationManager.Navigate(NavigationMenu.TrangChu);
+            else Close();
         }
     }
 }

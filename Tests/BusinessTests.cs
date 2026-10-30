@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Services;
-
 public static class BusinessTests
 {
     private static int checks;
@@ -32,7 +31,6 @@ public static class BusinessTests
         return new SaleRequest { InvoiceId=id, CustomerId="KH001", EmployeeId="NV002",
             Date=DateTime.Today, Items=items, PaymentMethod=method, Months=months };
     }
-
     [STAThread]
     public static void Main()
     {
@@ -46,7 +44,6 @@ public static class BusinessTests
             Check(DataProcesser.DangNhap("admin", "wrong") == null, "Wrong password rejected");
             Check(DataProcesser.DangNhap("admin", "admin123") != null, "Demo administrator authenticates");
             UserSession.MaNV="NV001"; UserSession.ChucVu="Quản trị viên";
-
             foreach(int months in new[] {3,6,9,12})
             {
                 var plan=InstallmentCalculator.Calculate(19999999m,months);
@@ -59,7 +56,6 @@ public static class BusinessTests
             settings.Save("TRA_TRUOC_TOI_THIEU",0);
             Check(InstallmentCalculator.GetDefaultDownPaymentRatio()==0,"Zero percent preserved");
             settings.Save("TRA_TRUOC_TOI_THIEU",30);
-
             var sales=new SaleService();
             var reports=new ReportService();
             var baseline=reports.GetRevenue(RevenueGrouping.Day,DateTime.Today,DateTime.Today);
@@ -90,8 +86,6 @@ public static class BusinessTests
             bool opened=false;
             Reject(()=>new SaleService(()=>{ opened=true; return new DbHelpers(); }).Save(Sale("INVALID",0)),"Invalid input rejected before connection");
             Check(!opened,"Validation is independent of SQL connection");
-
-            // Two employees compete for the last three machines; only one can sell two.
             var first=Sale("TEST-RACE-A",2); first.Items.Rows[0]["MaLaptop"]="LT010";
             var second=Sale("TEST-RACE-B",2); second.Items.Rows[0]["MaLaptop"]="LT010";
             int successes=0;
@@ -105,13 +99,11 @@ public static class BusinessTests
             Check(successes==1 && Scalar("SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop='LT010'")==1,"Concurrent sales cannot oversell");
             foreach(string id in new[]{first.InvoiceId,second.InvoiceId})
                 if(Scalar("SELECT COUNT(*) FROM HOA_DON WHERE MaHD=@0",id)>0) sales.Delete(id);
-
             decimal beforeImport=Scalar("SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop='LT003'");
             DataProcesser.ChangeData(@"DECLARE @items dbo.TVP_NhapHang,@id varchar(10);
                 INSERT @items VALUES('LT003',1001,12000000);
                 EXEC sp_NhapHang 'NCC03','NV003',@items,NULL,@id OUTPUT;");
             Check(Scalar("SELECT SoLuongTon FROM LAPTOP WHERE MaLaptop='LT003'")==beforeImport+1001,"Import 1001 serials without truncation or double allocation");
-
             sales.Save(Sale("TEST-CREDIT",1,"Trả góp",3));
             var schedule=DataProcesser.ReadData("SELECT * FROM LICH_TRA_GOP WHERE MaHD=@0","TEST-CREDIT");
             var calc=InstallmentCalculator.Load("TEST-CREDIT",13500000m,3);
@@ -120,7 +112,6 @@ public static class BusinessTests
             Reject(()=>DataProcesser.ChangeData("EXEC sp_ThanhToanKy @MaHD=@0,@KyThu=@1", "TEST-CREDIT",1),"Duplicate payment rejected");
             Reject(()=>sales.Delete("TEST-CREDIT"),"Credit invoice cannot be deleted");
             Check(new InstallmentService().GetSummary().Contracts==3,"Installment summary query");
-
             var warranty=new WarrantyService();
             string serial=Convert.ToString(DataProcesser.ExecuteScalar("SELECT SerialNo FROM LAPTOP_SERIAL WHERE MaHD=@0","TEST-CREDIT"));
             string serialFilter="SerialNo='"+serial+"'";
@@ -142,7 +133,17 @@ public static class BusinessTests
             warranty.UpdateProblem(ticket,"Updated fan problem");
             warranty.Delete(ticket);
             Check(Convert.ToString(DataProcesser.ExecuteScalar("SELECT TrangThai FROM LAPTOP_SERIAL WHERE SerialNo=@0",serial))=="Đã bán","Delete pending ticket restores state");
-
+            DataProcesser.ChangeData("INSERT KHACH_HANG_DATA(MaKH,TenKH,Sdt) VALUES(@0,@1,@2)","KH-REPAIR","Khách chỉ sửa máy","0909998877");
+            Check(Scalar("SELECT COUNT(*) FROM HOA_DON WHERE MaKH=@0","KH-REPAIR")==0,"Repair customer has no purchases");
+            string outside=warranty.Create("KH-REPAIR",null,"Sửa chữa","Vệ sinh máy mua ngoài","Dell mua nơi khác");
+            string outside2=warranty.Create("KH-REPAIR",null,"Sửa chữa","Thay bàn phím","HP mua nơi khác");
+            Check(warranty.GetTickets().Select("MaPhieuBH='"+outside+"'").Length==1,"External repair visible in ticket list");
+            warranty.UpdateProblem(outside,"Updated external repair");
+            DataProcesser.ChangeData("EXEC sp_CapNhatBaoHanh @MaPhieuBH=@0,@TinhTrang=@1,@ChiPhi=@2",outside,"Đã trả khách",100000m);
+            Check(Convert.ToString(DataProcesser.ExecuteScalar("SELECT TinhTrangBH FROM BAO_HANH_SUA_CHUA WHERE MaPhieuBH=@0",outside))=="Đã trả khách","External repair can be completed");
+            warranty.Delete(outside2);
+            Reject(()=>warranty.Create("KH002",null,"Bảo hành","Test","Máy mua ngoài"),"External device cannot claim warranty");
+            Reject(()=>warranty.Create("KH002",null,"Sửa chữa","Test"," "),"External repair requires device name");
             UserSession.ChucVu="Nhân viên";
             Reject(()=>settings.Save("TRA_TRUOC_TOI_THIEU",50),"Employee cannot change terms");
             Reject(()=>new EmployeeService().Delete("NV003"),"Employee cannot delete another employee");

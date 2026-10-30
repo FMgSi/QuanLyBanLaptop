@@ -1,11 +1,9 @@
 using System;
 using System.Windows.Forms;
-
 namespace QuanLyBanLaptop
 {
     internal static class Program
     {
-        // The main entry point for the application.
         [STAThread]
         static void Main()
         {

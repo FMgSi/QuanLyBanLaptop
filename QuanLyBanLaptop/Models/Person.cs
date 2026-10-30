@@ -1,5 +1,4 @@
-using System;
-
+﻿using System;
 namespace QuanLyBanLaptop.Models
 {
     public abstract class Person
@@ -11,12 +10,10 @@ namespace QuanLyBanLaptop.Models
         public string Phone { get; set; }
         public string Address { get; set; }
     }
-
     public sealed class Customer : Person
     {
         public string Membership { get; set; }
     }
-
     public sealed class Employee : Person
     {
         public string Role { get; set; }

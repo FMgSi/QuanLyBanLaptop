@@ -7,7 +7,6 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-
 namespace QuanLyBanLaptop.Classes
 {
     public static class GridExcelExporter
@@ -24,17 +23,27 @@ namespace QuanLyBanLaptop.Classes
                     table.Rows.Add(columns.Select(c => (object)Convert.ToString(row.Cells[c.Index].FormattedValue)).ToArray());
             return table;
         }
-
-        public static void Export(IWin32Window owner, DataGridView grid, string title, string filename)
+        public static DataTable ReadRow(DataGridViewRow row)
         {
-            var data = ReadGrid(grid);
-            if (data.Rows.Count == 0 || data.Columns.Count == 0)
+            if (row == null || row.DataGridView == null) return new DataTable();
+            var grid = row.DataGridView;
+            var columns = grid.Columns.Cast<DataGridViewColumn>()
+                .Where(c => c.Visible && !(c is DataGridViewButtonColumn)).OrderBy(c => c.DisplayIndex).ToArray();
+            var table = new DataTable();
+            foreach (var column in columns)
+                table.Columns.Add("C" + column.Index, typeof(string)).Caption = column.HeaderText;
+            if (!row.IsNewRow && row.Visible)
+                table.Rows.Add(columns.Select(c => (object)Convert.ToString(row.Cells[c.Index].FormattedValue)).ToArray());
+            return table;
+        }
+        public static void Export(IWin32Window owner, DataTable data, string title, string filename)
+        {
+            if (data == null || data.Rows.Count == 0 || data.Columns.Count == 0)
             {
                 Function.ThongBaoCanhBao("Không có dữ liệu trong bảng để xuất.");
                 return;
             }
             if (OpenInExcel(data, title)) return;
-            // Giống màn bán hàng: xuất bảng HTML mà Excel đọc được khi không có Excel COM.
             using (var dialog = new SaveFileDialog
             {
                 Title = "Lưu bảng Excel", Filter = "Tệp Excel (*.xls)|*.xls", DefaultExt = "xls",
@@ -50,7 +59,10 @@ namespace QuanLyBanLaptop.Classes
                     catch (Exception ex) { Function.ThongBaoCanhBao("File đã lưu, nhưng không mở được: " + ex.Message); }
             }
         }
-
+        public static void Export(IWin32Window owner, DataGridView grid, string title, string filename) =>
+            Export(owner, ReadGrid(grid), title, filename);
+        public static void ExportRow(IWin32Window owner, DataGridViewRow row, string title, string filename) =>
+            Export(owner, ReadRow(row), title, filename);
         private static bool OpenInExcel(DataTable data, string title)
         {
             dynamic app = null, books = null, book = null, sheets = null, sheet = null, range = null;
@@ -72,7 +84,6 @@ namespace QuanLyBanLaptop.Classes
                     values[1, c] = data.Columns[c].Caption;
                     for (int r = 0; r < data.Rows.Count; r++) values[r + 2, c] = Convert.ToString(data.Rows[r][c]);
                 }
-                // Các bảng này là thông tin văn bản: giữ số 0 đầu, không thực thi công thức nhập từ dữ liệu.
                 string endColumn = "";
                 for (int n = data.Columns.Count; n > 0; n = (n - 1) / 26)
                     endColumn = (char)('A' + (n - 1) % 26) + endColumn;
@@ -95,7 +106,6 @@ namespace QuanLyBanLaptop.Classes
                     if (item != null && Marshal.IsComObject(item)) Marshal.FinalReleaseComObject(item);
             }
         }
-
         public static string BuildHtml(DataTable data, string title)
         {
             var html = new StringBuilder("<html><head><meta charset='utf-8'></head><body><h2>");

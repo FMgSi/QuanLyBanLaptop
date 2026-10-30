@@ -7,34 +7,29 @@ using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.DanhMuc;
 using QuanLyBanLaptop.HoaDon;
 using QuanLyBanLaptop.Thongke;
-
 public static class GridScrollTests
 {
     private static int checks = 0;
-
     private static void Check(bool condition, string message)
     {
         if (!condition) throw new Exception("FAILED: " + message);
         checks++;
         Console.WriteLine("  [PASS] " + message);
     }
-
     [STAThread]
     public static void Main()
     {
         try
         {
+            string connection = Environment.GetEnvironmentVariable("LAPTOP_TEST_CONNECTION");
+            if (!string.IsNullOrWhiteSpace(connection)) DataProcesser.ConnectionString = connection;
             Console.WriteLine("Starting Grid Scroll and Resize Verification Tests...");
-
-            // 1. Function.DinhDangBang
             using (var testGrid = new DataGridView())
             {
                 Function.DinhDangBang(testGrid);
                 Check(testGrid.AllowUserToResizeColumns == true, "Function.DinhDangBang must set AllowUserToResizeColumns = true");
                 Check(testGrid.ScrollBars == ScrollBars.Both, "Function.DinhDangBang must set ScrollBars = ScrollBars.Both");
             }
-
-            // 2. frmNhanVien
             using (var fNV = new frmNhanVien())
             {
                 var dgv = fNV.Controls.Find("dgvNhanVien", true).FirstOrDefault() as DataGridView;
@@ -44,15 +39,9 @@ public static class GridScrollTests
                 var colMK = dgv.Columns["colMatKhau"] ?? dgv.Columns["MatKhau"];
                 Check(colMK != null && colMK.Visible, "colMatKhau must be visible in dgvNhanVien for Admin");
                 foreach (DataGridViewColumn col in dgv.Columns)
-                {
                     if (col.Visible)
-                    {
                         Check(col.MinimumWidth >= 80, $"dgvNhanVien column {col.Name} MinimumWidth must be >= 80 (got {col.MinimumWidth})");
-                    }
-                }
             }
-
-            // 3. frmKhachHang
             using (var fKH = new frmKhachHang())
             {
                 var dgv = fKH.Controls.Find("dgvKhachHang", true).FirstOrDefault() as DataGridView;
@@ -61,27 +50,21 @@ public static class GridScrollTests
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvKhachHang must have ScrollBars.Both");
                 Check(dgv.AutoSizeColumnsMode == DataGridViewAutoSizeColumnsMode.None, "dgvKhachHang AutoSizeColumnsMode must be None");
             }
-
-            // 4. frmSanPham
             using (var fSP = new frmSanPham())
             {
                 var dgvLap = fSP.Controls.Find("dgvLaptop", true).FirstOrDefault() as DataGridView;
                 Check(dgvLap != null, "dgvLaptop must exist in frmSanPham");
                 Check(dgvLap.AllowUserToResizeColumns == true, "dgvLaptop must allow column resizing");
                 Check(dgvLap.ScrollBars == ScrollBars.Both, "dgvLaptop must have ScrollBars.Both");
-
                 var dgvLoai = fSP.Controls.Find("dgvLoaiMay", true).FirstOrDefault() as DataGridView;
                 Check(dgvLoai != null, "dgvLoaiMay must exist in frmSanPham");
                 Check(dgvLoai.AllowUserToResizeColumns == true, "dgvLoaiMay must allow column resizing");
                 Check(dgvLoai.ScrollBars == ScrollBars.Both, "dgvLoaiMay must have ScrollBars.Both");
-
                 var dgvNCC = fSP.Controls.Find("dgvNCC", true).FirstOrDefault() as DataGridView;
                 Check(dgvNCC != null, "dgvNCC must exist in frmSanPham");
                 Check(dgvNCC.AllowUserToResizeColumns == true, "dgvNCC must allow column resizing");
                 Check(dgvNCC.ScrollBars == ScrollBars.Both, "dgvNCC must have ScrollBars.Both");
             }
-
-            // 5. frmBaoHanhSuaChua
             using (var fBH = new frmBaoHanhSuaChua())
             {
                 var dgv = fBH.Controls.Find("dgvBaoHanh", true).FirstOrDefault() as DataGridView;
@@ -89,8 +72,6 @@ public static class GridScrollTests
                 Check(dgv.AllowUserToResizeColumns == true, "dgvBaoHanh must allow column resizing");
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvBaoHanh must have ScrollBars.Both");
             }
-
-            // 6. frmCauHinhTraGop
             using (var fCH = new frmCauHinhTraGop())
             {
                 var dgv = fCH.Controls.Find("dgvCauHinh", true).FirstOrDefault() as DataGridView;
@@ -100,22 +81,17 @@ public static class GridScrollTests
                 Check(dgv.Columns["MoTa"].MinimumWidth >= 200, "dgvCauHinh MoTa MinimumWidth >= 200");
                 Check(dgv.Columns["Khoa"].MinimumWidth >= 120, "dgvCauHinh Khoa MinimumWidth >= 120");
             }
-
-            // 7. frmQuanLyTraGop
             using (var fTG = new frmQuanLyTraGop())
             {
                 var dgvHopDong = fTG.Controls.Find("dgvHopDong", true).FirstOrDefault() as DataGridView;
                 Check(dgvHopDong != null, "dgvHopDong must exist in frmQuanLyTraGop");
                 Check(dgvHopDong.AllowUserToResizeColumns == true, "dgvHopDong must allow column resizing");
                 Check(dgvHopDong.ScrollBars == ScrollBars.Both, "dgvHopDong must have ScrollBars.Both");
-
                 var dgvLich = fTG.Controls.Find("dgvLichTraGop", true).FirstOrDefault() as DataGridView;
                 Check(dgvLich != null, "dgvLichTraGop must exist in frmQuanLyTraGop");
                 Check(dgvLich.AllowUserToResizeColumns == true, "dgvLichTraGop must allow column resizing");
                 Check(dgvLich.ScrollBars == ScrollBars.Both, "dgvLichTraGop must have ScrollBars.Both");
             }
-
-            // 8. frmThongKe
             using (var fTK = new frmThongKe())
             {
                 var dgv = fTK.Controls.Find("dgvThongKe", true).FirstOrDefault() as DataGridView;
@@ -123,8 +99,6 @@ public static class GridScrollTests
                 Check(dgv.AllowUserToResizeColumns == true, "dgvThongKe must allow column resizing");
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvThongKe must have ScrollBars.Both");
             }
-
-            // 9. frmBanHang
             using (var fBH = new frmBanHang())
             {
                 var dgv = fBH.Controls.Find("dgvGioHang", true).FirstOrDefault() as DataGridView;
@@ -132,8 +106,6 @@ public static class GridScrollTests
                 Check(dgv.AllowUserToResizeColumns == true, "dgvGioHang must allow column resizing");
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvGioHang must have ScrollBars.Both");
             }
-
-            // 10. frmTimKiemLaptop
             using (var fTKLT = new frmTimKiemLaptop())
             {
                 var dgv = fTKLT.Controls.Find("dgvLaptop", true).FirstOrDefault() as DataGridView;
@@ -141,8 +113,6 @@ public static class GridScrollTests
                 Check(dgv.AllowUserToResizeColumns == true, "dgvLaptop in frmTimKiemLaptop must allow column resizing");
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvLaptop in frmTimKiemLaptop must have ScrollBars.Both");
             }
-
-            // 11. frmTimKiemKhachHang
             using (var fTKKH = new frmTimKiemKhachHang())
             {
                 var dgv = fTKKH.Controls.Find("dgvKhachHang", true).FirstOrDefault() as DataGridView;
@@ -150,7 +120,6 @@ public static class GridScrollTests
                 Check(dgv.AllowUserToResizeColumns == true, "dgvKhachHang in frmTimKiemKhachHang must allow column resizing");
                 Check(dgv.ScrollBars == ScrollBars.Both, "dgvKhachHang in frmTimKiemKhachHang must have ScrollBars.Both");
             }
-
             Console.WriteLine($"\nALL {checks} GRID CHECKS PASSED SUCCESSFULLY!");
         }
         catch (Exception ex)

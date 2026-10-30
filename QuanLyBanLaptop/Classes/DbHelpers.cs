@@ -1,83 +1,55 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
-
 namespace QuanLyBanLaptop.Classes
 {
-    // Một phiên DB sở hữu kết nối và transaction, tự rollback khi chưa commit.
+    public interface IDatabaseSession : IDisposable
+    {
+        DataTable DocBang(string sql, params object[] values);
+        int CapNhat(string sql, params object[] values);
+        object LayMotGiaTri(string sql, params object[] values);
+        void BatDauGiaoDich();
+        void XacNhan();
+    }
     public class DbHelpers : IDatabaseSession
     {
-        private readonly SqlConnection connection;
+        private readonly SqlConnection connection = DataProcesser.GetOpenConnection();
         private SqlTransaction transaction;
-
-        // Mở đúng kết nối được cấu hình cho ứng dụng.
-        public DbHelpers() { connection = DataProcesser.GetOpenConnection(); }
-
-        // Tạo lệnh dùng chung cho truy vấn, cập nhật và stored procedure.
-        internal static SqlCommand CreateCommand(SqlConnection connection, SqlTransaction transaction,
-            string sql, SqlParameter[] parameters, CommandType type = CommandType.Text)
+        internal static SqlCommand CreateCommand(SqlConnection cn, SqlTransaction tx, string sql, SqlParameter[] p, CommandType type = CommandType.Text)
         {
-            var command = new SqlCommand(sql, connection, transaction) { CommandType = type };
-            if (parameters != null) command.Parameters.AddRange(parameters);
-            return command;
+            var cmd = new SqlCommand(sql, cn, tx) { CommandType = type };
+            if (p != null) cmd.Parameters.AddRange(p);
+            return cmd;
         }
-
-        // Chuyển tham số vị trí thành @0, @1, ... và xử lý giá trị null.
         internal static SqlParameter[] Parameters(object[] values)
         {
             if (values == null) return new SqlParameter[0];
-            var result = new SqlParameter[values.Length];
-            for (int i = 0; i < values.Length; i++)
-                result[i] = new SqlParameter("@" + i, values[i] ?? DBNull.Value);
-            return result;
+            var res = new SqlParameter[values.Length];
+            for (int i = 0; i < values.Length; i++) res[i] = new SqlParameter("@" + i, values[i] ?? DBNull.Value);
+            return res;
         }
-
-        // Đọc bảng trong cùng phiên và transaction.
         public DataTable DocBang(string sql, params object[] values)
         {
-            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
-            using (var adapter = new SqlDataAdapter(command))
-            {
-                var table = new DataTable();
-                adapter.Fill(table);
-                return table;
-            }
+            using (var cmd = CreateCommand(connection, transaction, sql, Parameters(values)))
+            using (var da = new SqlDataAdapter(cmd)) { var dt = new DataTable(); da.Fill(dt); return dt; }
         }
-
-        // Ghi dữ liệu trong transaction hiện tại.
         public int CapNhat(string sql, params object[] values)
         {
-            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
-                return command.ExecuteNonQuery();
+            using (var cmd = CreateCommand(connection, transaction, sql, Parameters(values))) return cmd.ExecuteNonQuery();
         }
-
-        // Giữ tương thích API cũ nhưng không mở kết nối ngoài transaction.
-        public int CapNhatDuLieu(string sql) { return CapNhat(sql); }
-
-        // Đọc một giá trị và chuyển SQL NULL thành null.
         public object LayMotGiaTri(string sql, params object[] values)
         {
-            using (var command = CreateCommand(connection, transaction, sql, Parameters(values)))
+            using (var cmd = CreateCommand(connection, transaction, sql, Parameters(values)))
             {
-                var result = command.ExecuteScalar();
-                return result == DBNull.Value ? null : result;
+                var r = cmd.ExecuteScalar();
+                return r == DBNull.Value ? null : r;
             }
         }
-
-        // Lấy khóa identity trong cùng phạm vi câu INSERT.
-        public int ThemLayMa(string sql, params object[] values)
-        {
-            return Convert.ToInt32(LayMotGiaTri(sql + "; SELECT CAST(SCOPE_IDENTITY() AS INT)", values));
-        }
-
-        // Ngăn mở transaction lồng ngoài ý muốn.
         public void BatDauGiaoDich()
         {
             if (transaction != null) throw new InvalidOperationException("Giao dịch đã bắt đầu.");
             transaction = connection.BeginTransaction();
         }
-
-        // Commit và giải phóng transaction đã hoàn tất.
         public void XacNhan()
         {
             if (transaction == null) throw new InvalidOperationException("Chưa bắt đầu giao dịch.");
@@ -85,19 +57,10 @@ namespace QuanLyBanLaptop.Classes
             transaction.Dispose();
             transaction = null;
         }
-
-        // Đóng kết nối kể cả khi rollback gặp lỗi.
         public void Dispose()
         {
-            // Procedure/trigger có thể đã rollback toàn bộ giao dịch khi THROW.
-            // Không rollback lần hai rồi che mất thông báo lỗi nghiệp vụ gốc.
-            try { if (transaction != null && transaction.Connection != null) transaction.Rollback(); }
-            finally
-            {
-                if (transaction != null) transaction.Dispose();
-                transaction = null;
-                connection.Dispose();
-            }
+            try { if (transaction?.Connection != null) transaction.Rollback(); }
+            finally { transaction?.Dispose(); transaction = null; connection.Dispose(); }
         }
     }
 }

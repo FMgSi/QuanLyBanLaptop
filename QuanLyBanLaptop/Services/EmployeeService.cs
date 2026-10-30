@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using QuanLyBanLaptop.Classes;
 using QuanLyBanLaptop.Models;
-
 namespace QuanLyBanLaptop.Services
 {
     public sealed class EmployeeService
@@ -12,7 +11,6 @@ namespace QuanLyBanLaptop.Services
         {
             if (!UserSession.IsAdmin) throw new InvalidOperationException("Chỉ quản trị viên được quản lý nhân viên.");
         }
-
         public DataTable Search(string keyword)
         {
             RequireAdmin();
@@ -22,7 +20,6 @@ namespace QuanLyBanLaptop.Services
                 dt = DataProcesser.ExecProc("sp_TimKiemNhanVien", new[] { new SqlParameter("@TuKhoa", keyword ?? "") });
             }
             catch { }
-
             if (dt == null || (dt.Rows.Count > 0 && dt.Columns.Contains("MatKhau") && dt.Rows[0]["MatKhau"] == DBNull.Value))
             {
                 string sql = @"
@@ -37,7 +34,6 @@ namespace QuanLyBanLaptop.Services
             }
             return dt;
         }
-
         public string Save(Employee employee, bool isNew)
         {
             RequireAdmin();
@@ -60,7 +56,6 @@ namespace QuanLyBanLaptop.Services
             });
             return Convert.ToString(id.Value);
         }
-
         public void Delete(string id)
         {
             RequireAdmin();

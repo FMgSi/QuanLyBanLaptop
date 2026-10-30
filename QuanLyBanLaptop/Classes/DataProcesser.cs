@@ -1,148 +1,85 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
-
 namespace QuanLyBanLaptop.Classes
 {
-    // Cổng truy cập dữ liệu không trạng thái; giao dịch dùng IDatabaseSession.
     public static class DataProcesser
     {
         private static string connectionString;
-
-        // Đọc cấu hình một lần, không tự chuyển sang server hoặc DB khác khi lỗi.
         public static string ConnectionString
         {
             get
             {
                 if (connectionString == null)
                 {
-                    var setting = ConfigurationManager.ConnectionStrings["QuanLyBanLaptop"];
-                    if (setting == null || string.IsNullOrWhiteSpace(setting.ConnectionString))
+                    var s = ConfigurationManager.ConnectionStrings["QuanLyBanLaptop"];
+                    if (s == null || string.IsNullOrWhiteSpace(s.ConnectionString))
                         throw new ConfigurationErrorsException("Thiếu connection string QuanLyBanLaptop.");
-                    connectionString = setting.ConnectionString;
+                    connectionString = s.ConnectionString;
                 }
                 return connectionString;
             }
-            set { connectionString = value; }
+            set => connectionString = value;
         }
-
-        // Trả kết nối mở; giải phóng kết nối ngay nếu mở thất bại.
         public static SqlConnection GetOpenConnection()
         {
-            var connection = new SqlConnection(ConnectionString);
-            try { connection.Open(); return connection; }
-            catch { connection.Dispose(); throw; }
+            var cn = new SqlConnection(ConnectionString);
+            try { cn.Open(); return cn; } catch { cn.Dispose(); throw; }
         }
-
-        // Giữ tên API dùng bởi các service giao dịch.
-        public static SqlConnection GetConnection() { return GetOpenConnection(); }
-
-        // Thực thi một lệnh và luôn giải phóng kết nối, command.
-        private static T Execute<T>(string sql, SqlParameter[] parameters, CommandType type,
-            Func<SqlCommand, T> action)
+        private static T Execute<T>(string sql, SqlParameter[] p, CommandType type, Func<SqlCommand, T> action)
         {
-            using (var connection = GetOpenConnection())
-            using (var command = DbHelpers.CreateCommand(connection, null, sql, parameters, type))
-                return action(command);
+            using (var cn = GetOpenConnection())
+            using (var cmd = DbHelpers.CreateCommand(cn, null, sql, p, type))
+                return action(cmd);
         }
-
-        // Đọc bảng; lỗi được chuyển cho caller để không báo thành công giả.
-        public static DataTable ExecuteReader(string sql, SqlParameter[] parameters = null,
-            CommandType commandType = CommandType.Text)
+        public static DataTable ExecuteReader(string sql, SqlParameter[] p = null, CommandType type = CommandType.Text) =>
+            Execute(sql, p, type, cmd => { using (var da = new SqlDataAdapter(cmd)) { var dt = new DataTable(); da.Fill(dt); return dt; } });
+        public static int ExecuteNonQuery(string sql, SqlParameter[] p = null, CommandType type = CommandType.Text) =>
+            Execute(sql, p, type, cmd => cmd.ExecuteNonQuery());
+        public static object ExecuteScalar(string sql, SqlParameter[] p, CommandType type)
         {
-            return Execute(sql, parameters, commandType, command =>
-            {
-                using (var adapter = new SqlDataAdapter(command))
-                {
-                    var table = new DataTable();
-                    adapter.Fill(table);
-                    return table;
-                }
-            });
+            var v = Execute(sql, p, type, cmd => cmd.ExecuteScalar());
+            return v == DBNull.Value ? null : v;
         }
-
-        // Thực thi lệnh ghi và trả số dòng bị tác động.
-        public static int ExecuteNonQuery(string sql, SqlParameter[] parameters = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return Execute(sql, parameters, commandType, command => command.ExecuteNonQuery());
-        }
-
-        // Đọc một giá trị với loại command được chỉ định.
-        public static object ExecuteScalar(string sql, SqlParameter[] parameters, CommandType commandType)
-        {
-            var value = Execute(sql, parameters, commandType, command => command.ExecuteScalar());
-            return value == DBNull.Value ? null : value;
-        }
-
-        // Các alias giữ tương thích cho form và tiện ích hiện có.
-        public static DataTable GetTable(string sql, params SqlParameter[] p) => ExecuteReader(sql, p);
-        // Đọc bảng với tham số SQL có tên.
         public static DataTable ReadData(string sql, params SqlParameter[] p) => ExecuteReader(sql, p);
-        // Đọc bảng với tham số vị trí.
+        public static DataTable ReadData(string sql) => ExecuteReader(sql, (SqlParameter[])null);
         public static DataTable ReadData(string sql, params object[] p) => ExecuteReader(sql, DbHelpers.Parameters(p));
-        // Cập nhật với tham số SQL có tên.
         public static int ChangeData(string sql, params SqlParameter[] p) => ExecuteNonQuery(sql, p);
-        // Cập nhật với tham số vị trí.
+        public static int ChangeData(string sql) => ExecuteNonQuery(sql, (SqlParameter[])null);
         public static int ChangeData(string sql, params object[] p) => ExecuteNonQuery(sql, DbHelpers.Parameters(p));
-        // Đọc giá trị với tham số SQL có tên.
         public static object ExecuteScalar(string sql, params SqlParameter[] p) => ExecuteScalar(sql, p, CommandType.Text);
-        // Đọc giá trị với tham số vị trí.
+        public static object ExecuteScalar(string sql) => ExecuteScalar(sql, (SqlParameter[])null, CommandType.Text);
         public static object ExecuteScalar(string sql, params object[] p) => ExecuteScalar(sql, DbHelpers.Parameters(p), CommandType.Text);
-        // Gọi stored procedure trả bảng.
         public static DataTable ExecProc(string name, SqlParameter[] p = null) => ExecuteReader(name, p, CommandType.StoredProcedure);
-        // Gọi stored procedure ghi dữ liệu.
         public static void ExecProcNonQuery(string name, SqlParameter[] p = null) => ExecuteNonQuery(name, p, CommandType.StoredProcedure);
-
-        // Chỉ tác vụ phụ như badge được phép bỏ qua lỗi kết nối.
-        public static object ExecuteScalarSilent(string sql, params SqlParameter[] p)
+        public static object ExecuteScalarSilent(string sql, params SqlParameter[] p) { try { return ExecuteScalar(sql, p); } catch (SqlException) { return null; } }
+        public static bool TestConnection() { try { using (GetOpenConnection()) return true; } catch (SqlException) { return false; } }
+        public static void FillComboBox(ComboBox combo, string sql, string displayMember, string valueMember, string defaultItemText = null)
         {
-            try { return ExecuteScalar(sql, p); }
-            catch (SqlException) { return null; }
-        }
-
-        // Kiểm tra khả năng kết nối mà không hiển thị hộp thoại.
-        public static bool TestConnection()
-        {
-            try { using (var connection = GetOpenConnection()) return true; }
-            catch (SqlException) { return false; }
-        }
-
-        // Gán bảng vào combobox và tùy chọn thêm dòng mặc định.
-        public static void FillComboBox(ComboBox combo, string sql, string displayMember,
-            string valueMember, string defaultItemText = null)
-        {
-            var table = ExecuteReader(sql);
+            var dt = ExecuteReader(sql);
             if (!string.IsNullOrEmpty(defaultItemText))
             {
-                var row = table.NewRow();
-                row[displayMember] = defaultItemText;
-                row[valueMember] = DBNull.Value;
-                table.Rows.InsertAt(row, 0);
+                var r = dt.NewRow();
+                r[displayMember] = defaultItemText;
+                r[valueMember] = DBNull.Value;
+                dt.Rows.InsertAt(r, 0);
             }
             combo.DisplayMember = displayMember;
             combo.ValueMember = valueMember;
-            combo.DataSource = table;
+            combo.DataSource = dt;
             if (combo.Items.Count > 0) combo.SelectedIndex = 0;
         }
-
-        // Xác thực qua stored procedure và trả hồ sơ phiên đăng nhập.
         public static DataRow DangNhap(string username, string password)
         {
-            var table = ExecProc("sp_DangNhap", new[]
+            var dt = ExecProc("sp_DangNhap", new[]
             {
                 new SqlParameter("@TenDN", SqlDbType.VarChar, 50) { Value = username },
                 new SqlParameter("@MatKhau", SqlDbType.NVarChar, 100) { Value = password }
             });
-            return table.Rows.Count > 0 ? table.Rows[0] : null;
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
-
-        // Hiển thị lỗi nghiệp vụ SQL tại lớp giao diện.
-        public static void ShowSqlError(SqlException error)
-        {
-            Function.ThongBaoCanhBao(error.Message, "Lỗi dữ liệu");
-        }
+        public static void ShowSqlError(SqlException error) => Function.ThongBaoCanhBao(error.Message, "Lỗi dữ liệu");
     }
 }

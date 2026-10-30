@@ -1,4 +1,4 @@
-namespace QuanLyBanLaptop.Classes
+﻿namespace QuanLyBanLaptop.Classes
 {
     public static class UserSession
     {
@@ -12,9 +12,8 @@ namespace QuanLyBanLaptop.Classes
             set { role = value; Changed?.Invoke(null, System.EventArgs.Empty); }
         }
         public static string TenDN { get; set; }
-
-        public static bool IsAdmin => !string.IsNullOrEmpty(ChucVu) && 
-            (string.Equals(ChucVu.Trim(), "Quản trị viên", System.StringComparison.OrdinalIgnoreCase) || 
+        public static bool IsAdmin => !string.IsNullOrEmpty(ChucVu) &&
+            (string.Equals(ChucVu.Trim(), "Quản trị viên", System.StringComparison.OrdinalIgnoreCase) ||
              string.Equals(ChucVu.Trim(), "Admin", System.StringComparison.OrdinalIgnoreCase));
         public static void RequireAdmin()
         {
